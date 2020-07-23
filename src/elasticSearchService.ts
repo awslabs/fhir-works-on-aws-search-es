@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
 import {
@@ -9,13 +14,34 @@ import {
     SearchEntry,
 } from 'aws-fhir-interface';
 import { ElasticSearch } from './elasticSearch';
-import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS, SEPARATOR } from './constants';
+import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
 
-export const ElasticSearchService: Search = class {
+export class ElasticSearchService implements Search {
+    private readonly filterRulesForActiveResources: any[];
+
+    private readonly cleanUpFunction: (resource: any) => any;
+
+    /**
+     * @param filterRulesForActiveResources - If you are storing both History and Search resources
+     * in your elastic search you can filter out your History elements by supplying a filter argument like:
+     * [{ match: { documentStatus: 'AVAILABLE' }}]
+     * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
+     * the return ES objects
+     */
+    constructor(
+        filterRulesForActiveResources: any[] = [],
+        cleanUpFunction: (resource: any) => any = function (resource: any) {
+            return resource;
+        },
+    ) {
+        this.filterRulesForActiveResources = filterRulesForActiveResources;
+        this.cleanUpFunction = cleanUpFunction;
+    }
+
     /*
     searchParams => {field: value}
      */
-    static async typeSearch(request: TypeSearchRequest): Promise<SearchResponse> {
+    async typeSearch(request: TypeSearchRequest): Promise<SearchResponse> {
         const { queryParams, resourceType } = request;
         try {
             const from = queryParams[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]
@@ -33,7 +59,7 @@ export const ElasticSearchService: Search = class {
 
             const must: any = [];
             // TODO Implement fuzzy matches
-            Object.keys(searchFieldToValue).forEach(field => {
+            Object.keys(searchFieldToValue).forEach((field) => {
                 // id is mapped in ElasticSearch to be of type "keyword", which requires an exact match
                 const fieldParam = field === 'id' ? 'id' : `${field}.*`;
                 // Don't send _format param to ES
@@ -50,6 +76,8 @@ export const ElasticSearchService: Search = class {
                 must.push(query);
             });
 
+            const filter = this.filterRulesForActiveResources;
+
             const params = {
                 index: resourceType.toLowerCase(),
                 from,
@@ -58,6 +86,7 @@ export const ElasticSearchService: Search = class {
                     query: {
                         bool: {
                             must,
+                            filter,
                         },
                     },
                 },
@@ -71,8 +100,7 @@ export const ElasticSearchService: Search = class {
                 entries: response.body.hits.hits.map(
                     (hit: any): SearchEntry => {
                         // Modify to return resource with FHIR id not Dynamo ID
-                        const idComponents: string[] = hit._source.id.split(SEPARATOR);
-                        const resource = Object.assign(hit._source, { id: idComponents[0] });
+                        const resource = this.cleanUpFunction(hit._source);
                         return {
                             search: {
                                 mode: 'match',
@@ -123,7 +151,7 @@ export const ElasticSearchService: Search = class {
         }
     }
 
-    static createURL(host: string, query: any, resourceType?: string) {
+    private createURL(host: string, query: any, resourceType?: string) {
         return URL.format({
             host,
             pathname: `/${resourceType}`,
@@ -135,4 +163,4 @@ export const ElasticSearchService: Search = class {
     static globalSearch(request: GlobalSearchRequest): Promise<SearchResponse> {
         throw new Error('Method not implemented.');
     }
-};
+}
