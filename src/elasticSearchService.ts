@@ -12,10 +12,11 @@ import {
     SearchResponse,
     GlobalSearchRequest,
     SearchEntry,
-} from 'aws-fhir-interface';
+} from '@awslabs/aws-fhir-interface';
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
 
+// eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
     private readonly filterRulesForActiveResources: any[];
 
@@ -30,7 +31,7 @@ export class ElasticSearchService implements Search {
      */
     constructor(
         filterRulesForActiveResources: any[] = [],
-        cleanUpFunction: (resource: any) => any = function (resource: any) {
+        cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
     ) {
@@ -59,7 +60,7 @@ export class ElasticSearchService implements Search {
 
             const must: any = [];
             // TODO Implement fuzzy matches
-            Object.keys(searchFieldToValue).forEach((field) => {
+            Object.keys(searchFieldToValue).forEach(field => {
                 // id is mapped in ElasticSearch to be of type "keyword", which requires an exact match
                 const fieldParam = field === 'id' ? 'id' : `${field}.*`;
                 // Don't send _format param to ES
@@ -151,6 +152,7 @@ export class ElasticSearchService implements Search {
         }
     }
 
+    // eslint-disable-next-line class-methods-use-this
     private createURL(host: string, query: any, resourceType?: string) {
         return URL.format({
             host,
@@ -159,8 +161,9 @@ export class ElasticSearchService implements Search {
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static globalSearch(request: GlobalSearchRequest): Promise<SearchResponse> {
+    // eslint-disable-next-line class-methods-use-this
+    async globalSearch(request: GlobalSearchRequest): Promise<SearchResponse> {
+        console.log(request);
         throw new Error('Method not implemented.');
     }
 }

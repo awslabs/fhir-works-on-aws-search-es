@@ -20,6 +20,7 @@ if (IS_OFFLINE === 'true') {
     esDomainEndpoint = process.env.OFFLINE_ELASTICSEARCH_DOMAIN_ENDPOINT || 'https://fake-es-endpoint.com';
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export const ElasticSearch = new Client({
     node: esDomainEndpoint,
     Connection: AmazonConnection,
