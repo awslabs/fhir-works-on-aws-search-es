@@ -1,4 +1,4 @@
-# aws-fhir-search-es (v 0.7.0)
+# aws-fhir-search-es
 
 ## Purpose
 
