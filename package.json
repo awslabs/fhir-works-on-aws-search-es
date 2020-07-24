@@ -1,6 +1,6 @@
 {
   "name": "@awslabs/aws-fhir-search-es",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "FHIR Solution hosted on AWS Lambda",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,9 +18,9 @@
     "local": "node ."
   },
   "dependencies": {
+    "@awslabs/aws-fhir-interface": "^0.7.1",
     "@elastic/elasticsearch": "7",
     "aws-elasticsearch-connector": "^8.2.0",
-    "@awslabs/aws-fhir-interface": "^0.7.1",
     "aws-sdk": "^2.610.0"
   },
   "devDependencies": {
