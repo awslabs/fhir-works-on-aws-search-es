@@ -19,11 +19,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
+          registry-url: https://npm.pkg.github.com/
+          scope: '@awslabs'
       - name: Install dependencies
-        run: |
-          yarn install
+        run: yarn install
       - name: Lint
-        run: |
-          yarn lint
+        run: yarn lint
       - name: Unit tests
         run: yarn test
