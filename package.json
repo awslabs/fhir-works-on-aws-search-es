@@ -18,7 +18,7 @@
     "local": "node ."
   },
   "dependencies": {
-    "@awslabs/aws-fhir-interface": "^0.7.1",
+    "@awslabs/aws-fhir-interface": "^0.7.4",
     "@elastic/elasticsearch": "7",
     "aws-elasticsearch-connector": "^8.2.0",
     "aws-sdk": "^2.610.0"
