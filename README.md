@@ -4,7 +4,7 @@
 
 Please visit [aws-fhir-solution](https://github.com/awslabs/aws-fhir-solution) for overall vision of the project and for more context.
 
-This package is an implementation of the search interface. It queries the Elastic Search Service to find the results. This also means that it assumes the ES cluster will be up to date and indexed by ResourceType. This assumption is acheived by the DynamoDB stream to ES lambda built in the [persistence component](https://github.com/awslabs/aws-fhir-persistence-ddb). To use and deploy this component (with the other default components) please follow the overall [README](https://github.com/awslabs/aws-fhir-solution)
+This package is an implementation of the search interface. It queries the Elastic Search Service to find the results. This also means that it assumes the ES cluster will be up to date and indexed by ResourceType. This assumption is achieved by the DynamoDB stream to ES lambda built in the [persistence component](https://github.com/awslabs/aws-fhir-persistence-ddb). To use and deploy this component (with the other default components) please follow the overall [README](https://github.com/awslabs/aws-fhir-solution)
 
 ## Usage
 
