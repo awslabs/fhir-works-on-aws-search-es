@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@awslabs/fhir-works-on-aws-interface@^0.9.1":
-  version "0.9.1"
-  resolved "https://npm.pkg.github.com/download/@awslabs/fhir-works-on-aws-interface/0.9.1/130c63b021f2f9063c765c2f860b23a31d599a6f297365704404dc20b169fa2a#c2451c87c0de0a1af8bfbbd875998aba5eb2a3da"
-  integrity sha512-6nbU5PfRz0JnqO5dNHGZEbyl6yXuZCDj2dUDc5Y4SHGHPnuVnTBSSYcQMc35JK5evFmjt36eQR2jJaLp8xNLHA==
+"@awslabs/fhir-works-on-aws-interface@^0.9.2":
+  version "0.9.2"
+  resolved "https://npm.pkg.github.com/download/@awslabs/fhir-works-on-aws-interface/0.9.2/bdb9a59be94a0d44b305134ddc1736b7a76a5bc4ace031eececf2cf1f4b7e9bf#8af6fbb86bf6e03989ea8e8844adb9badba21031"
+  integrity sha512-QcJ2bSTuii4/rfWEJmDcXrJHK9iaoFnsuzsfBeSa9lh5nwtTBI5GyYZzvwKxLKDxdRm8RljGRzhVmlB8BUJc4A==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4":
   version "7.10.4"
