@@ -1,7 +1,7 @@
 {
-  "name": "@awslabs/aws-fhir-search-es",
+  "name": "@awslabs/fhir-works-on-aws-search-es",
   "version": "0.9.1",
-  "description": "FHIR Solution hosted on AWS Lambda",
+  "description": "FHIR Works on AWS search Elasticsearch implementation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "author": "amzn",
@@ -56,5 +56,5 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
-  "repository": "git://github.com/awslabs/aws-fhir-search-es.git"
+  "repository": "git://github.com/awslabs/fhir-works-on-aws-search-es.git"
 }
