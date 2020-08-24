@@ -1,7 +1,7 @@
 {
   "name": "@awslabs/fhir-works-on-aws-search-es",
   "version": "0.9.1",
-  "description": "FHIR Works on AWS search's Elastic Search implementation",
+  "description": "FHIR Works on AWS search Elasticsearch implementation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "author": "amzn",
