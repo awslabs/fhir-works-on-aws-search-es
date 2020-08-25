@@ -10,7 +10,7 @@ This package is an implementation of the search interface from the [FHIR Works i
 
 This package assumes certain infrastructure:
 
-- Elasticsearch - The Elasticsearch cluster is indexed by ResourceType
+- Elasticsearch - The Elasticsearch cluster is indexed by ResourceType & the domain is defined by the environment variable ELASTICSEARCH_DOMAIN_ENDPOINT
 - DynamoDB stream - To keep our Elasticsearch cluster in sync with the source of truth (DynamoDB) we expect the [persistence component](https://github.com/awslabs/fhir-works-on-aws-persistence-ddb) to have a DynamoDB stream, which will stream the table's updates to the Elasticsearch cluster
 
 ## Usage
