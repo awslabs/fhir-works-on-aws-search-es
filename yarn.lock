@@ -2,11 +2,6 @@
 # yarn lockfile v1
 
 
-"@awslabs/fhir-works-on-aws-interface@^0.9.3":
-  version "0.9.3"
-  resolved "https://npm.pkg.github.com/download/@awslabs/fhir-works-on-aws-interface/0.9.3/9ef960751411ba6b2a2166b2cc1c87c2d9ca5f3796d9cc74bf8dc982f5b51206#5d9ace1bf8611bf6668674c70dc6369b3ebf7df1"
-  integrity sha512-3/10Y10hKjzi3TD2whsQFclwPztYKTPBb3ejOybDhHkcmrahkYFAFOQ8zNu0Ao+aKXCZQiiS8wJ+UBnd7CI4tQ==
-
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"
@@ -1754,6 +1749,11 @@ fb-watchman@^2.0.0:
   integrity sha512-DkPJKQeY6kKwmuMretBhr7G6Vodr7bFwDYTXIkfG1gjvNpaxBTQV3PbXg6bR1c1UP4jPOX0jHUbbHANL9vRjVg==
   dependencies:
     bser "2.1.1"
+
+fhir-works-on-aws-interface@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/fhir-works-on-aws-interface/-/fhir-works-on-aws-interface-1.0.0.tgz#7de73929ebab013745582518f7596607c85a4ad0"
+  integrity sha512-b+B7D4/Msfzku/efM7dhbqCANEjCEKqUm7YJwEsQVjfmNbyRHWNmk+Mer89POmPnbw0eqryjnvV7C698C/8+rQ==
 
 figures@^3.0.0:
   version "3.2.0"
