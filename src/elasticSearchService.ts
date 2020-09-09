@@ -73,6 +73,7 @@ export class ElasticSearchService implements Search {
                         fields: [fieldParam],
                         query: queryParams[field],
                         default_operator: 'AND',
+                        lenient: true,
                     },
                 };
                 must.push(query);
