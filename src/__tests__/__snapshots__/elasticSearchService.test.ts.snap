@@ -1,0 +1,256 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`typeSearch Response format 1`] = `
+Object {
+  "result": Object {
+    "entries": Array [
+      Object {
+        "fullUrl": "https://base-url.com/Patient/ab69afd3-39ed-42c3-9f77-8a718a247742",
+        "resource": Object {
+          "birthDate": "1995-09-24",
+          "gender": "female",
+          "id": "ab69afd3-39ed-42c3-9f77-8a718a247742",
+          "resourceType": "Patient",
+          "vid": "1",
+        },
+        "search": Object {
+          "mode": "match",
+        },
+      },
+    ],
+    "message": "",
+    "numberOfResults": 1,
+  },
+}
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_count":10,"_getpagesoffset":2,"id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "body": Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [],
+              "must": Array [
+                Object {
+                  "query_string": Object {
+                    "default_operator": "AND",
+                    "fields": Array [
+                      "id",
+                    ],
+                    "lenient": true,
+                    "query": "11111111-1111-1111-1111-111111111111",
+                  },
+                },
+                Object {
+                  "query_string": Object {
+                    "default_operator": "AND",
+                    "fields": Array [
+                      "gender.*",
+                    ],
+                    "lenient": true,
+                    "query": "female",
+                  },
+                },
+                Object {
+                  "query_string": Object {
+                    "default_operator": "AND",
+                    "fields": Array [
+                      "name.*",
+                    ],
+                    "lenient": true,
+                    "query": "Emily",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        "from": 2,
+        "index": "patient",
+        "size": 10,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_count":10,"_getpagesoffset":2} 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "body": Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [],
+              "must": Array [],
+            },
+          },
+        },
+        "from": 2,
+        "index": "patient",
+        "size": 10,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_format":"json"} 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "body": Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [],
+              "must": Array [],
+            },
+          },
+        },
+        "from": 0,
+        "index": "patient",
+        "size": 20,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"gender":"female","name":"Emily"} 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "body": Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [],
+              "must": Array [
+                Object {
+                  "query_string": Object {
+                    "default_operator": "AND",
+                    "fields": Array [
+                      "gender.*",
+                    ],
+                    "lenient": true,
+                    "query": "female",
+                  },
+                },
+                Object {
+                  "query_string": Object {
+                    "default_operator": "AND",
+                    "fields": Array [
+                      "name.*",
+                    ],
+                    "lenient": true,
+                    "query": "Emily",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        "from": 0,
+        "index": "patient",
+        "size": 20,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"id":"11111111-1111-1111-1111-111111111111"} 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "body": Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [],
+              "must": Array [
+                Object {
+                  "query_string": Object {
+                    "default_operator": "AND",
+                    "fields": Array [
+                      "id",
+                    ],
+                    "lenient": true,
+                    "query": "11111111-1111-1111-1111-111111111111",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        "from": 0,
+        "index": "patient",
+        "size": 20,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={} 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "body": Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [],
+              "must": Array [],
+            },
+          },
+        },
+        "from": 0,
+        "index": "patient",
+        "size": 20,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
