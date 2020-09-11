@@ -209,7 +209,7 @@ export class ElasticSearchService implements Search {
         }
         const includes = this.getParamAsArray(queryParams._include);
 
-        const resourcesToInclude = flatten(
+        const resourcesToInclude: { resourceType: string; id: string }[] = flatten(
             includes.map(include => {
                 const [sourceResource, searchParameter, targetResourceType] = include.split(':');
                 if (sourceResource !== request.resourceType) {
@@ -228,12 +228,12 @@ export class ElasticSearchService implements Search {
             }),
         );
 
-        const idsByResourceType = mapValues(
+        const resourceTypeToIds = mapValues(
             groupBy(resourcesToInclude, resourceToInclude => resourceToInclude.resourceType),
             arr => arr.map(x => x.id),
         );
 
-        const searchQueries = Object.entries(idsByResourceType).map(([resourceType, ids]) => ({
+        const searchQueries = Object.entries(resourceTypeToIds).map(([resourceType, ids]) => ({
             index: resourceType.toLowerCase(),
             body: {
                 query: {
