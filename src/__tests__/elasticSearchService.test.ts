@@ -9,12 +9,13 @@ import { ElasticSearch } from '../elasticSearch';
 
 jest.mock('../elasticSearch');
 
-describe('typeSearch', () => {
-    describe('query snapshots for simple queryParams', () => {
-        beforeEach(() => {
-            jest.resetAllMocks();
-        });
+const FILTER_RULES_FOR_ACTIVE_RESOURCES = [{ match: { someFieldThatTellsIfTheResourceIsActive: 'AVAILABLE' } }];
 
+describe('typeSearch', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
+    describe('query snapshots for simple queryParams', () => {
         each([
             [{}],
             [{ _count: 10, _getpagesoffset: 2 }],
@@ -57,14 +58,14 @@ describe('typeSearch', () => {
                 },
             };
             (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
-            const es = new ElasticSearchService();
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
             await es.typeSearch({
                 resourceType: 'Patient',
                 baseUrl: 'https://base-url.com',
                 queryParams,
             });
 
-            expect(ElasticSearch.search).toMatchSnapshot();
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
         });
     });
     test('Response format', async () => {
@@ -97,12 +98,98 @@ describe('typeSearch', () => {
 
         (ElasticSearch.search as jest.Mock).mockResolvedValue(patientSearchResult);
 
-        const es = new ElasticSearchService();
+        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
         const result = await es.typeSearch({
             resourceType: 'Patient',
             baseUrl: 'https://base-url.com',
             queryParams: {},
         });
         expect(result).toMatchSnapshot();
+    });
+
+    const fakeMedicationRequestSearchResult = {
+        body: {
+            took: 5,
+            timed_out: false,
+            _shards: {
+                total: 5,
+                successful: 5,
+                skipped: 0,
+                failed: 0,
+            },
+            hits: {
+                total: {
+                    value: 1,
+                    relation: 'eq',
+                },
+                max_score: 1.0,
+                hits: [
+                    {
+                        _index: 'medicationrequest',
+                        _type: '_doc',
+                        _id: 'medicationrequest-id-111_1',
+                        _score: 1.0,
+                        _source: {
+                            vid: '1',
+                            performer: {
+                                reference: 'Practitioner/practitioner-id-222',
+                            },
+                            meta: {
+                                lastUpdated: '2020-09-10T06:34:46.680Z',
+                                versionId: '1',
+                            },
+                            subject: {
+                                reference: 'Patient/patient-id-333',
+                            },
+                            documentStatus: 'AVAILABLE',
+                            id: 'medicationrequest-id-111',
+                            lockEndTs: 1599719686680,
+                            resourceType: 'MedicationRequest',
+                        },
+                    },
+                ],
+            },
+        },
+    };
+
+    describe('_include', () => {
+        each([
+            [{ _include: 'MedicationRequest:subject' }],
+            [{ _include: 'MedicationRequest:subject:Group' }],
+            [{ _include: ['MedicationRequest:subject', 'MedicationRequest:performer'] }],
+            [{ _include: ['MedicationRequest:subject', 'MedicationRequest:subject'] }],
+        ]).test('queryParams=%j', async (queryParams: any) => {
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'MedicationRequest',
+                baseUrl: 'https://base-url.com',
+                queryParams: { ...queryParams },
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
+    });
+
+    describe('_revinclude', () => {
+        each([
+            [{ _revinclude: 'MedicationAdministration:request' }],
+            [{ _revinclude: 'MedicationAdministration:request:MedicationRequest' }],
+            [{ _revinclude: 'MedicationAdministration:request:Device' }],
+            [{ _revinclude: ['MedicationAdministration:request', 'Provenance:target'] }],
+            [{ _revinclude: ['MedicationAdministration:request', 'MedicationAdministration:request'] }],
+        ]).test('queryParams=%j', async (queryParams: any) => {
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'MedicationRequest',
+                baseUrl: 'https://base-url.com',
+                queryParams: { ...queryParams },
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
     });
 });
