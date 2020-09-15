@@ -5,7 +5,7 @@
 
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
-import { flatten, groupBy, mapValues, uniq } from 'lodash';
+import { groupBy, mapValues, uniq } from 'lodash';
 
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
 import {
@@ -209,24 +209,22 @@ export class ElasticSearchService implements Search {
         }
         const includes = this.getParamAsArray(queryParams._include);
 
-        const resourcesToInclude: { resourceType: string; id: string }[] = flatten(
-            includes.map(include => {
-                const [sourceResource, searchParameter, targetResourceType] = include.split(':');
-                if (sourceResource !== request.resourceType) {
-                    return [];
-                }
-                const RELATIVE_URL_REGEX = /^[A-Za-z]+\/[A-Za-z0-9-]+$/;
-                return searchEntries
-                    .map((searchEntry: SearchEntry) => searchEntry.resource[searchParameter]?.reference)
-                    .filter((x): x is string => typeof x === 'string')
-                    .filter(reference => RELATIVE_URL_REGEX.test(reference))
-                    .map(relativeUrl => {
-                        const [resourceType, id] = relativeUrl.split('/');
-                        return { resourceType, id };
-                    })
-                    .filter(({ resourceType }) => !targetResourceType || targetResourceType === resourceType);
-            }),
-        );
+        const resourcesToInclude: { resourceType: string; id: string }[] = includes.flatMap(include => {
+            const [sourceResource, searchParameter, targetResourceType] = include.split(':');
+            if (sourceResource !== request.resourceType) {
+                return [];
+            }
+            const RELATIVE_URL_REGEX = /^[A-Za-z]+\/[A-Za-z0-9-]+$/;
+            return searchEntries
+                .map((searchEntry: SearchEntry) => searchEntry.resource[searchParameter]?.reference)
+                .filter((x): x is string => typeof x === 'string')
+                .filter(reference => RELATIVE_URL_REGEX.test(reference))
+                .map(relativeUrl => {
+                    const [resourceType, id] = relativeUrl.split('/');
+                    return { resourceType, id };
+                })
+                .filter(({ resourceType }) => !targetResourceType || targetResourceType === resourceType);
+        });
 
         const resourceTypeToIds = mapValues(
             groupBy(resourcesToInclude, resourceToInclude => resourceToInclude.resourceType),
@@ -258,7 +256,7 @@ export class ElasticSearchService implements Search {
             }),
         );
 
-        return flatten(searchResults);
+        return searchResults.flat();
     }
 
     private async processSearchRevIncludes(
@@ -307,7 +305,7 @@ export class ElasticSearchService implements Search {
                 return this.hitsToSearchEntries({ hits, baseUrl, mode: 'include' });
             }),
         );
-        return flatten(searchResults);
+        return searchResults.flat();
     }
 
     // eslint-disable-next-line class-methods-use-this
