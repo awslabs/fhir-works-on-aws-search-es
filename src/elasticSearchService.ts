@@ -5,7 +5,6 @@
 
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
-import { groupBy, mapValues, uniq } from 'lodash';
 
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
 import {
@@ -18,6 +17,7 @@ import {
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
+import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 
 const NON_SEARCHABLE_FIELDS = [
     SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
@@ -191,68 +191,21 @@ export class ElasticSearchService implements Search {
         );
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    private getParamAsArray(param: any): string[] {
-        if (!param) {
-            return [];
-        }
-        return Array.isArray(param) ? (uniq(param) as string[]) : [param as string];
-    }
-
     private async processSearchIncludes(
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
     ): Promise<SearchEntry[]> {
-        const { queryParams, baseUrl } = request;
-        if (!queryParams._include) {
-            return [];
-        }
-        const includes = this.getParamAsArray(queryParams._include);
-
-        const resourcesToInclude: { resourceType: string; id: string }[] = includes.flatMap(include => {
-            const [sourceResource, searchParameter, targetResourceType] = include.split(':');
-            if (sourceResource !== request.resourceType) {
-                return [];
-            }
-            const RELATIVE_URL_REGEX = /^[A-Za-z]+\/[A-Za-z0-9-]+$/;
-            return searchEntries
-                .map((searchEntry: SearchEntry) => searchEntry.resource[searchParameter]?.reference)
-                .filter((x): x is string => typeof x === 'string')
-                .filter(reference => RELATIVE_URL_REGEX.test(reference))
-                .map(relativeUrl => {
-                    const [resourceType, id] = relativeUrl.split('/');
-                    return { resourceType, id };
-                })
-                .filter(({ resourceType }) => !targetResourceType || targetResourceType === resourceType);
-        });
-
-        const resourceTypeToIds = mapValues(
-            groupBy(resourcesToInclude, resourceToInclude => resourceToInclude.resourceType),
-            arr => arr.map(x => x.id),
+        const searchQueries = buildIncludeQueries(
+            request.queryParams,
+            searchEntries.map(x => x.resource),
+            request.resourceType,
+            this.filterRulesForActiveResources,
         );
-
-        const searchQueries = Object.entries(resourceTypeToIds).map(([resourceType, ids]) => ({
-            index: resourceType.toLowerCase(),
-            body: {
-                query: {
-                    bool: {
-                        filter: [
-                            {
-                                terms: {
-                                    id: ids,
-                                },
-                            },
-                            ...this.filterRulesForActiveResources,
-                        ],
-                    },
-                },
-            },
-        }));
 
         const searchResults = await Promise.all(
             searchQueries.map(async query => {
                 const { hits } = await this.executeQuery(query);
-                return this.hitsToSearchEntries({ hits, baseUrl, mode: 'include' });
+                return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
             }),
         );
 
@@ -263,46 +216,17 @@ export class ElasticSearchService implements Search {
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
     ): Promise<SearchEntry[]> {
-        const { queryParams, baseUrl, resourceType } = request;
-        if (!queryParams._revinclude) {
-            return [];
-        }
-
-        const revincludes = this.getParamAsArray(queryParams._revinclude);
-
-        const references = searchEntries.map(
-            searchEntry => `${searchEntry.resource.resourceType}/${searchEntry.resource.id}`,
+        const searchQueries = buildRevIncludeQueries(
+            request.queryParams,
+            searchEntries.map(x => x.resource),
+            request.resourceType,
+            this.filterRulesForActiveResources,
         );
-        const searchQueries = revincludes
-            .filter(revinclude => {
-                const [, , targetResourceType] = revinclude.split(':');
-                return !targetResourceType || targetResourceType === resourceType;
-            })
-            .map(revinclude => {
-                const [sourceResource, searchParameter] = revinclude.split(':');
-                return {
-                    index: sourceResource.toLowerCase(),
-                    body: {
-                        query: {
-                            bool: {
-                                filter: [
-                                    {
-                                        terms: {
-                                            [`${searchParameter}.reference.keyword`]: references,
-                                        },
-                                    },
-                                    ...this.filterRulesForActiveResources,
-                                ],
-                            },
-                        },
-                    },
-                };
-            });
 
         const searchResults = await Promise.all(
             searchQueries.map(async query => {
                 const { hits } = await this.executeQuery(query);
-                return this.hitsToSearchEntries({ hits, baseUrl, mode: 'include' });
+                return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
             }),
         );
         return searchResults.flat();
