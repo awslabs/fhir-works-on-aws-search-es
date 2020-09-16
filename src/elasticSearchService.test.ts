@@ -4,10 +4,10 @@
  */
 
 import each from 'jest-each';
-import { ElasticSearchService } from '../elasticSearchService';
-import { ElasticSearch } from '../elasticSearch';
+import { ElasticSearchService } from './elasticSearchService';
+import { ElasticSearch } from './elasticSearch';
 
-jest.mock('../elasticSearch');
+jest.mock('./elasticSearch');
 
 const FILTER_RULES_FOR_ACTIVE_RESOURCES = [{ match: { someFieldThatTellsIfTheResourceIsActive: 'AVAILABLE' } }];
 

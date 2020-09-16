@@ -5,7 +5,7 @@ import {
     TypedInclusionParameter,
     getReferencesFromResources,
     IncludeSearchParameter,
-} from '../searchInclusions';
+} from './searchInclusions';
 
 describe('inclusionParameterFromString', () => {
     describe('invalid inclusion parameters', () => {
