@@ -5,7 +5,7 @@
 
 /*
 This scripts generates the JSON files at src/schema. Before running the script download the JSON FHIR definition package and copy
-the profiles-resources.json file on this directory.
+the profiles-resources.json file into this directory.
 
 You can download the latest FHIR definition from https://www.hl7.org/fhir/downloads.html or find older FHIR versions at http://hl7.org/fhir/directory.html
  */
