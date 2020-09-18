@@ -134,6 +134,12 @@ describe('typeSearch', () => {
                             performer: {
                                 reference: 'Practitioner/practitioner-id-222',
                             },
+                            requester: {
+                                reference: 'PractitionerRole/practitionerRole-id-555',
+                            },
+                            recorder: {
+                                reference: 'PractitionerRole/practitionerRole-id-555',
+                            },
                             meta: {
                                 lastUpdated: '2020-09-10T06:34:46.680Z',
                                 versionId: '1',
@@ -141,6 +147,11 @@ describe('typeSearch', () => {
                             subject: {
                                 reference: 'Patient/patient-id-333',
                             },
+                            basedOn: [
+                                {
+                                    reference: 'ImmunizationRecommendation/immunizationRec-id-444',
+                                },
+                            ],
                             documentStatus: 'AVAILABLE',
                             id: 'medicationrequest-id-111',
                             lockEndTs: 1599719686680,
@@ -154,6 +165,7 @@ describe('typeSearch', () => {
 
     describe('_include', () => {
         each([
+            [{ _include: '*' }],
             [{ _include: 'MedicationRequest:subject' }],
             [{ _include: 'MedicationRequest:subject:Group' }],
             [{ _include: ['MedicationRequest:subject', 'MedicationRequest:performer'] }],
@@ -174,6 +186,7 @@ describe('typeSearch', () => {
 
     describe('_revinclude', () => {
         each([
+            [{ _revinclude: '*' }],
             [{ _revinclude: 'MedicationAdministration:request' }],
             [{ _revinclude: 'MedicationAdministration:request:MedicationRequest' }],
             [{ _revinclude: 'MedicationAdministration:request:Device' }],

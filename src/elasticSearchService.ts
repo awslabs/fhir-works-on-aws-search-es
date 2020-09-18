@@ -33,21 +33,26 @@ export class ElasticSearchService implements Search {
 
     private readonly cleanUpFunction: (resource: any) => any;
 
+    private readonly fhirVersion: string;
+
     /**
      * @param filterRulesForActiveResources - If you are storing both History and Search resources
      * in your elastic search you can filter out your History elements by supplying a filter argument like:
      * [{ match: { documentStatus: 'AVAILABLE' }}]
      * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
      * the return ES objects
+     * @param fhirVersion
      */
     constructor(
         filterRulesForActiveResources: any[] = [],
         cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
+        fhirVersion: string = '4.0.1',
     ) {
         this.filterRulesForActiveResources = filterRulesForActiveResources;
         this.cleanUpFunction = cleanUpFunction;
+        this.fhirVersion = fhirVersion;
     }
 
     /*
@@ -200,6 +205,7 @@ export class ElasticSearchService implements Search {
             searchEntries.map(x => x.resource),
             request.resourceType,
             this.filterRulesForActiveResources,
+            this.fhirVersion,
         );
 
         const searchResults = await Promise.all(
@@ -221,6 +227,7 @@ export class ElasticSearchService implements Search {
             searchEntries.map(x => x.resource),
             request.resourceType,
             this.filterRulesForActiveResources,
+            this.fhirVersion,
         );
 
         const searchResults = await Promise.all(
