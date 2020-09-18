@@ -20,7 +20,7 @@
     "lint-fix": "eslint --fix . --ext .ts,.tsx",
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest --silent --passWithNoTests",
+    "test": "jest src --silent",
     "test-coverage": "jest --coverage",
     "release": "yarn run build && yarn run lint && yarn run test",
     "clean": "rm -rf build/* node_modules/* dist/* .serverless/* .nyc_output/* lib/*",
@@ -28,13 +28,15 @@
     "prepublish": "tsc"
   },
   "dependencies": {
-    "fhir-works-on-aws-interface": "^1.0.0",
     "@elastic/elasticsearch": "7",
     "aws-elasticsearch-connector": "^8.2.0",
-    "aws-sdk": "^2.610.0"
+    "aws-sdk": "^2.610.0",
+    "fhir-works-on-aws-interface": "^1.0.0",
+    "lodash": "^4.17.20"
   },
   "devDependencies": {
     "@types/jest": "^25.1.1",
+    "@types/lodash": "^4.14.161",
     "@types/node": "^12",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
@@ -44,6 +46,7 @@
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-prettier": "^3.1.2",
     "jest": "^25.1.0",
+    "jest-each": "^26.4.2",
     "jest-mock-extended": "^1.0.8",
     "prettier": "^1.19.1",
     "ts-jest": "^25.1.0",
@@ -61,7 +64,7 @@
     "transform": {
       "\\.(ts)$": "ts-jest"
     },
-    "testRegex": ".test.ts"
+    "testRegex": ".test.ts$"
   },
   "repository": {
     "type": "git",

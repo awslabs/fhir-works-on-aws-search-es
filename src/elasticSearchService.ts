@@ -5,6 +5,7 @@
 
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
+
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
 import {
     Search,
@@ -16,6 +17,15 @@ import {
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
+import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
+
+const NON_SEARCHABLE_FIELDS = [
+    SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
+    SEARCH_PAGINATION_PARAMS.COUNT,
+    '_format',
+    '_include',
+    '_revinclude',
+];
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
@@ -56,16 +66,13 @@ export class ElasticSearchService implements Search {
 
             // Exp. {gender: 'male', name: 'john'}
             const searchFieldToValue = { ...queryParams };
-            delete searchFieldToValue[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET];
-            delete searchFieldToValue[SEARCH_PAGINATION_PARAMS.COUNT];
 
             const must: any = [];
             // TODO Implement fuzzy matches
             Object.keys(searchFieldToValue).forEach(field => {
                 // id is mapped in ElasticSearch to be of type "keyword", which requires an exact match
                 const fieldParam = field === 'id' ? 'id' : `${field}.*`;
-                // Don't send _format param to ES
-                if (field === '_format') {
+                if (NON_SEARCHABLE_FIELDS.includes(field)) {
                     return;
                 }
                 const query = {
@@ -94,28 +101,10 @@ export class ElasticSearchService implements Search {
                     },
                 },
             };
-
-            const response = await ElasticSearch.search(params);
-            const total = response.body.hits.total.value;
-
+            const { total, hits } = await this.executeQuery(params);
             const result: SearchResult = {
                 numberOfResults: total,
-                entries: response.body.hits.hits.map(
-                    (hit: any): SearchEntry => {
-                        // Modify to return resource with FHIR id not Dynamo ID
-                        const resource = this.cleanUpFunction(hit._source);
-                        return {
-                            search: {
-                                mode: 'match',
-                            },
-                            fullUrl: URL.format({
-                                host: request.baseUrl,
-                                pathname: `/${resourceType}/${resource.id}`,
-                            }),
-                            resource,
-                        };
-                    },
-                ),
+                entries: this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'match' }),
                 message: '',
             };
 
@@ -142,22 +131,105 @@ export class ElasticSearchService implements Search {
                 );
             }
 
+            const [includedResources, revincludedResources] = await Promise.all([
+                this.processSearchIncludes(result.entries, request),
+                this.processSearchRevIncludes(result.entries, request),
+            ]);
+            result.entries.push(...includedResources, ...revincludedResources);
             return { result };
         } catch (error) {
-            // Indexes are created the first time a resource of a given type is written to DDB.
-            if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
-                console.log(`Search index for ${resourceType} does not exist. Returning an empty search result`);
-                return {
-                    result: {
-                        numberOfResults: 0,
-                        entries: [],
-                        message: '',
-                    },
-                };
-            }
             console.error(error);
             throw error;
         }
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    private async executeQuery(searchQuery: any): Promise<{ hits: any[]; total: number }> {
+        try {
+            const apiResponse = await ElasticSearch.search(searchQuery);
+            return {
+                total: apiResponse.body.hits.total.value,
+                hits: apiResponse.body.hits.hits,
+            };
+        } catch (error) {
+            // Indexes are created the first time a resource of a given type is written to DDB.
+            if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
+                console.log(`Search index for ${searchQuery.index} does not exist. Returning an empty search result`);
+                return {
+                    total: 0,
+                    hits: [],
+                };
+            }
+            throw error;
+        }
+    }
+
+    private hitsToSearchEntries({
+        hits,
+        baseUrl,
+        mode = 'match',
+    }: {
+        hits: any[];
+        baseUrl: string;
+        mode: 'match' | 'include';
+    }): SearchEntry[] {
+        return hits.map(
+            (hit: any): SearchEntry => {
+                // Modify to return resource with FHIR id not Dynamo ID
+                const resource = this.cleanUpFunction(hit._source);
+                return {
+                    search: {
+                        mode,
+                    },
+                    fullUrl: URL.format({
+                        host: baseUrl,
+                        pathname: `/${resource.resourceType}/${resource.id}`,
+                    }),
+                    resource,
+                };
+            },
+        );
+    }
+
+    private async processSearchIncludes(
+        searchEntries: SearchEntry[],
+        request: TypeSearchRequest,
+    ): Promise<SearchEntry[]> {
+        const searchQueries = buildIncludeQueries(
+            request.queryParams,
+            searchEntries.map(x => x.resource),
+            request.resourceType,
+            this.filterRulesForActiveResources,
+        );
+
+        const searchResults = await Promise.all(
+            searchQueries.map(async query => {
+                const { hits } = await this.executeQuery(query);
+                return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
+            }),
+        );
+
+        return searchResults.flat();
+    }
+
+    private async processSearchRevIncludes(
+        searchEntries: SearchEntry[],
+        request: TypeSearchRequest,
+    ): Promise<SearchEntry[]> {
+        const searchQueries = buildRevIncludeQueries(
+            request.queryParams,
+            searchEntries.map(x => x.resource),
+            request.resourceType,
+            this.filterRulesForActiveResources,
+        );
+
+        const searchResults = await Promise.all(
+            searchQueries.map(async query => {
+                const { hits } = await this.executeQuery(query);
+                return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
+            }),
+        );
+        return searchResults.flat();
     }
 
     // eslint-disable-next-line class-methods-use-this
