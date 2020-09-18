@@ -13,25 +13,29 @@ You can download the latest FHIR definition from https://www.hl7.org/fhir/downlo
 const fs = require('fs');
 const stringify = require('json-stringify-pretty-compact');
 
-const data = JSON.parse(fs.readFileSync('profiles-resources.json'));
+const data = JSON.parse(fs.readFileSync('profiles-resources.json', { encoding: 'utf8' }));
 
 const { fhirVersion } = data.entry[0].resource;
 
 if (fhirVersion.startsWith('4')) {
     const r = data.entry
-        .filter(x => x.resource.baseDefinition === 'http://hl7.org/fhir/StructureDefinition/DomainResource')
-        .flatMap(x => {
-            return x.resource.snapshot.element
-                .filter(el => el.type && el.type[0].code === 'Reference')
-                .flatMap(el =>
-                    el.type[0].targetProfile.map(target => [
-                        x.resource.type,
-                        el.id.replace(`${x.resource.type}.`, '').replace('[x]', ''),
+        .filter(entry => entry.resource.baseDefinition === 'http://hl7.org/fhir/StructureDefinition/DomainResource')
+        .flatMap(entry => {
+            return entry.resource.snapshot.element
+                .filter(element => element.type && element.type[0].code === 'Reference')
+                .flatMap(element =>
+                    element.type[0].targetProfile.map(target => [
+                        entry.resource.type,
+                        element.id.replace(`${entry.resource.type}.`, '').replace('[x]', ''),
                         target,
                     ]),
                 );
         })
-        .map(([a, b, c]) => [a, b, c.replace('http://hl7.org/fhir/StructureDefinition/', '')]);
+        .map(([resourceType, field, target]) => [
+            resourceType,
+            field,
+            target.replace('http://hl7.org/fhir/StructureDefinition/', ''),
+        ]);
     fs.writeFileSync(
         `../src/schema/fhirResourceReferencesMatrix.v${fhirVersion}.json`,
         stringify(r, { maxLength: 200 }),
@@ -40,21 +44,25 @@ if (fhirVersion.startsWith('4')) {
 
 if (fhirVersion.startsWith('3')) {
     const r = data.entry
-        .filter(x => x.resource.baseDefinition === 'http://hl7.org/fhir/StructureDefinition/DomainResource')
-        .flatMap(x => {
-            return x.resource.snapshot.element
-                .filter(el => !!el.type)
-                .flatMap(el => {
-                    return el.type
-                        .filter(t => t.code === 'Reference' && !!t.targetProfile)
-                        .map(t => [
-                            x.resource.type,
-                            el.id.replace(`${x.resource.type}.`, '').replace('[x]', ''),
-                            t.targetProfile,
+        .filter(entry => entry.resource.baseDefinition === 'http://hl7.org/fhir/StructureDefinition/DomainResource')
+        .flatMap(entry => {
+            return entry.resource.snapshot.element
+                .filter(element => !!element.type)
+                .flatMap(element => {
+                    return element.type
+                        .filter(type => type.code === 'Reference' && !!type.targetProfile)
+                        .map(type => [
+                            entry.resource.type,
+                            element.id.replace(`${entry.resource.type}.`, '').replace('[x]', ''),
+                            type.targetProfile,
                         ]);
                 });
         })
-        .map(([a, b, c]) => [a, b, c.replace('http://hl7.org/fhir/StructureDefinition/', '')]);
+        .map(([resourceType, field, target]) => [
+            resourceType,
+            field,
+            target.replace('http://hl7.org/fhir/StructureDefinition/', ''),
+        ]);
     fs.writeFileSync(
         `../src/schema/fhirResourceReferencesMatrix.v${fhirVersion}.json`,
         stringify(r, { maxLength: 200 }),

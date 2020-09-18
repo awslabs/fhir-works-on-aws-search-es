@@ -14,6 +14,7 @@ import {
     SearchResponse,
     GlobalSearchRequest,
     SearchEntry,
+    FhirVersion,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
@@ -33,7 +34,7 @@ export class ElasticSearchService implements Search {
 
     private readonly cleanUpFunction: (resource: any) => any;
 
-    private readonly fhirVersion: string;
+    private readonly fhirVersion: FhirVersion;
 
     /**
      * @param filterRulesForActiveResources - If you are storing both History and Search resources
@@ -48,7 +49,7 @@ export class ElasticSearchService implements Search {
         cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
-        fhirVersion: string = '4.0.1',
+        fhirVersion: FhirVersion = '4.0.1',
     ) {
         this.filterRulesForActiveResources = filterRulesForActiveResources;
         this.cleanUpFunction = cleanUpFunction;

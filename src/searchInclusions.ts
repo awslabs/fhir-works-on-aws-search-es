@@ -1,5 +1,6 @@
 import { groupBy, mapValues, uniq, get, uniqBy } from 'lodash';
 
+import { FhirVersion } from 'fhir-works-on-aws-interface';
 import resourceReferencesMatrixV4 from './schema/fhirResourceReferencesMatrix.v4.0.1.json';
 import resourceReferencesMatrixV3 from './schema/fhirResourceReferencesMatrix.v3.0.1.json';
 import { isPresent } from './tsUtils';
@@ -84,9 +85,9 @@ export const getInclusionParametersFromQueryParams = (
     }
     if (Array.isArray(queryParam)) {
         return uniq(queryParam)
-            .map(x => inclusionParameterFromString(x))
+            .map(param => inclusionParameterFromString(param))
             .filter(isPresent)
-            .map(x => ({ type: includeType, ...x }));
+            .map(inclusionParam => ({ type: includeType, ...inclusionParam }));
     }
     const inclusionParameter = inclusionParameterFromString(queryParam);
     if (inclusionParameter === null) {
@@ -113,7 +114,7 @@ export const getReferencesFromResources = (
                 }
                 return [get(valueAtPath, 'reference')];
             })
-            .filter((x): x is string => typeof x === 'string')
+            .filter((reference): reference is string => typeof reference === 'string')
             .filter(reference => RELATIVE_URL_REGEX.test(reference))
             .map(relativeUrl => {
                 const [resourceType, id] = relativeUrl.split('/');
@@ -172,7 +173,7 @@ export const buildRevIncludeQuery = (
     };
 };
 
-const getResourceReferenceMatrix = (fhirVersion: string): string[][] => {
+const getResourceReferenceMatrix = (fhirVersion: FhirVersion): string[][] => {
     if (fhirVersion === '4.0.1') {
         return resourceReferencesMatrixV4;
     }
@@ -188,7 +189,7 @@ export const buildIncludeQueries = (
     resources: any[],
     requestResourceType: string,
     filterRulesForActiveResources: any[],
-    fhirVersion: string,
+    fhirVersion: FhirVersion,
 ): any[] => {
     const allIncludeParameters = getInclusionParametersFromQueryParams(
         '_include',
@@ -221,7 +222,7 @@ export const buildRevIncludeQueries = (
     resources: any[],
     requestResourceType: string,
     filterRulesForActiveResources: any[],
-    fhirVersion: string,
+    fhirVersion: FhirVersion,
 ) => {
     const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams);
 
