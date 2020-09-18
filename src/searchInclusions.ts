@@ -42,20 +42,27 @@ export const inclusionParameterFromString = (
 
 const expandRevIncludeWildcard = (
     resourceType: string,
-    resourceReferencesMatrix: any[][],
+    resourceReferencesMatrix: string[][],
 ): InclusionSearchParameter[] => {
     return resourceReferencesMatrix
-        .filter(([, , targetResourceType]) => targetResourceType === resourceType)
+        .filter(
+            // Some Resources have fields that can reference any resource type. They have their type noted as Reference(Any) on the FHIR website.
+            // In those cases the targetResourceType is noted as 'Resource' in the references matrix.
+            ([, , targetResourceType]) => targetResourceType === resourceType || targetResourceType === 'Resource',
+        )
         .map(([sourceResource, searchParameter, targetResourceType]) => ({
             type: '_revinclude',
             isWildcard: false,
             sourceResource,
             searchParameter,
-            targetResourceType,
+            targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
         }));
 };
 
-const expandIncludeWildcard = (resourceType: string, resourceReferencesMatrix: any[][]): InclusionSearchParameter[] => {
+const expandIncludeWildcard = (
+    resourceType: string,
+    resourceReferencesMatrix: string[][],
+): InclusionSearchParameter[] => {
     return resourceReferencesMatrix
         .filter(([sourceResource, ,]) => sourceResource === resourceType)
         .map(([sourceResource, searchParameter, targetResourceType]) => ({
@@ -63,7 +70,7 @@ const expandIncludeWildcard = (resourceType: string, resourceReferencesMatrix: a
             isWildcard: false,
             sourceResource,
             searchParameter,
-            targetResourceType,
+            targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
         }));
 };
 
@@ -165,7 +172,7 @@ export const buildRevIncludeQuery = (
     };
 };
 
-const getResourceReferenceMatrix = (fhirVersion: string): any[][] => {
+const getResourceReferenceMatrix = (fhirVersion: string): string[][] => {
     if (fhirVersion === '4.0.1') {
         return resourceReferencesMatrixV4;
     }
