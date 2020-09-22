@@ -163,6 +163,12 @@ describe('typeSearch', () => {
         },
     };
 
+    const emptyMsearchResult = {
+        body: {
+            responses: [],
+        },
+    };
+
     describe('_include', () => {
         each([
             [{ _include: '*' }],
@@ -172,6 +178,7 @@ describe('typeSearch', () => {
             [{ _include: ['MedicationRequest:subject', 'MedicationRequest:subject'] }],
         ]).test('queryParams=%j', async (queryParams: any) => {
             (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+            (ElasticSearch.msearch as jest.Mock).mockResolvedValue(emptyMsearchResult);
 
             const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
             await es.typeSearch({
@@ -180,7 +187,8 @@ describe('typeSearch', () => {
                 queryParams: { ...queryParams },
             });
 
-            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+            expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
         });
     });
 
@@ -194,6 +202,7 @@ describe('typeSearch', () => {
             [{ _revinclude: ['MedicationAdministration:request', 'MedicationAdministration:request'] }],
         ]).test('queryParams=%j', async (queryParams: any) => {
             (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+            (ElasticSearch.msearch as jest.Mock).mockResolvedValue(emptyMsearchResult);
 
             const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
             await es.typeSearch({
@@ -202,7 +211,8 @@ describe('typeSearch', () => {
                 queryParams: { ...queryParams },
             });
 
-            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+            expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
         });
     });
 });
