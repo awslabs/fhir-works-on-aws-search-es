@@ -2,7 +2,8 @@ import each from 'jest-each';
 import {
     inclusionParameterFromString,
     getInclusionParametersFromQueryParams,
-    getReferencesFromResources,
+    getIncludeReferencesFromResources,
+    getRevincludeReferencesFromResources,
     InclusionSearchParameter,
 } from './searchInclusions';
 
@@ -89,7 +90,7 @@ describe('getInclusionParametersFromQueryParams', () => {
     });
 });
 
-describe('getReferencesFromResources', () => {
+describe('getIncludeReferencesFromResources', () => {
     test('Happy case', () => {
         const includeSearchParams: InclusionSearchParameter[] = [
             {
@@ -110,6 +111,7 @@ describe('getReferencesFromResources', () => {
 
         const resources: any[] = [
             {
+                resourceType: 'Patient',
                 someField: {
                     reference: 'Practitioner/111',
                 },
@@ -119,11 +121,64 @@ describe('getReferencesFromResources', () => {
             },
         ];
 
-        const refs = getReferencesFromResources(includeSearchParams, resources, 'Patient');
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
 
         const expected = [
             { resourceType: 'Practitioner', id: '111' },
             { resourceType: 'Organization', id: '222' },
+        ];
+        expect(refs).toEqual(expected);
+    });
+
+    test('Mixed resource types', () => {
+        const includeSearchParams: InclusionSearchParameter[] = [
+            {
+                isWildcard: false,
+                type: '_include',
+                searchParameter: 'someField',
+                sourceResource: 'Patient',
+                targetResourceType: '',
+            },
+            {
+                isWildcard: false,
+                type: '_include',
+                searchParameter: 'anotherField',
+                sourceResource: 'Patient',
+                targetResourceType: '',
+            },
+            {
+                isWildcard: false,
+                type: '_include',
+                searchParameter: 'orgField',
+                sourceResource: 'Organization',
+                targetResourceType: '',
+            },
+        ];
+
+        const resources: any[] = [
+            {
+                resourceType: 'Patient',
+                someField: {
+                    reference: 'Practitioner/111',
+                },
+                anotherField: {
+                    reference: 'Organization/222',
+                },
+            },
+            {
+                resourceType: 'Organization',
+                orgField: {
+                    reference: 'Device/333',
+                },
+            },
+        ];
+
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
+
+        const expected = [
+            { resourceType: 'Practitioner', id: '111' },
+            { resourceType: 'Organization', id: '222' },
+            { resourceType: 'Device', id: '333' },
         ];
         expect(refs).toEqual(expected);
     });
@@ -148,6 +203,7 @@ describe('getReferencesFromResources', () => {
 
         const resources: any[] = [
             {
+                resourceType: 'Patient',
                 someField: {
                     reference: 'Practitioner/111',
                 },
@@ -157,7 +213,7 @@ describe('getReferencesFromResources', () => {
             },
         ];
 
-        const refs = getReferencesFromResources(includeSearchParams, resources, 'Patient');
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
 
         const expected = [{ resourceType: 'Practitioner', id: '111' }];
         expect(refs).toEqual(expected);
@@ -176,6 +232,7 @@ describe('getReferencesFromResources', () => {
 
         const resources: any[] = [
             {
+                resourceType: 'Patient',
                 someField: [
                     {
                         reference: 'Practitioner/111',
@@ -187,7 +244,7 @@ describe('getReferencesFromResources', () => {
             },
         ];
 
-        const refs = getReferencesFromResources(includeSearchParams, resources, 'Patient');
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
 
         const expected = [
             { resourceType: 'Practitioner', id: '111' },
@@ -209,6 +266,7 @@ describe('getReferencesFromResources', () => {
 
         const resources: any[] = [
             {
+                resourceType: 'Patient',
                 someField: {
                     nestedField: {
                         reference: 'Practitioner/111',
@@ -217,7 +275,7 @@ describe('getReferencesFromResources', () => {
             },
         ];
 
-        const refs = getReferencesFromResources(includeSearchParams, resources, 'Patient');
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
 
         const expected = [{ resourceType: 'Practitioner', id: '111' }];
         expect(refs).toEqual(expected);
@@ -243,6 +301,7 @@ describe('getReferencesFromResources', () => {
 
         const resources: any[] = [
             {
+                resourceType: 'Patient',
                 someField: {
                     reference: 'https://some-fhir-server/Practitioner/111',
                 },
@@ -252,7 +311,7 @@ describe('getReferencesFromResources', () => {
             },
         ];
 
-        const refs = getReferencesFromResources(includeSearchParams, resources, 'Patient');
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
         expect(refs).toEqual([]);
     });
 
@@ -269,13 +328,14 @@ describe('getReferencesFromResources', () => {
 
         const resources: any[] = [
             {
+                resourceType: 'Patient',
                 someField: {
                     reference: 'Practitioner/111',
                 },
             },
         ];
 
-        const refs = getReferencesFromResources(includeSearchParams, resources, 'Patient');
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
         expect(refs).toEqual([]);
     });
 
@@ -292,13 +352,103 @@ describe('getReferencesFromResources', () => {
 
         const resources: any[] = [
             {
+                resourceType: 'Patient',
                 someField: {
                     reference: 'Practitioner/111',
                 },
             },
         ];
 
-        const refs = getReferencesFromResources(includeSearchParams, resources, 'Patient');
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
+        expect(refs).toEqual([]);
+    });
+});
+
+describe('getRevincludeReferencesFromResources', () => {
+    test('happy case', () => {
+        const revinclude: InclusionSearchParameter = {
+            isWildcard: false,
+            type: '_revinclude',
+            searchParameter: 'someField',
+            sourceResource: 'Device',
+            targetResourceType: 'Patient',
+        };
+        const includeSearchParams: InclusionSearchParameter[] = [revinclude];
+
+        const resources: any[] = [
+            {
+                resourceType: 'Patient',
+                id: 'patient-id-111',
+            },
+            {
+                resourceType: 'Organization',
+                id: 'org-id-111',
+            },
+        ];
+
+        const refs = getRevincludeReferencesFromResources(includeSearchParams, resources);
+
+        expect(refs).toEqual([
+            {
+                references: ['Patient/patient-id-111'],
+                revinclude,
+            },
+        ]);
+    });
+
+    test('undefined targetResourceType', () => {
+        const revinclude: InclusionSearchParameter = {
+            isWildcard: false,
+            type: '_revinclude',
+            searchParameter: 'someField',
+            sourceResource: 'Device',
+        };
+        const includeSearchParams: InclusionSearchParameter[] = [revinclude];
+
+        const resources: any[] = [
+            {
+                resourceType: 'Patient',
+                id: 'patient-id-111',
+            },
+            {
+                resourceType: 'Organization',
+                id: 'org-id-111',
+            },
+        ];
+
+        const refs = getRevincludeReferencesFromResources(includeSearchParams, resources);
+
+        expect(refs).toEqual([
+            {
+                references: ['Patient/patient-id-111', 'Organization/org-id-111'],
+                revinclude,
+            },
+        ]);
+    });
+
+    test('targetResourceType not matching any resource', () => {
+        const revinclude: InclusionSearchParameter = {
+            isWildcard: false,
+            type: '_revinclude',
+            searchParameter: 'someField',
+            sourceResource: 'Device',
+            targetResourceType: 'SomeResourceType',
+        };
+        const includeSearchParams: InclusionSearchParameter[] = [revinclude];
+
+        const resources: any[] = [
+            {
+                resourceType: 'Patient',
+                id: 'patient-id-111',
+            },
+            {
+                resourceType: 'Organization',
+                id: 'org-id-111',
+            },
+        ];
+
+        const refs = getRevincludeReferencesFromResources(includeSearchParams, resources);
+
         expect(refs).toEqual([]);
     });
 });
