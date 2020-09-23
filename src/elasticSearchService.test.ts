@@ -134,6 +134,12 @@ describe('typeSearch', () => {
                             performer: {
                                 reference: 'Practitioner/practitioner-id-222',
                             },
+                            requester: {
+                                reference: 'PractitionerRole/practitionerRole-id-555',
+                            },
+                            recorder: {
+                                reference: 'PractitionerRole/practitionerRole-id-555',
+                            },
                             meta: {
                                 lastUpdated: '2020-09-10T06:34:46.680Z',
                                 versionId: '1',
@@ -141,6 +147,11 @@ describe('typeSearch', () => {
                             subject: {
                                 reference: 'Patient/patient-id-333',
                             },
+                            basedOn: [
+                                {
+                                    reference: 'ImmunizationRecommendation/immunizationRec-id-444',
+                                },
+                            ],
                             documentStatus: 'AVAILABLE',
                             id: 'medicationrequest-id-111',
                             lockEndTs: 1599719686680,
@@ -152,14 +163,22 @@ describe('typeSearch', () => {
         },
     };
 
+    const emptyMsearchResult = {
+        body: {
+            responses: [],
+        },
+    };
+
     describe('_include', () => {
         each([
+            [{ _include: '*' }],
             [{ _include: 'MedicationRequest:subject' }],
             [{ _include: 'MedicationRequest:subject:Group' }],
             [{ _include: ['MedicationRequest:subject', 'MedicationRequest:performer'] }],
             [{ _include: ['MedicationRequest:subject', 'MedicationRequest:subject'] }],
         ]).test('queryParams=%j', async (queryParams: any) => {
             (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+            (ElasticSearch.msearch as jest.Mock).mockResolvedValue(emptyMsearchResult);
 
             const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
             await es.typeSearch({
@@ -168,12 +187,14 @@ describe('typeSearch', () => {
                 queryParams: { ...queryParams },
             });
 
-            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+            expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
         });
     });
 
     describe('_revinclude', () => {
         each([
+            [{ _revinclude: '*' }],
             [{ _revinclude: 'MedicationAdministration:request' }],
             [{ _revinclude: 'MedicationAdministration:request:MedicationRequest' }],
             [{ _revinclude: 'MedicationAdministration:request:Device' }],
@@ -181,6 +202,7 @@ describe('typeSearch', () => {
             [{ _revinclude: ['MedicationAdministration:request', 'MedicationAdministration:request'] }],
         ]).test('queryParams=%j', async (queryParams: any) => {
             (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+            (ElasticSearch.msearch as jest.Mock).mockResolvedValue(emptyMsearchResult);
 
             const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
             await es.typeSearch({
@@ -189,7 +211,8 @@ describe('typeSearch', () => {
                 queryParams: { ...queryParams },
             });
 
-            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+            expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
         });
     });
 });

@@ -14,6 +14,7 @@ import {
     SearchResponse,
     GlobalSearchRequest,
     SearchEntry,
+    FhirVersion,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
@@ -33,21 +34,26 @@ export class ElasticSearchService implements Search {
 
     private readonly cleanUpFunction: (resource: any) => any;
 
+    private readonly fhirVersion: FhirVersion;
+
     /**
      * @param filterRulesForActiveResources - If you are storing both History and Search resources
      * in your elastic search you can filter out your History elements by supplying a filter argument like:
      * [{ match: { documentStatus: 'AVAILABLE' }}]
      * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
      * the return ES objects
+     * @param fhirVersion
      */
     constructor(
         filterRulesForActiveResources: any[] = [],
         cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
+        fhirVersion: FhirVersion = '4.0.1',
     ) {
         this.filterRulesForActiveResources = filterRulesForActiveResources;
         this.cleanUpFunction = cleanUpFunction;
+        this.fhirVersion = fhirVersion;
     }
 
     /*
@@ -164,6 +170,42 @@ export class ElasticSearchService implements Search {
         }
     }
 
+    // eslint-disable-next-line class-methods-use-this
+    private async executeQueries(searchQueries: any[]): Promise<{ hits: any[] }> {
+        if (searchQueries.length === 0) {
+            return {
+                hits: [],
+            };
+        }
+        const apiResponse = await ElasticSearch.msearch({
+            body: searchQueries.flatMap(query => [{ index: query.index }, { query: query.body.query }]),
+        });
+
+        return (apiResponse.body.responses as any[])
+            .filter(response => {
+                if (response.error) {
+                    if (response.error.type === 'index_not_found_exception') {
+                        // Indexes are created the first time a resource of a given type is written to DDB.
+                        console.log(
+                            `Search index for ${response.error.index} does not exist. Returning an empty search result`,
+                        );
+                        return false;
+                    }
+                    throw response.error;
+                }
+                return true;
+            })
+            .reduce(
+                (acc, response) => {
+                    acc.hits.push(...response.hits.hits);
+                    return acc;
+                },
+                {
+                    hits: [],
+                },
+            );
+    }
+
     private hitsToSearchEntries({
         hits,
         baseUrl,
@@ -200,16 +242,11 @@ export class ElasticSearchService implements Search {
             searchEntries.map(x => x.resource),
             request.resourceType,
             this.filterRulesForActiveResources,
+            this.fhirVersion,
         );
 
-        const searchResults = await Promise.all(
-            searchQueries.map(async query => {
-                const { hits } = await this.executeQuery(query);
-                return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
-            }),
-        );
-
-        return searchResults.flat();
+        const { hits } = await this.executeQueries(searchQueries);
+        return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
     }
 
     private async processSearchRevIncludes(
@@ -221,15 +258,11 @@ export class ElasticSearchService implements Search {
             searchEntries.map(x => x.resource),
             request.resourceType,
             this.filterRulesForActiveResources,
+            this.fhirVersion,
         );
 
-        const searchResults = await Promise.all(
-            searchQueries.map(async query => {
-                const { hits } = await this.executeQuery(query);
-                return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
-            }),
-        );
-        return searchResults.flat();
+        const { hits } = await this.executeQueries(searchQueries);
+        return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
     }
 
     // eslint-disable-next-line class-methods-use-this

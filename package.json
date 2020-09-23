@@ -48,6 +48,7 @@
     "jest": "^25.1.0",
     "jest-each": "^26.4.2",
     "jest-mock-extended": "^1.0.8",
+    "json-stringify-pretty-compact": "^2.0.0",
     "prettier": "^1.19.1",
     "ts-jest": "^25.1.0",
     "typescript": "^3.7.5"
