@@ -258,7 +258,13 @@ export class ElasticSearchService implements Search {
             this.fhirVersion,
             iterative,
         );
-        const { hits } = await this.executeQueries([...includeSearchQueries, ...revIncludeSearchQueries]);
+
+        const lowerCaseAllowedResourceTypes = new Set(request.allowedResourceTypes.map(r => r.toLowerCase()));
+        const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
+            lowerCaseAllowedResourceTypes.has(query.index),
+        );
+
+        const { hits } = await this.executeQueries(allowedInclusionQueries);
         return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
     }
 

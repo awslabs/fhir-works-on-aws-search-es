@@ -10,6 +10,19 @@ import { ElasticSearch } from './elasticSearch';
 jest.mock('./elasticSearch');
 
 const FILTER_RULES_FOR_ACTIVE_RESOURCES = [{ match: { someFieldThatTellsIfTheResourceIsActive: 'AVAILABLE' } }];
+const ALLOWED_RESOURCE_TYPES = [
+    'Claim',
+    'Communication',
+    'ImmunizationRecommendation',
+    'MedicationAdministration',
+    'MedicationRequest',
+    'MedicationStatement',
+    'Organization',
+    'Patient',
+    'Practitioner',
+    'PractitionerRole',
+    'Provenance',
+];
 
 describe('typeSearch', () => {
     beforeEach(() => {
@@ -63,6 +76,7 @@ describe('typeSearch', () => {
                 resourceType: 'Patient',
                 baseUrl: 'https://base-url.com',
                 queryParams,
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
             });
 
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
@@ -103,6 +117,7 @@ describe('typeSearch', () => {
             resourceType: 'Patient',
             baseUrl: 'https://base-url.com',
             queryParams: {},
+            allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
         });
         expect(result).toMatchSnapshot();
     });
@@ -185,6 +200,7 @@ describe('typeSearch', () => {
                 resourceType: 'MedicationRequest',
                 baseUrl: 'https://base-url.com',
                 queryParams: { ...queryParams },
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
             });
 
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
@@ -209,6 +225,7 @@ describe('typeSearch', () => {
                 resourceType: 'MedicationRequest',
                 baseUrl: 'https://base-url.com',
                 queryParams: { ...queryParams },
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
             });
 
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
@@ -277,6 +294,7 @@ describe('typeSearch', () => {
             resourceType: 'MedicationRequest',
             baseUrl: 'https://base-url.com',
             queryParams: { ...queryParams },
+            allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
         });
 
         expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
@@ -339,6 +357,7 @@ describe('typeSearch', () => {
             resourceType: 'MedicationRequest',
             baseUrl: 'https://base-url.com',
             queryParams: { ...queryParams },
+            allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
         });
 
         expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
