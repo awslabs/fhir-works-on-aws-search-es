@@ -360,6 +360,34 @@ Array [
 ]
 `;
 
+exports[`typeSearch _include wildcard include with restrictive allowed resource types: msearch queries 1`] = `Array []`;
+
+exports[`typeSearch _include wildcard include with restrictive allowed resource types: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch _include:iterate: msearch queries 1`] = `
 Array [
   Array [

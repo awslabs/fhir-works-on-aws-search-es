@@ -206,6 +206,22 @@ describe('typeSearch', () => {
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
             expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
         });
+
+        test('wildcard include with restrictive allowed resource types', async () => {
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+            (ElasticSearch.msearch as jest.Mock).mockResolvedValue(emptyMsearchResult);
+
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'MedicationRequest',
+                baseUrl: 'https://base-url.com',
+                queryParams: { _include: '*' },
+                allowedResourceTypes: ['MedicationRequest'],
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+            expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+        });
     });
 
     describe('_revinclude', () => {
