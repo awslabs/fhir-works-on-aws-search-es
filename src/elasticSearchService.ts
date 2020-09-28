@@ -26,7 +26,11 @@ const NON_SEARCHABLE_FIELDS = [
     '_format',
     '_include',
     '_revinclude',
+    '_include:iterate',
+    '_revinclude:iterate',
 ];
+
+const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
@@ -137,11 +141,12 @@ export class ElasticSearchService implements Search {
                 );
             }
 
-            const [includedResources, revincludedResources] = await Promise.all([
-                this.processSearchIncludes(result.entries, request),
-                this.processSearchRevIncludes(result.entries, request),
-            ]);
-            result.entries.push(...includedResources, ...revincludedResources);
+            const includedResources = await this.processSearchInclusions(result.entries, request);
+            result.entries.push(...includedResources);
+
+            const iterativelyIncludedResources = await this.processIterativeSearchInclusions(result.entries, request);
+            result.entries.push(...iterativelyIncludedResources);
+
             return { result };
         } catch (error) {
             console.error(error);
@@ -233,36 +238,71 @@ export class ElasticSearchService implements Search {
         );
     }
 
-    private async processSearchIncludes(
+    private async processSearchInclusions(
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
+        iterative?: true,
     ): Promise<SearchEntry[]> {
-        const searchQueries = buildIncludeQueries(
+        const includeSearchQueries = buildIncludeQueries(
             request.queryParams,
             searchEntries.map(x => x.resource),
-            request.resourceType,
             this.filterRulesForActiveResources,
             this.fhirVersion,
+            iterative,
         );
 
-        const { hits } = await this.executeQueries(searchQueries);
+        const revIncludeSearchQueries = buildRevIncludeQueries(
+            request.queryParams,
+            searchEntries.map(x => x.resource),
+            this.filterRulesForActiveResources,
+            this.fhirVersion,
+            iterative,
+        );
+        const { hits } = await this.executeQueries([...includeSearchQueries, ...revIncludeSearchQueries]);
         return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
     }
 
-    private async processSearchRevIncludes(
+    private async processIterativeSearchInclusions(
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
     ): Promise<SearchEntry[]> {
-        const searchQueries = buildRevIncludeQueries(
-            request.queryParams,
-            searchEntries.map(x => x.resource),
-            request.resourceType,
-            this.filterRulesForActiveResources,
-            this.fhirVersion,
+        const result: SearchEntry[] = [];
+        const resourceIdsAlreadyInResult: Set<string> = new Set(
+            searchEntries.map(searchEntry => searchEntry.resource.id),
         );
+        const resourceIdsWithInclusionsAlreadyResolved: Set<string> = new Set();
 
-        const { hits } = await this.executeQueries(searchQueries);
-        return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
+        console.log('Iterative inclusion search starts');
+
+        let resourcesToIterate = searchEntries;
+        for (let i = 0; i < MAX_INCLUDE_ITERATIVE_DEPTH; i += 1) {
+            // eslint-disable-next-line no-await-in-loop
+            const resourcesFound = await this.processSearchInclusions(resourcesToIterate, request, true);
+
+            resourcesToIterate.forEach(resource => resourceIdsWithInclusionsAlreadyResolved.add(resource.resource.id));
+            if (resourcesFound.length === 0) {
+                console.log(`Iteration ${i} found zero results. Stopping`);
+                break;
+            }
+
+            resourcesFound.forEach(resourceFound => {
+                // Avoid duplicates in result. In some cases different include/revinclude clauses can end up finding the same resource.
+                if (!resourceIdsAlreadyInResult.has(resourceFound.resource.id)) {
+                    resourceIdsAlreadyInResult.add(resourceFound.resource.id);
+                    result.push(resourceFound);
+                }
+            });
+
+            if (i === MAX_INCLUDE_ITERATIVE_DEPTH - 1) {
+                console.log('MAX_INCLUDE_ITERATIVE_DEPTH reached. Stopping');
+                break;
+            }
+            resourcesToIterate = resourcesFound.filter(
+                r => !resourceIdsWithInclusionsAlreadyResolved.has(r.resource.id),
+            );
+            console.log(`Iteration ${i} found ${resourcesFound.length} resources`);
+        }
+        return result;
     }
 
     // eslint-disable-next-line class-methods-use-this

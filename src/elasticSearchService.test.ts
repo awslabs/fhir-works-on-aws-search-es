@@ -215,4 +215,133 @@ describe('typeSearch', () => {
             expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
         });
     });
+
+    test('_include:iterate', async () => {
+        (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [
+                                {
+                                    _source: {
+                                        id: 'patient-id-333',
+                                        resourceType: 'Patient',
+                                        managingOrganization: {
+                                            reference: 'Organization/org-id-111',
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [
+                                {
+                                    _source: {
+                                        id: 'org-id-111',
+                                        resourceType: 'Organization',
+                                    },
+                                },
+                            ],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        const queryParams = { '_include:iterate': ['MedicationRequest:subject', 'Patient:managingOrganization'] };
+        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+        await es.typeSearch({
+            resourceType: 'MedicationRequest',
+            baseUrl: 'https://base-url.com',
+            queryParams: { ...queryParams },
+        });
+
+        expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+        expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+    });
+
+    test('_revinclude:iterate', async () => {
+        (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [
+                                {
+                                    _source: {
+                                        id: 'medication-administration-111',
+                                        resourceType: 'MedicationAdministration',
+                                    },
+                                },
+                            ],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        const queryParams = {
+            '_revinclude:iterate': [
+                'MedicationAdministration:request:MedicationRequest',
+                'MedicationStatement:partOf:MedicationAdministration',
+            ],
+        };
+        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+        await es.typeSearch({
+            resourceType: 'MedicationRequest',
+            baseUrl: 'https://base-url.com',
+            queryParams: { ...queryParams },
+        });
+
+        expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+        expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+    });
 });

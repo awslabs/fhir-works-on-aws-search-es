@@ -8,6 +8,7 @@ import { isPresent } from './tsUtils';
 export type InclusionSearchParameter = {
     type: '_include' | '_revinclude';
     isWildcard: false;
+    isIterate?: true;
     sourceResource: string;
     searchParameter: string;
     targetResourceType?: string;
@@ -16,6 +17,7 @@ export type InclusionSearchParameter = {
 export type WildcardInclusionSearchParameter = {
     type: '_include' | '_revinclude';
     isWildcard: true;
+    isIterate?: true;
 };
 
 export const inclusionParameterFromString = (
@@ -42,44 +44,50 @@ export const inclusionParameterFromString = (
 };
 
 const expandRevIncludeWildcard = (
-    resourceType: string,
+    resourceTypes: string[],
     resourceReferencesMatrix: string[][],
 ): InclusionSearchParameter[] => {
-    return resourceReferencesMatrix
-        .filter(
-            // Some Resources have fields that can reference any resource type. They have their type noted as Reference(Any) on the FHIR website.
-            // In those cases the targetResourceType is noted as 'Resource' in the references matrix.
-            ([, , targetResourceType]) => targetResourceType === resourceType || targetResourceType === 'Resource',
-        )
-        .map(([sourceResource, searchParameter, targetResourceType]) => ({
-            type: '_revinclude',
-            isWildcard: false,
-            sourceResource,
-            searchParameter,
-            targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
-        }));
+    return resourceTypes.flatMap(resourceType => {
+        return resourceReferencesMatrix
+            .filter(
+                // Some Resources have fields that can reference any resource type. They have their type noted as Reference(Any) on the FHIR website.
+                // In those cases the targetResourceType is noted as 'Resource' in the references matrix.
+                ([, , targetResourceType]) => targetResourceType === resourceType || targetResourceType === 'Resource',
+            )
+            .map(([sourceResource, searchParameter, targetResourceType]) => ({
+                type: '_revinclude',
+                isWildcard: false,
+                sourceResource,
+                searchParameter,
+                targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
+            }));
+    });
 };
 
 const expandIncludeWildcard = (
-    resourceType: string,
+    resourceTypes: string[],
     resourceReferencesMatrix: string[][],
 ): InclusionSearchParameter[] => {
-    return resourceReferencesMatrix
-        .filter(([sourceResource, ,]) => sourceResource === resourceType)
-        .map(([sourceResource, searchParameter, targetResourceType]) => ({
-            type: '_include',
-            isWildcard: false,
-            sourceResource,
-            searchParameter,
-            targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
-        }));
+    return resourceTypes.flatMap(resourceType => {
+        return resourceReferencesMatrix
+            .filter(([sourceResource, ,]) => sourceResource === resourceType)
+            .map(([sourceResource, searchParameter, targetResourceType]) => ({
+                type: '_include',
+                isWildcard: false,
+                sourceResource,
+                searchParameter,
+                targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
+            }));
+    });
 };
 
 export const getInclusionParametersFromQueryParams = (
     includeType: '_include' | '_revinclude',
     queryParams: any,
+    iterate?: true,
 ): (InclusionSearchParameter | WildcardInclusionSearchParameter)[] => {
-    const queryParam = queryParams?.[includeType];
+    const includeTypeKey = iterate ? `${includeType}:iterate` : includeType;
+    const queryParam = queryParams?.[includeTypeKey];
     if (!queryParam) {
         return [];
     }
@@ -93,20 +101,16 @@ export const getInclusionParametersFromQueryParams = (
     if (inclusionParameter === null) {
         return [];
     }
-    return [{ type: includeType, ...inclusionParameter }];
+    return [{ type: includeType, isIterate: iterate, ...inclusionParameter }];
 };
 const RELATIVE_URL_REGEX = /^[A-Za-z]+\/[A-Za-z0-9-]+$/;
-export const getReferencesFromResources = (
+export const getIncludeReferencesFromResources = (
     includes: InclusionSearchParameter[],
     resources: any[],
-    requestResourceType: string,
 ): { resourceType: string; id: string }[] => {
     const references = includes.flatMap(include => {
-        if (include.sourceResource !== requestResourceType) {
-            return [];
-        }
-
         return resources
+            .filter(resource => resource.resourceType === include.sourceResource)
             .map(resource => get(resource, `${include.searchParameter}`) as any)
             .flatMap(valueAtPath => {
                 if (Array.isArray(valueAtPath)) {
@@ -124,6 +128,24 @@ export const getReferencesFromResources = (
     });
 
     return uniqBy(references, x => `${x.resourceType}/${x.id}`);
+};
+
+export const getRevincludeReferencesFromResources = (
+    revIncludeParameters: InclusionSearchParameter[],
+    resources: any[],
+): { references: string[]; revinclude: InclusionSearchParameter }[] => {
+    return revIncludeParameters
+        .map(revinclude => {
+            const references = resources
+                .filter(
+                    resource =>
+                        revinclude.targetResourceType === undefined ||
+                        resource.resourceType === revinclude.targetResourceType,
+                )
+                .map(resource => `${resource.resourceType}/${resource.id}`);
+            return { revinclude, references };
+        })
+        .filter(({ references }) => references.length > 0);
 };
 
 export const buildIncludeQuery = (
@@ -187,23 +209,31 @@ const getResourceReferenceMatrix = (fhirVersion: FhirVersion): string[][] => {
 export const buildIncludeQueries = (
     queryParams: any,
     resources: any[],
-    requestResourceType: string,
     filterRulesForActiveResources: any[],
     fhirVersion: FhirVersion,
+    iterate?: true,
 ): any[] => {
     const allIncludeParameters = getInclusionParametersFromQueryParams(
         '_include',
         queryParams,
+        iterate,
     ) as InclusionSearchParameter[];
 
     const includeParameters = allIncludeParameters.some(x => x.isWildcard)
-        ? expandIncludeWildcard(requestResourceType, getResourceReferenceMatrix(fhirVersion))
+        ? expandIncludeWildcard(
+              [
+                  ...resources.reduce(
+                      (acc: Set<string>, resource) => acc.add(resource.resourceType),
+                      new Set() as Set<string>,
+                  ),
+              ],
+              getResourceReferenceMatrix(fhirVersion),
+          )
         : (allIncludeParameters as InclusionSearchParameter[]);
 
-    const resourceReferences: { resourceType: string; id: string }[] = getReferencesFromResources(
+    const resourceReferences: { resourceType: string; id: string }[] = getIncludeReferencesFromResources(
         includeParameters,
         resources,
-        requestResourceType,
     );
 
     const resourceTypeToIds: { [resourceType: string]: string[] } = mapValues(
@@ -220,24 +250,28 @@ export const buildIncludeQueries = (
 export const buildRevIncludeQueries = (
     queryParams: any,
     resources: any[],
-    requestResourceType: string,
     filterRulesForActiveResources: any[],
     fhirVersion: FhirVersion,
+    iterate?: true,
 ) => {
-    const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams);
+    const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams, iterate);
 
     const revIncludeParameters = allRevincludeParameters.some(x => x.isWildcard)
-        ? expandRevIncludeWildcard(requestResourceType, getResourceReferenceMatrix(fhirVersion))
+        ? expandRevIncludeWildcard(
+              [
+                  ...resources.reduce(
+                      (acc: Set<string>, resource) => acc.add(resource.resourceType),
+                      new Set() as Set<string>,
+                  ),
+              ],
+              getResourceReferenceMatrix(fhirVersion),
+          )
         : (allRevincludeParameters as InclusionSearchParameter[]);
 
-    const references: string[] = resources.map(resource => `${resource.resourceType}/${resource.id}`);
-    const searchQueries = revIncludeParameters
-        .filter(revinclude => {
-            const { targetResourceType } = revinclude;
-            return !targetResourceType || targetResourceType === requestResourceType;
-        })
-        .map(revinclude => {
-            return buildRevIncludeQuery(revinclude, references, filterRulesForActiveResources);
-        });
+    const revincludeReferences = getRevincludeReferencesFromResources(revIncludeParameters, resources);
+
+    const searchQueries = revincludeReferences.map(({ revinclude, references }) =>
+        buildRevIncludeQuery(revinclude, references, filterRulesForActiveResources),
+    );
     return searchQueries;
 };
