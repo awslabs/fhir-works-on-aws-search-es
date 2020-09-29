@@ -5,6 +5,7 @@
 
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
+
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
 import {
     Search,
@@ -13,9 +14,23 @@ import {
     SearchResponse,
     GlobalSearchRequest,
     SearchEntry,
+    FhirVersion,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
+import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
+
+const NON_SEARCHABLE_FIELDS = [
+    SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
+    SEARCH_PAGINATION_PARAMS.COUNT,
+    '_format',
+    '_include',
+    '_revinclude',
+    '_include:iterate',
+    '_revinclude:iterate',
+];
+
+const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
@@ -23,21 +38,26 @@ export class ElasticSearchService implements Search {
 
     private readonly cleanUpFunction: (resource: any) => any;
 
+    private readonly fhirVersion: FhirVersion;
+
     /**
      * @param filterRulesForActiveResources - If you are storing both History and Search resources
      * in your elastic search you can filter out your History elements by supplying a filter argument like:
      * [{ match: { documentStatus: 'AVAILABLE' }}]
      * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
      * the return ES objects
+     * @param fhirVersion
      */
     constructor(
         filterRulesForActiveResources: any[] = [],
         cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
+        fhirVersion: FhirVersion = '4.0.1',
     ) {
         this.filterRulesForActiveResources = filterRulesForActiveResources;
         this.cleanUpFunction = cleanUpFunction;
+        this.fhirVersion = fhirVersion;
     }
 
     /*
@@ -56,16 +76,13 @@ export class ElasticSearchService implements Search {
 
             // Exp. {gender: 'male', name: 'john'}
             const searchFieldToValue = { ...queryParams };
-            delete searchFieldToValue[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET];
-            delete searchFieldToValue[SEARCH_PAGINATION_PARAMS.COUNT];
 
             const must: any = [];
             // TODO Implement fuzzy matches
             Object.keys(searchFieldToValue).forEach(field => {
                 // id is mapped in ElasticSearch to be of type "keyword", which requires an exact match
                 const fieldParam = field === 'id' ? 'id' : `${field}.*`;
-                // Don't send _format param to ES
-                if (field === '_format') {
+                if (NON_SEARCHABLE_FIELDS.includes(field)) {
                     return;
                 }
                 const query = {
@@ -94,28 +111,10 @@ export class ElasticSearchService implements Search {
                     },
                 },
             };
-
-            const response = await ElasticSearch.search(params);
-            const total = response.body.hits.total.value;
-
+            const { total, hits } = await this.executeQuery(params);
             const result: SearchResult = {
                 numberOfResults: total,
-                entries: response.body.hits.hits.map(
-                    (hit: any): SearchEntry => {
-                        // Modify to return resource with FHIR id not Dynamo ID
-                        const resource = this.cleanUpFunction(hit._source);
-                        return {
-                            search: {
-                                mode: 'match',
-                            },
-                            fullUrl: URL.format({
-                                host: request.baseUrl,
-                                pathname: `/${resourceType}/${resource.id}`,
-                            }),
-                            resource,
-                        };
-                    },
-                ),
+                entries: this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'match' }),
                 message: '',
             };
 
@@ -142,22 +141,174 @@ export class ElasticSearchService implements Search {
                 );
             }
 
+            const includedResources = await this.processSearchInclusions(result.entries, request);
+            result.entries.push(...includedResources);
+
+            const iterativelyIncludedResources = await this.processIterativeSearchInclusions(result.entries, request);
+            result.entries.push(...iterativelyIncludedResources);
+
             return { result };
         } catch (error) {
-            // Indexes are created the first time a resource of a given type is written to DDB.
-            if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
-                console.log(`Search index for ${resourceType} does not exist. Returning an empty search result`);
-                return {
-                    result: {
-                        numberOfResults: 0,
-                        entries: [],
-                        message: '',
-                    },
-                };
-            }
             console.error(error);
             throw error;
         }
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    private async executeQuery(searchQuery: any): Promise<{ hits: any[]; total: number }> {
+        try {
+            const apiResponse = await ElasticSearch.search(searchQuery);
+            return {
+                total: apiResponse.body.hits.total.value,
+                hits: apiResponse.body.hits.hits,
+            };
+        } catch (error) {
+            // Indexes are created the first time a resource of a given type is written to DDB.
+            if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
+                console.log(`Search index for ${searchQuery.index} does not exist. Returning an empty search result`);
+                return {
+                    total: 0,
+                    hits: [],
+                };
+            }
+            throw error;
+        }
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    private async executeQueries(searchQueries: any[]): Promise<{ hits: any[] }> {
+        if (searchQueries.length === 0) {
+            return {
+                hits: [],
+            };
+        }
+        const apiResponse = await ElasticSearch.msearch({
+            body: searchQueries.flatMap(query => [{ index: query.index }, { query: query.body.query }]),
+        });
+
+        return (apiResponse.body.responses as any[])
+            .filter(response => {
+                if (response.error) {
+                    if (response.error.type === 'index_not_found_exception') {
+                        // Indexes are created the first time a resource of a given type is written to DDB.
+                        console.log(
+                            `Search index for ${response.error.index} does not exist. Returning an empty search result`,
+                        );
+                        return false;
+                    }
+                    throw response.error;
+                }
+                return true;
+            })
+            .reduce(
+                (acc, response) => {
+                    acc.hits.push(...response.hits.hits);
+                    return acc;
+                },
+                {
+                    hits: [],
+                },
+            );
+    }
+
+    private hitsToSearchEntries({
+        hits,
+        baseUrl,
+        mode = 'match',
+    }: {
+        hits: any[];
+        baseUrl: string;
+        mode: 'match' | 'include';
+    }): SearchEntry[] {
+        return hits.map(
+            (hit: any): SearchEntry => {
+                // Modify to return resource with FHIR id not Dynamo ID
+                const resource = this.cleanUpFunction(hit._source);
+                return {
+                    search: {
+                        mode,
+                    },
+                    fullUrl: URL.format({
+                        host: baseUrl,
+                        pathname: `/${resource.resourceType}/${resource.id}`,
+                    }),
+                    resource,
+                };
+            },
+        );
+    }
+
+    private async processSearchInclusions(
+        searchEntries: SearchEntry[],
+        request: TypeSearchRequest,
+        iterative?: true,
+    ): Promise<SearchEntry[]> {
+        const includeSearchQueries = buildIncludeQueries(
+            request.queryParams,
+            searchEntries.map(x => x.resource),
+            this.filterRulesForActiveResources,
+            this.fhirVersion,
+            iterative,
+        );
+
+        const revIncludeSearchQueries = buildRevIncludeQueries(
+            request.queryParams,
+            searchEntries.map(x => x.resource),
+            this.filterRulesForActiveResources,
+            this.fhirVersion,
+            iterative,
+        );
+
+        const lowerCaseAllowedResourceTypes = new Set(request.allowedResourceTypes.map(r => r.toLowerCase()));
+        const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
+            lowerCaseAllowedResourceTypes.has(query.index),
+        );
+
+        const { hits } = await this.executeQueries(allowedInclusionQueries);
+        return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
+    }
+
+    private async processIterativeSearchInclusions(
+        searchEntries: SearchEntry[],
+        request: TypeSearchRequest,
+    ): Promise<SearchEntry[]> {
+        const result: SearchEntry[] = [];
+        const resourceIdsAlreadyInResult: Set<string> = new Set(
+            searchEntries.map(searchEntry => searchEntry.resource.id),
+        );
+        const resourceIdsWithInclusionsAlreadyResolved: Set<string> = new Set();
+
+        console.log('Iterative inclusion search starts');
+
+        let resourcesToIterate = searchEntries;
+        for (let i = 0; i < MAX_INCLUDE_ITERATIVE_DEPTH; i += 1) {
+            // eslint-disable-next-line no-await-in-loop
+            const resourcesFound = await this.processSearchInclusions(resourcesToIterate, request, true);
+
+            resourcesToIterate.forEach(resource => resourceIdsWithInclusionsAlreadyResolved.add(resource.resource.id));
+            if (resourcesFound.length === 0) {
+                console.log(`Iteration ${i} found zero results. Stopping`);
+                break;
+            }
+
+            resourcesFound.forEach(resourceFound => {
+                // Avoid duplicates in result. In some cases different include/revinclude clauses can end up finding the same resource.
+                if (!resourceIdsAlreadyInResult.has(resourceFound.resource.id)) {
+                    resourceIdsAlreadyInResult.add(resourceFound.resource.id);
+                    result.push(resourceFound);
+                }
+            });
+
+            if (i === MAX_INCLUDE_ITERATIVE_DEPTH - 1) {
+                console.log('MAX_INCLUDE_ITERATIVE_DEPTH reached. Stopping');
+                break;
+            }
+            resourcesToIterate = resourcesFound.filter(
+                r => !resourceIdsWithInclusionsAlreadyResolved.has(r.resource.id),
+            );
+            console.log(`Iteration ${i} found ${resourcesFound.length} resources`);
+        }
+        return result;
     }
 
     // eslint-disable-next-line class-methods-use-this

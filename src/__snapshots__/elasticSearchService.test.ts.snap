@@ -1,0 +1,1483 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`typeSearch _include queryParams={"_include":"*"}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "patient",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "patient-id-333",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "practitionerrole",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "practitionerRole-id-555",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "practitioner",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "practitioner-id-222",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "immunizationrecommendation",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "immunizationRec-id-444",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":"*"}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":"MedicationRequest:subject"}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "patient",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "patient-id-333",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":"MedicationRequest:subject"}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":"MedicationRequest:subject:Group"}: msearch queries 1`] = `Array []`;
+
+exports[`typeSearch _include queryParams={"_include":"MedicationRequest:subject:Group"}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:performer"]}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "patient",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "patient-id-333",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "practitioner",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "practitioner-id-222",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:performer"]}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:subject"]}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "patient",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "patient-id-333",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:subject"]}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include wildcard include with restrictive allowed resource types: msearch queries 1`] = `Array []`;
+
+exports[`typeSearch _include wildcard include with restrictive allowed resource types: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include:iterate: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "patient",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "patient-id-333",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "organization",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "org-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _include:iterate: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"*"}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "claim",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "prescription.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "claim",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "originalPrescription.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "communication",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "basedOn.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "communication",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "partOf.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "communication",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "about.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "immunizationrecommendation",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "recommendation.supportingPatientInformation.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "medicationadministration",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "supportingInformation.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "medicationadministration",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "request.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "medicationrequest",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "supportingInformation.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "medicationrequest",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "basedOn.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "medicationrequest",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "priorPrescription.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "medicationstatement",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "basedOn.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "medicationstatement",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "derivedFrom.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "provenance",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "target.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "provenance",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "entity.what.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"*"}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"MedicationAdministration:request"}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "medicationadministration",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "request.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"MedicationAdministration:request"}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"MedicationAdministration:request:Device"}: msearch queries 1`] = `Array []`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"MedicationAdministration:request:Device"}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"MedicationAdministration:request:MedicationRequest"}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "medicationadministration",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "request.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":"MedicationAdministration:request:MedicationRequest"}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":["MedicationAdministration:request","MedicationAdministration:request"]}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "medicationadministration",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "request.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":["MedicationAdministration:request","MedicationAdministration:request"]}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":["MedicationAdministration:request","Provenance:target"]}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "medicationadministration",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "request.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "provenance",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "target.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude queryParams={"_revinclude":["MedicationAdministration:request","Provenance:target"]}: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude:iterate: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "medicationadministration",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "request.reference.keyword": Array [
+                      "MedicationRequest/medicationrequest-id-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "medicationstatement",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "partOf.reference.keyword": Array [
+                      "MedicationAdministration/medication-administration-111",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`typeSearch _revinclude:iterate: search queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "medicationrequest",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch Response format 1`] = `
+Object {
+  "result": Object {
+    "entries": Array [
+      Object {
+        "fullUrl": "https://base-url.com/Patient/ab69afd3-39ed-42c3-9f77-8a718a247742",
+        "resource": Object {
+          "birthDate": "1995-09-24",
+          "gender": "female",
+          "id": "ab69afd3-39ed-42c3-9f77-8a718a247742",
+          "resourceType": "Patient",
+          "vid": "1",
+        },
+        "search": Object {
+          "mode": "match",
+        },
+      },
+    ],
+    "message": "",
+    "numberOfResults": 1,
+  },
+}
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_count":10,"_getpagesoffset":2,"id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "query_string": Object {
+                  "default_operator": "AND",
+                  "fields": Array [
+                    "id",
+                  ],
+                  "lenient": true,
+                  "query": "11111111-1111-1111-1111-111111111111",
+                },
+              },
+              Object {
+                "query_string": Object {
+                  "default_operator": "AND",
+                  "fields": Array [
+                    "gender.*",
+                  ],
+                  "lenient": true,
+                  "query": "female",
+                },
+              },
+              Object {
+                "query_string": Object {
+                  "default_operator": "AND",
+                  "fields": Array [
+                    "name.*",
+                  ],
+                  "lenient": true,
+                  "query": "Emily",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 2,
+      "index": "patient",
+      "size": 10,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_count":10,"_getpagesoffset":2} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 2,
+      "index": "patient",
+      "size": 10,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_format":"json"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"gender":"female","name":"Emily"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "query_string": Object {
+                  "default_operator": "AND",
+                  "fields": Array [
+                    "gender.*",
+                  ],
+                  "lenient": true,
+                  "query": "female",
+                },
+              },
+              Object {
+                "query_string": Object {
+                  "default_operator": "AND",
+                  "fields": Array [
+                    "name.*",
+                  ],
+                  "lenient": true,
+                  "query": "Emily",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={"id":"11111111-1111-1111-1111-111111111111"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "query_string": Object {
+                  "default_operator": "AND",
+                  "fields": Array [
+                    "id",
+                  ],
+                  "lenient": true,
+                  "query": "11111111-1111-1111-1111-111111111111",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams queryParams={} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
