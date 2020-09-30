@@ -19,8 +19,9 @@ import {
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
+import { getDocumentField } from './searchParametersMapping';
 
-const NON_SEARCHABLE_FIELDS = [
+const NON_SEARCHABLE_PARAMETERS = [
     SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
     SEARCH_PAGINATION_PARAMS.COUNT,
     '_format',
@@ -75,20 +76,19 @@ export class ElasticSearchService implements Search {
                 : DEFAULT_SEARCH_RESULTS_PER_PAGE;
 
             // Exp. {gender: 'male', name: 'john'}
-            const searchFieldToValue = { ...queryParams };
+            const searchParameterToValue = { ...queryParams };
 
             const must: any = [];
             // TODO Implement fuzzy matches
-            Object.keys(searchFieldToValue).forEach(field => {
-                // id is mapped in ElasticSearch to be of type "keyword", which requires an exact match
-                const fieldParam = field === 'id' ? 'id' : `${field}.*`;
-                if (NON_SEARCHABLE_FIELDS.includes(field)) {
+            Object.entries(searchParameterToValue).forEach(([searchParameter, value]) => {
+                if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
                     return;
                 }
+                const field = getDocumentField(searchParameter);
                 const query = {
                     query_string: {
-                        fields: [fieldParam],
-                        query: queryParams[field],
+                        fields: [field],
+                        query: value,
                         default_operator: 'AND',
                         lenient: true,
                     },
@@ -122,7 +122,7 @@ export class ElasticSearchService implements Search {
                 result.previousResultUrl = this.createURL(
                     request.baseUrl,
                     {
-                        ...searchFieldToValue,
+                        ...searchParameterToValue,
                         [SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]: from - size,
                         [SEARCH_PAGINATION_PARAMS.COUNT]: size,
                     },
@@ -133,7 +133,7 @@ export class ElasticSearchService implements Search {
                 result.nextResultUrl = this.createURL(
                     request.baseUrl,
                     {
-                        ...searchFieldToValue,
+                        ...searchParameterToValue,
                         [SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]: from + size,
                         [SEARCH_PAGINATION_PARAMS.COUNT]: size,
                     },
