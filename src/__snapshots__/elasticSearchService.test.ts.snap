@@ -1372,6 +1372,43 @@ Array [
 ]
 `;
 
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_id":"11111111-1111-1111-1111-111111111111"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "query_string": Object {
+                  "default_operator": "AND",
+                  "fields": Array [
+                    "id",
+                  ],
+                  "lenient": true,
+                  "query": "11111111-1111-1111-1111-111111111111",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch query snapshots for simple queryParams queryParams={"gender":"female","name":"Emily"} 1`] = `
 Array [
   Array [
