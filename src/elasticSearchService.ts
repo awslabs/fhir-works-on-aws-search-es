@@ -274,9 +274,9 @@ export class ElasticSearchService implements Search {
         request: TypeSearchRequest,
     ): Promise<SearchEntry[]> {
         if (
-            Object.keys(request.queryParams).filter(searchParam => {
-                return ITERATIVE_INCLUSION_PARAMETERS.includes(searchParam);
-            }).length === 0
+            !ITERATIVE_INCLUSION_PARAMETERS.some(param => {
+                return Object.keys(request.queryParams).includes(param);
+            })
         ) {
             return [];
         }
