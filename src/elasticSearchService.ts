@@ -21,14 +21,15 @@ import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './con
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { getDocumentField } from './searchParametersMapping';
 
+const ITERATIVE_INCLUSION_PARAMETERS = ['_include:iterate', '_revinclude:iterate'];
+
 const NON_SEARCHABLE_PARAMETERS = [
     SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
     SEARCH_PAGINATION_PARAMS.COUNT,
     '_format',
     '_include',
     '_revinclude',
-    '_include:iterate',
-    '_revinclude:iterate',
+    ...ITERATIVE_INCLUSION_PARAMETERS,
 ];
 
 const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
@@ -272,6 +273,13 @@ export class ElasticSearchService implements Search {
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
     ): Promise<SearchEntry[]> {
+        if (
+            Object.keys(request.queryParams).filter(searchParam => {
+                return ITERATIVE_INCLUSION_PARAMETERS.includes(searchParam);
+            }).length === 0
+        ) {
+            return [];
+        }
         const result: SearchEntry[] = [];
         const resourceIdsAlreadyInResult: Set<string> = new Set(
             searchEntries.map(searchEntry => searchEntry.resource.id),
