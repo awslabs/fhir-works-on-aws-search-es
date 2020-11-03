@@ -13,7 +13,7 @@ const { IS_OFFLINE } = process.env;
 let esDomainEndpoint = process.env.ELASTICSEARCH_DOMAIN_ENDPOINT || 'https://fake-es-endpoint.com';
 if (IS_OFFLINE === 'true') {
     AWS.config.update({
-        region: 'us-west-2',
+        region: process.env.AWS_REGION || 'us-west-2',
         accessKeyId: process.env.ACCESS_KEY,
         secretAccessKey: process.env.SECRET_KEY,
     });
