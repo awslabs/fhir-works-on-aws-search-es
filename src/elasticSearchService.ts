@@ -19,18 +19,9 @@ import {
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
-import { getDocumentField } from './searchParametersMapping';
+import { QueryBuilder } from './queryBuilder';
 
 const ITERATIVE_INCLUSION_PARAMETERS = ['_include:iterate', '_revinclude:iterate'];
-
-const NON_SEARCHABLE_PARAMETERS = [
-    SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
-    SEARCH_PAGINATION_PARAMS.COUNT,
-    '_format',
-    '_include',
-    '_revinclude',
-    ...ITERATIVE_INCLUSION_PARAMETERS,
-];
 
 const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
@@ -75,43 +66,17 @@ export class ElasticSearchService implements Search {
             const size = queryParams[SEARCH_PAGINATION_PARAMS.COUNT]
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.COUNT])
                 : DEFAULT_SEARCH_RESULTS_PER_PAGE;
-
-            // Exp. {gender: 'male', name: 'john'}
             const searchParameterToValue = { ...queryParams };
-
-            const must: any = [];
-            // TODO Implement fuzzy matches
-            Object.entries(searchParameterToValue).forEach(([searchParameter, value]) => {
-                if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
-                    return;
-                }
-                const field = getDocumentField(searchParameter);
-                const query = {
-                    query_string: {
-                        fields: [field],
-                        query: value,
-                        default_operator: 'AND',
-                        lenient: true,
-                    },
-                };
-                must.push(query);
-            });
-
-            const filter = this.filterRulesForActiveResources;
-
+            const queryBuilder = new QueryBuilder(searchParameterToValue);
+            const body: any = queryBuilder.buildQuery();
             const params = {
                 index: resourceType.toLowerCase(),
                 from,
                 size,
-                body: {
-                    query: {
-                        bool: {
-                            must,
-                            filter,
-                        },
-                    },
-                },
+                body,
             };
+
+            console.log(JSON.stringify(params));
             const { total, hits } = await this.executeQuery(params);
             const result: SearchResult = {
                 numberOfResults: total,
