@@ -110,14 +110,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -170,14 +165,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -198,14 +188,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -281,14 +266,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -341,14 +321,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -369,14 +344,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -458,14 +428,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -840,14 +805,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -900,14 +860,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -928,14 +883,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -988,14 +938,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -1048,14 +993,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -1131,14 +1071,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -1220,14 +1155,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -1270,13 +1200,7 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1309,6 +1233,7 @@ Array [
                 },
               },
             ],
+            "must_not": Array [],
           },
         },
       },
@@ -1327,14 +1252,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -1353,14 +1273,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
@@ -1379,13 +1294,7 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1398,6 +1307,7 @@ Array [
                 },
               },
             ],
+            "must_not": Array [],
           },
         },
       },
@@ -1416,13 +1326,7 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1445,6 +1349,7 @@ Array [
                 },
               },
             ],
+            "must_not": Array [],
           },
         },
       },
@@ -1463,13 +1368,7 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1482,6 +1381,7 @@ Array [
                 },
               },
             ],
+            "must_not": Array [],
           },
         },
       },
@@ -1500,14 +1400,9 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
+            "filter": Array [],
             "must": Array [],
+            "must_not": Array [],
           },
         },
       },
