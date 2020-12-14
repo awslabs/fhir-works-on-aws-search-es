@@ -32,7 +32,8 @@
     "aws-elasticsearch-connector": "^8.2.0",
     "aws-sdk": "^2.610.0",
     "fhir-works-on-aws-interface": "^2.0.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "nearley": "^2.20.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.1",
