@@ -380,4 +380,51 @@ describe('typeSearch', () => {
         expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
         expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
     });
+    describe('query snapshots for Date', () => {
+        each([
+            [{ birthDate: '2020-01-12' }],
+            [{ birthDate: 'eq2020-01-12' }],
+            [{ birthDate: 'le2020-01-12' }],
+            [{ birthDate: 'sa2020-01-12' }],
+            [{ birthDate: 'gt2020-01-12' }],
+            [{ gender: 'female', name: 'Emily', birthDate: 'eq2020-01-12' }],
+            [{ birthDate: '2020-01-12eq' }],
+        ]).test('queryParams=%j', async (queryParams: any) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 1,
+                        hits: [
+                            {
+                                _index: 'patient',
+                                _type: '_doc',
+                                _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                _score: 1,
+                                _source: {
+                                    vid: '1',
+                                    id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                    resourceType: 'Patient',
+                                    birthDate: '1987-02-20',
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams,
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            });
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+        });
+    });
 });

@@ -19,7 +19,7 @@ import {
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
-import { QueryBuilder } from './queryBuilder';
+import { buildQuery } from './queryBuilder';
 
 const ITERATIVE_INCLUSION_PARAMETERS = ['_include:iterate', '_revinclude:iterate'];
 
@@ -67,8 +67,7 @@ export class ElasticSearchService implements Search {
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.COUNT])
                 : DEFAULT_SEARCH_RESULTS_PER_PAGE;
             const searchParameterToValue = { ...queryParams };
-            const queryBuilder = new QueryBuilder(searchParameterToValue);
-            const body: any = queryBuilder.buildQuery();
+            const body: any = buildQuery(searchParameterToValue);
             const params = {
                 index: resourceType.toLowerCase(),
                 from,
@@ -76,7 +75,6 @@ export class ElasticSearchService implements Search {
                 body,
             };
 
-            console.log(JSON.stringify(params));
             const { total, hits } = await this.executeQuery(params);
             const result: SearchResult = {
                 numberOfResults: total,

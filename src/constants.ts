@@ -11,7 +11,7 @@ export const enum SEARCH_PAGINATION_PARAMS {
 }
 
 // Add here which requires date based search
-export const DATEFIELDS = [
+export const DATE_FIELDS = [
     'birthDate',
     'effectiveDateTime',
     'date',
@@ -39,24 +39,24 @@ export const ALLOWED_PREFIXES = ['eq', 'ne', 'gt', 'lt', 'ge', 'le', 'sa', 'eb',
 
 export const enum PREFIXES {
     EQUAL = 'eq',
-    NOTEQUAL = 'ne',
+    NOT_EQUAL = 'ne',
     GREATER = 'gt',
     LESSER = 'lt',
-    GREATEROREQUAL = 'ge',
-    LESSEROREQUAL = 'le',
-    STARTSAFTER = 'sa', // These values need to be set appropriately
-    ENDSBEFORE = 'eb', // These values need to be set appropriately
+    GREATER_OR_EQUAL = 'ge',
+    LESSER_OR_EQUAL = 'le',
+    STARTS_AFTER = 'sa', // These values need to be set appropriately
+    ENDS_BEFORE = 'eb', // These values need to be set appropriately
     APPROXIMATION = 'ap', // These values need to be set appropriately
 }
 
-export const enum ESOPERATORS {
-    LESSEROREQUAL = 'lte',
-    GREATEROREQUAL = 'gte',
+export const enum ES_OPERATORS {
+    LESSER_OR_EQUAL = 'lte',
+    GREATER_OR_EQUAL = 'gte',
     GREATER = 'gt',
     LESSER = 'lt',
 }
 
-export const enum TYPEOFQUERY {
+export const enum TYPE_OF_QUERY {
     FILTER = 'FILTER',
     MUST = 'MUST',
     MUST_NOT = 'MUST_NOT',
