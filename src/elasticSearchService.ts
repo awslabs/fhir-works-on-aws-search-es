@@ -14,6 +14,8 @@ import {
     SearchResponse,
     GlobalSearchRequest,
     SearchEntry,
+    SearchFilter,
+    KeyValueMap,
     FhirVersion,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
@@ -36,28 +38,28 @@ const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
-    private readonly filterRulesForActiveResources: any[];
+    private readonly searchFiltersForActiveResources: SearchFilter[];
 
     private readonly cleanUpFunction: (resource: any) => any;
 
     private readonly fhirVersion: FhirVersion;
 
     /**
-     * @param filterRulesForActiveResources - If you are storing both History and Search resources
-     * in your elastic search you can filter out your History elements by supplying a filter argument like:
-     * [{ match: { documentStatus: 'AVAILABLE' }}]
+     * @param searchFiltersForActiveResources - If you are storing both History and Search resources
+     * in your elastic search you can filter out your History elements by supplying a list of SearchFilters
+     *
      * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
      * the return ES objects
      * @param fhirVersion
      */
     constructor(
-        filterRulesForActiveResources: any[] = [],
+        searchFiltersForActiveResources: SearchFilter[] = [],
         cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
         fhirVersion: FhirVersion = '4.0.1',
     ) {
-        this.filterRulesForActiveResources = filterRulesForActiveResources;
+        this.searchFiltersForActiveResources = searchFiltersForActiveResources;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
     }
@@ -66,7 +68,7 @@ export class ElasticSearchService implements Search {
     searchParams => {field: value}
      */
     async typeSearch(request: TypeSearchRequest): Promise<SearchResponse> {
-        const { queryParams, resourceType } = request;
+        const { queryParams, searchFilters, resourceType } = request;
         try {
             const from = queryParams[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET])
@@ -78,26 +80,16 @@ export class ElasticSearchService implements Search {
 
             // Exp. {gender: 'male', name: 'john'}
             const searchParameterToValue = { ...queryParams };
+            console.log('searchParameterToValue:', searchParameterToValue);
 
-            const must: any = [];
-            // TODO Implement fuzzy matches
-            Object.entries(searchParameterToValue).forEach(([searchParameter, value]) => {
-                if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
-                    return;
-                }
-                const field = getDocumentField(searchParameter);
-                const query = {
-                    query_string: {
-                        fields: [field],
-                        query: value,
-                        default_operator: 'AND',
-                        lenient: true,
-                    },
-                };
-                must.push(query);
-            });
+            const searchFilters: SearchFilter[] = [
+                ...this.searchFiltersForActiveResources,
+                ...this.queryParamsToSearchFilter(searchParameterToValue)
+            ];
+            console.log('searchFilters:', searchFilters);
 
-            const filter = this.filterRulesForActiveResources;
+            const esQuery = ElasticSearchService.searchFiltersToElasticQuery(searchFilters)
+            console.log('esQuery:', esQuery);
 
             const params = {
                 index: resourceType.toLowerCase(),
@@ -106,10 +98,9 @@ export class ElasticSearchService implements Search {
                 body: {
                     query: {
                         bool: {
-                            must,
-                            filter,
+                            esQuery
                         },
-                    },
+                    }
                 },
             };
             const { total, hits } = await this.executeQuery(params);
@@ -247,7 +238,7 @@ export class ElasticSearchService implements Search {
         const includeSearchQueries = buildIncludeQueries(
             request.queryParams,
             searchEntries.map(x => x.resource),
-            this.filterRulesForActiveResources,
+            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForActiveResources),
             this.fhirVersion,
             iterative,
         );
@@ -255,7 +246,7 @@ export class ElasticSearchService implements Search {
         const revIncludeSearchQueries = buildRevIncludeQueries(
             request.queryParams,
             searchEntries.map(x => x.resource),
-            this.filterRulesForActiveResources,
+            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForActiveResources),
             this.fhirVersion,
             iterative,
         );
@@ -332,5 +323,96 @@ export class ElasticSearchService implements Search {
     async globalSearch(request: GlobalSearchRequest): Promise<SearchResponse> {
         console.log(request);
         throw new Error('Method not implemented.');
+    }
+
+    private queryParamsToSearchFilter(queryParams: KeyValueMap): SearchFilter[] {
+        // TODO Implement fuzzy matches
+        return Object.entries(queryParams)
+            .filter(([searchParameter, value]) => {
+                !NON_SEARCHABLE_PARAMETERS.includes(searchParameter)
+            })
+            .map(([searchParameter, value]) => {
+                const field = getDocumentField(searchParameter);
+                return {
+                    filterKey: field,
+                    filterValue: value,
+                    filterOperator: '~'
+                };
+            });
+    }
+
+    private static searchFilterToElasticQuery(searchFilter: SearchFilter): any {
+        const {filterKey, filterValue, filterOperator} = searchFilter;
+
+        switch (filterOperator) {
+            case '~': {
+                return {
+                    query_string: {
+                        fields: [filterKey],
+                        query: filterValue,
+                        default_operator: 'AND',
+                        lenient: true,
+                    },
+                }
+            }
+            case '==': {
+                return {
+                    match: {
+                        [filterKey]: filterValue
+                    }
+                }
+            }
+            case '!=': {
+                return {
+                    bool: {
+                        must_not: [{
+                            term: {
+                                [filterKey]: filterValue
+                            }
+                        }]
+                    }
+                }
+            }
+            case '>': {
+                return {
+                    range: {
+                        [filterKey]: {
+                            gt: filterValue
+                        }
+                    }
+                }
+            }
+            case '<': {
+                return {
+                    range: {
+                        [filterKey]: {
+                            lt: filterValue
+                        }
+                    }
+                }
+            }
+            case '>=': {
+                return {
+                    range: {
+                        [filterKey]: {
+                            gte: filterValue
+                        }
+                    }
+                }
+            }
+            case '<=': {
+                return {
+                    range: {
+                        [filterKey]: {
+                            lte: filterValue
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static searchFiltersToElasticQuery(searchFilters: SearchFilter[]): any {
+        return searchFilters.map(searchFilter => this.searchFilterToElasticQuery(searchFilter))
     }
 }
