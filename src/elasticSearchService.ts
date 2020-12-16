@@ -82,13 +82,13 @@ export class ElasticSearchService implements Search {
             const searchParameterToValue = { ...queryParams };
             console.log('searchParameterToValue:', searchParameterToValue);
             const must: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery(
-                this.queryParamsToSearchFilter(searchParameterToValue)
-            )
+                this.queryParamsToSearchFilter(searchParameterToValue),
+            );
             console.log('must:', must);
 
             const filter: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery([
                 ...this.searchFiltersForAllQueries,
-                ...searchFilters ?? []
+                ...(searchFilters ?? []),
             ]);
             console.log('filter:', filter);
 
@@ -100,9 +100,9 @@ export class ElasticSearchService implements Search {
                     query: {
                         bool: {
                             filter,
-                            must
+                            must,
                         },
-                    }
+                    },
                 },
             };
             const { total, hits } = await this.executeQuery(params);
@@ -331,20 +331,20 @@ export class ElasticSearchService implements Search {
         // TODO Implement fuzzy matches
         return Object.entries(queryParams)
             .filter(([searchParameter, value]) => {
-                return !NON_SEARCHABLE_PARAMETERS.includes(searchParameter)
+                return !NON_SEARCHABLE_PARAMETERS.includes(searchParameter);
             })
             .map(([searchParameter, value]) => {
                 const field = getDocumentField(searchParameter);
                 return {
                     filterKey: field,
                     filterValue: value,
-                    filterOperator: '~'
+                    filterOperator: '~',
                 };
             });
     }
 
     private static searchFilterToElasticQuery(searchFilter: SearchFilter): any {
-        const {filterKey, filterValue, filterOperator} = searchFilter;
+        const { filterKey, filterValue, filterOperator } = searchFilter;
 
         switch (filterOperator) {
             case '~': {
@@ -355,66 +355,68 @@ export class ElasticSearchService implements Search {
                         default_operator: 'AND',
                         lenient: true,
                     },
-                }
+                };
             }
             case '==': {
                 return {
                     match: {
-                        [filterKey]: filterValue
-                    }
-                }
+                        [filterKey]: filterValue,
+                    },
+                };
             }
             case '!=': {
                 return {
                     bool: {
-                        must_not: [{
-                            term: {
-                                [filterKey]: filterValue
-                            }
-                        }]
-                    }
-                }
+                        must_not: [
+                            {
+                                term: {
+                                    [filterKey]: filterValue,
+                                },
+                            },
+                        ],
+                    },
+                };
             }
             case '>': {
                 return {
                     range: {
                         [filterKey]: {
-                            gt: filterValue
-                        }
-                    }
-                }
+                            gt: filterValue,
+                        },
+                    },
+                };
             }
             case '<': {
                 return {
                     range: {
                         [filterKey]: {
-                            lt: filterValue
-                        }
-                    }
-                }
+                            lt: filterValue,
+                        },
+                    },
+                };
             }
             case '>=': {
                 return {
                     range: {
                         [filterKey]: {
-                            gte: filterValue
-                        }
-                    }
-                }
+                            gte: filterValue,
+                        },
+                    },
+                };
             }
             case '<=': {
                 return {
                     range: {
                         [filterKey]: {
-                            lte: filterValue
-                        }
-                    }
-                }
+                            lte: filterValue,
+                        },
+                    },
+                };
             }
         }
     }
 
     private static searchFiltersToElasticQuery(searchFilters: SearchFilter[]): any {
-        return searchFilters.map(searchFilter => this.searchFilterToElasticQuery(searchFilter))
+        return searchFilters.map(searchFilter => this.searchFilterToElasticQuery(searchFilter));
     }
 }
