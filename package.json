@@ -20,7 +20,7 @@
     "lint-fix": "eslint --fix . --ext .ts,.tsx",
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest src --silent",
+    "test": "jest src --silent && jest scripts --silent",
     "test-coverage": "jest --coverage",
     "release": "yarn run build && yarn run lint && yarn run test",
     "clean": "rm -rf build/* node_modules/* dist/* .serverless/* .nyc_output/* lib/*",
@@ -66,7 +66,7 @@
     "transform": {
       "\\.(ts)$": "ts-jest"
     },
-    "testRegex": ".test.ts$"
+    "testRegex": ".test.(ts|js)$"
   },
   "repository": {
     "type": "git",
