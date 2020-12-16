@@ -38,14 +38,14 @@ const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
-    private readonly searchFiltersForActiveResources: SearchFilter[];
+    private readonly searchFiltersForAllQueries: SearchFilter[];
 
     private readonly cleanUpFunction: (resource: any) => any;
 
     private readonly fhirVersion: FhirVersion;
 
     /**
-     * @param searchFiltersForActiveResources - If you are storing both History and Search resources
+     * @param searchFiltersForAllQueries - If you are storing both History and Search resources
      * in your elastic search you can filter out your History elements by supplying a list of SearchFilters
      *
      * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
@@ -53,13 +53,13 @@ export class ElasticSearchService implements Search {
      * @param fhirVersion
      */
     constructor(
-        searchFiltersForActiveResources: SearchFilter[] = [],
+        searchFiltersForAllQueries: SearchFilter[] = [],
         cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
         fhirVersion: FhirVersion = '4.0.1',
     ) {
-        this.searchFiltersForActiveResources = searchFiltersForActiveResources;
+        this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
     }
@@ -81,15 +81,16 @@ export class ElasticSearchService implements Search {
             // Exp. {gender: 'male', name: 'john'}
             const searchParameterToValue = { ...queryParams };
             console.log('searchParameterToValue:', searchParameterToValue);
+            const must: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery(
+                this.queryParamsToSearchFilter(searchParameterToValue)
+            )
+            console.log('must:', must);
 
-            const searchFilters: SearchFilter[] = [
-                ...this.searchFiltersForActiveResources,
-                ...this.queryParamsToSearchFilter(searchParameterToValue)
-            ];
-            console.log('searchFilters:', searchFilters);
-
-            const esQuery = ElasticSearchService.searchFiltersToElasticQuery(searchFilters)
-            console.log('esQuery:', esQuery);
+            const filter: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery([
+                ...this.searchFiltersForAllQueries,
+                ...searchFilters ?? []
+            ]);
+            console.log('filter:', filter);
 
             const params = {
                 index: resourceType.toLowerCase(),
@@ -98,7 +99,8 @@ export class ElasticSearchService implements Search {
                 body: {
                     query: {
                         bool: {
-                            esQuery
+                            must,
+                            filter
                         },
                     }
                 },
@@ -238,7 +240,7 @@ export class ElasticSearchService implements Search {
         const includeSearchQueries = buildIncludeQueries(
             request.queryParams,
             searchEntries.map(x => x.resource),
-            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForActiveResources),
+            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForAllQueries),
             this.fhirVersion,
             iterative,
         );
@@ -246,7 +248,7 @@ export class ElasticSearchService implements Search {
         const revIncludeSearchQueries = buildRevIncludeQueries(
             request.queryParams,
             searchEntries.map(x => x.resource),
-            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForActiveResources),
+            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForAllQueries),
             this.fhirVersion,
             iterative,
         );
