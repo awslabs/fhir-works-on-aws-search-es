@@ -99,8 +99,8 @@ export class ElasticSearchService implements Search {
                 body: {
                     query: {
                         bool: {
-                            must,
-                            filter
+                            filter,
+                            must
                         },
                     }
                 },
@@ -331,7 +331,7 @@ export class ElasticSearchService implements Search {
         // TODO Implement fuzzy matches
         return Object.entries(queryParams)
             .filter(([searchParameter, value]) => {
-                !NON_SEARCHABLE_PARAMETERS.includes(searchParameter)
+                return !NON_SEARCHABLE_PARAMETERS.includes(searchParameter)
             })
             .map(([searchParameter, value]) => {
                 const field = getDocumentField(searchParameter);

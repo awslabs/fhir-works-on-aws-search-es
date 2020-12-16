@@ -12,7 +12,7 @@ jest.mock('./elasticSearch');
 const FILTER_RULES_FOR_ACTIVE_RESOURCES = [{
     filterKey: 'someFieldThatTellsIfTheResourceIsActive',
     filterValue: 'AVAILABLE',
-    filterOperator: '=='
+    filterOperator: '==' as const
 }]
 
 const ALLOWED_RESOURCE_TYPES = [
