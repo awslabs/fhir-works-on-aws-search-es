@@ -376,9 +376,7 @@ describe('typeSearch', () => {
             queryParams: { ...queryParams },
             allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
         });
-
-        expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
-        expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+        expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
     });
     describe('query snapshots for Date', () => {
         each([
@@ -423,8 +421,7 @@ describe('typeSearch', () => {
                 queryParams,
                 allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
             });
-            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
-            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
         });
     });
 });

@@ -67,7 +67,7 @@ export class ElasticSearchService implements Search {
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.COUNT])
                 : DEFAULT_SEARCH_RESULTS_PER_PAGE;
             const searchParameterToValue = { ...queryParams };
-            const body: any = buildQuery(searchParameterToValue);
+            const body: any = buildQuery(searchParameterToValue, this.filterRulesForActiveResources);
             const params = {
                 index: resourceType.toLowerCase(),
                 from,

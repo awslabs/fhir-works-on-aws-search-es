@@ -110,7 +110,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -165,7 +173,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -188,7 +204,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -266,7 +290,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -321,7 +353,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -344,7 +384,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -428,7 +476,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -805,7 +861,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -860,7 +924,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -883,7 +955,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -938,7 +1018,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -993,7 +1081,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -1071,7 +1167,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -1085,77 +1189,22 @@ Array [
 ]
 `;
 
-exports[`typeSearch _revinclude:iterate: msearch queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Array [
-        Object {
-          "index": "medicationadministration",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "request.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ],
-    },
-  ],
-  Array [
-    Object {
-      "body": Array [
-        Object {
-          "index": "medicationstatement",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "partOf.reference.keyword": Array [
-                      "MedicationAdministration/medication-administration-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ],
-    },
-  ],
-]
-`;
-
-exports[`typeSearch _revinclude:iterate: search queries 1`] = `
+exports[`typeSearch _revinclude:iterate 1`] = `
 Array [
   Array [
     Object {
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -1193,7 +1242,7 @@ Object {
 }
 `;
 
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"2020-01-12"}: msearch queries 1`] = `
+exports[`typeSearch query snapshots for Date queryParams={"birthDate":"2020-01-12"} 1`] = `
 Array [
   Array [
     Object {
@@ -1201,6 +1250,13 @@ Array [
         "query": Object {
           "bool": Object {
             "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
               Object {
                 "range": Object {
                   "birthDate": Object {
@@ -1223,7 +1279,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"2020-01-12"}: search queries 1`] = `
+exports[`typeSearch query snapshots for Date queryParams={"birthDate":"2020-01-12eq"} 1`] = `
 Array [
   Array [
     Object {
@@ -1231,36 +1287,13 @@ Array [
         "query": Object {
           "bool": Object {
             "filter": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gte": "2020-01-12",
-                    "lte": "2020-01-12",
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
                   },
                 },
-              },
-            ],
-            "must": Array [],
-            "must_not": Array [],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"2020-01-12eq"}: msearch queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
+              ],
               Object {
                 "range": Object {
                   "birthDate": Object {
@@ -1283,7 +1316,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"2020-01-12eq"}: search queries 1`] = `
+exports[`typeSearch query snapshots for Date queryParams={"birthDate":"eq2020-01-12"} 1`] = `
 Array [
   Array [
     Object {
@@ -1291,11 +1324,18 @@ Array [
         "query": Object {
           "bool": Object {
             "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
               Object {
                 "range": Object {
                   "birthDate": Object {
-                    "gte": "2020-01-12eq",
-                    "lte": "2020-01-12eq",
+                    "gte": "2020-01-12",
+                    "lte": "2020-01-12",
                   },
                 },
               },
@@ -1313,67 +1353,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"eq2020-01-12"}: msearch queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [],
-            "must": Array [],
-            "must_not": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gte": "2020-01-12",
-                    "lte": "2020-01-12",
-                  },
-                },
-              },
-            ],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"eq2020-01-12"}: search queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [],
-            "must": Array [],
-            "must_not": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gte": "2020-01-12",
-                    "lte": "2020-01-12",
-                  },
-                },
-              },
-            ],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"gt2020-01-12"}: msearch queries 1`] = `
+exports[`typeSearch query snapshots for Date queryParams={"birthDate":"gt2020-01-12"} 1`] = `
 Array [
   Array [
     Object {
@@ -1381,6 +1361,13 @@ Array [
         "query": Object {
           "bool": Object {
             "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
               Object {
                 "range": Object {
                   "birthDate": Object {
@@ -1402,7 +1389,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"gt2020-01-12"}: search queries 1`] = `
+exports[`typeSearch query snapshots for Date queryParams={"birthDate":"le2020-01-12"} 1`] = `
 Array [
   Array [
     Object {
@@ -1410,35 +1397,13 @@ Array [
         "query": Object {
           "bool": Object {
             "filter": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gt": "2020-01-12",
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
                   },
                 },
-              },
-            ],
-            "must": Array [],
-            "must_not": Array [],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"le2020-01-12"}: msearch queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
+              ],
               Object {
                 "range": Object {
                   "birthDate": Object {
@@ -1460,7 +1425,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"le2020-01-12"}: search queries 1`] = `
+exports[`typeSearch query snapshots for Date queryParams={"birthDate":"sa2020-01-12"} 1`] = `
 Array [
   Array [
     Object {
@@ -1468,93 +1433,58 @@ Array [
         "query": Object {
           "bool": Object {
             "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
               Object {
                 "range": Object {
                   "birthDate": Object {
+                    "gte": "2020-01-12",
+                  },
+                },
+              },
+            ],
+            "must": Array [],
+            "must_not": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for Date queryParams={"gender":"female","name":"Emily","birthDate":"eq2020-01-12"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+              Object {
+                "range": Object {
+                  "birthDate": Object {
+                    "gte": "2020-01-12",
                     "lte": "2020-01-12",
                   },
                 },
               },
             ],
-            "must": Array [],
-            "must_not": Array [],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"sa2020-01-12"}: msearch queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gte": "2020-01-12",
-                  },
-                },
-              },
-            ],
-            "must": Array [],
-            "must_not": Array [],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"birthDate":"sa2020-01-12"}: search queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gte": "2020-01-12",
-                  },
-                },
-              },
-            ],
-            "must": Array [],
-            "must_not": Array [],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"gender":"female","name":"Emily","birthDate":"eq2020-01-12"}: msearch queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1577,67 +1507,7 @@ Array [
                 },
               },
             ],
-            "must_not": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gte": "2020-01-12",
-                    "lte": "2020-01-12",
-                  },
-                },
-              },
-            ],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for Date queryParams={"gender":"female","name":"Emily","birthDate":"eq2020-01-12"}: search queries 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "gender.*",
-                  ],
-                  "lenient": true,
-                  "query": "female",
-                },
-              },
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "name.*",
-                  ],
-                  "lenient": true,
-                  "query": "Emily",
-                },
-              },
-            ],
-            "must_not": Array [
-              Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gte": "2020-01-12",
-                    "lte": "2020-01-12",
-                  },
-                },
-              },
-            ],
+            "must_not": Array [],
           },
         },
       },
@@ -1656,7 +1526,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1708,7 +1586,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -1729,7 +1615,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },
@@ -1750,7 +1644,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1782,7 +1684,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1824,7 +1734,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [
               Object {
                 "query_string": Object {
@@ -1856,7 +1774,15 @@ Array [
       "body": Object {
         "query": Object {
           "bool": Object {
-            "filter": Array [],
+            "filter": Array [
+              Array [
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            ],
             "must": Array [],
             "must_not": Array [],
           },

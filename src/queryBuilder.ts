@@ -54,7 +54,7 @@ function dateBasedSearch(searchParameter: string, searchvalue: string): any {
     let query = {};
 
     // No Prefix is available for dates
-    if (search.prefix === undefined) {
+    if (search.prefix === undefined || search.prefix === PREFIXES.EQUAL) {
         query = {
             range: {
                 [searchParameter]: {
@@ -67,7 +67,7 @@ function dateBasedSearch(searchParameter: string, searchvalue: string): any {
     }
 
     // NOT EQUAL Prefix
-    if (search.prefix === PREFIXES.NOT_EQUAL || search.prefix === PREFIXES.EQUAL) {
+    if (search.prefix === PREFIXES.NOT_EQUAL) {
         query = {
             range: {
                 [searchParameter]: {
@@ -111,13 +111,19 @@ function splitQuery(field: string, searchParameter: string, value: string) {
 /**
  * @param Pass Query strings  {"parameter1": "prefixvalue1", "parameter2": "prefixvalue2"}
  * ex - {"birthDate": "eq2020-12-01"}
+ * @param filterRulesForActiveResources - If you are storing both History and Search resources
+ * in your elastic search you can filter out your History elements by supplying a filter argument like:
+ * [{ match: { documentStatus: 'AVAILABLE' }}]
  * @param Returns built ES query
  */
 
-export function buildQuery(queryParams: any): any {
+export function buildQuery(queryParams: any, filterRulesForActiveResources: any): any {
     const must: any[] = [];
     const filter: any[] = [];
     const mustNot: any[] = [];
+    // Filter based on the user request
+    if (filterRulesForActiveResources.length > 0) filter.push(filterRulesForActiveResources);
+
     Object.entries(queryParams).forEach(([searchParameter, value]) => {
         // ignore search parameters
         if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
