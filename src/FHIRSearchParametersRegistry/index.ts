@@ -39,7 +39,7 @@ export class FHIRSearchParametersRegistry {
      * @param resourceType FHIR resource type
      * @param name search parameter name
      */
-    getSearchParameter(resourceType: string, name: string): SearchParam | undefined {
+    getSearchParameter(resourceType: string, name: string): SearchParam? {
         return this.compiledSearchParams?.[resourceType]?.[name];
     }
 }
