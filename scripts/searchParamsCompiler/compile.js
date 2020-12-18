@@ -26,12 +26,31 @@ const UNSUPPORTED_SEARCH_PARAMS = [
     'http://hl7.org/fhir/SearchParameter/Bundle-message', // Uses "Bundle.entry[0]". We have no way of searching the nth element of an array
 
     'http://hl7.org/fhir/SearchParameter/Patient-deceased', // Does not define a proper path "Patient.deceased.exists() and Patient.deceased != false"
+
+    'http://hl7.org/fhir/SearchParameter/Organization-phonetic', // Requires custom code for phonetic matching
+    'http://hl7.org/fhir/SearchParameter/individual-phonetic', // Requires custom code for phonetic matching
 ];
+
+const isParamSupported = searchParam => {
+    if (UNSUPPORTED_SEARCH_PARAMS.includes(searchParam.url)) {
+        return false;
+    }
+
+    if (searchParam.type === 'composite') {
+        return false;
+    }
+
+    if (searchParam.type === 'special') {
+        // requires custom code. i.e. Location.near is supposed to do a geospatial search.
+        return false;
+    }
+    return true;
+};
 
 const compileSearchParams = searchParams => {
     const compiledSearchParams = searchParams
         .filter(s => s.expression)
-        .filter(s => !UNSUPPORTED_SEARCH_PARAMS.includes(s.url))
+        .filter(isParamSupported)
         .map(searchParam => {
             const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
             parser.feed(searchParam.expression);
