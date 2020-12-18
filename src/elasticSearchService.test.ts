@@ -4,6 +4,7 @@
  */
 
 import each from 'jest-each';
+import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { ElasticSearchService } from './elasticSearchService';
 import { ElasticSearch } from './elasticSearch';
 
@@ -33,14 +34,13 @@ describe('typeSearch', () => {
             [{}],
             [{ _count: 10, _getpagesoffset: 2 }],
             [{ gender: 'female', name: 'Emily' }],
-            [{ id: '11111111-1111-1111-1111-111111111111' }],
             [{ _id: '11111111-1111-1111-1111-111111111111' }],
             [{ _format: 'json' }],
             [
                 {
                     _count: 10,
                     _getpagesoffset: 2,
-                    id: '11111111-1111-1111-1111-111111111111',
+                    _id: '11111111-1111-1111-1111-111111111111',
                     gender: 'female',
                     name: 'Emily',
                     _format: 'json',
@@ -83,6 +83,63 @@ describe('typeSearch', () => {
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
         });
     });
+
+    describe('search parameters with complex expressions', () => {
+        each([
+            [{ phone: '1234567' }, 'Patient'],
+            [{ 'value-string': 'some value' }, 'Observation'],
+            [{ 'depends-on': 'something' }, 'Library'],
+            [{ relatedperson: 'RelatedPerson/111' }, 'Person'],
+        ]).test('queryParams=%j', async (queryParams: any, resourceType: string) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 1,
+                        hits: [
+                            {
+                                _index: resourceType.toLowerCase(),
+                                _type: '_doc',
+                                _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                _score: 1,
+                                _source: {
+                                    vid: '1',
+                                    id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                    resourceType,
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType,
+                baseUrl: 'https://base-url.com',
+                queryParams,
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
+    });
+
+    test('Invalid Parameter', () => {
+        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+        expect(
+            es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams: { someFieldThatDoesNotExist: 'someValue' },
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            }),
+        ).rejects.toThrowError(InvalidSearchParameterError);
+    });
+
     test('Response format', async () => {
         const patientSearchResult = {
             body: {

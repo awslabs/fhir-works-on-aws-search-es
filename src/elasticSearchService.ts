@@ -15,11 +15,12 @@ import {
     GlobalSearchRequest,
     SearchEntry,
     FhirVersion,
+    InvalidSearchParameterError,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
 import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
-import { getDocumentField } from './searchParametersMapping';
+import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 
 const ITERATIVE_INCLUSION_PARAMETERS = ['_include:iterate', '_revinclude:iterate'];
 
@@ -34,6 +35,10 @@ const NON_SEARCHABLE_PARAMETERS = [
 
 const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
+const escapeQueryString = (string: string) => {
+    return string.replace(/\//g, '\\/');
+};
+
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
     private readonly filterRulesForActiveResources: any[];
@@ -41,6 +46,8 @@ export class ElasticSearchService implements Search {
     private readonly cleanUpFunction: (resource: any) => any;
 
     private readonly fhirVersion: FhirVersion;
+
+    private readonly fhirSearchParams: FHIRSearchParametersRegistry;
 
     /**
      * @param filterRulesForActiveResources - If you are storing both History and Search resources
@@ -60,6 +67,7 @@ export class ElasticSearchService implements Search {
         this.filterRulesForActiveResources = filterRulesForActiveResources;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
+        this.fhirSearchParams = new FHIRSearchParametersRegistry(fhirVersion);
     }
 
     /*
@@ -81,20 +89,63 @@ export class ElasticSearchService implements Search {
 
             const must: any = [];
             // TODO Implement fuzzy matches
-            Object.entries(searchParameterToValue).forEach(([searchParameter, value]) => {
+            Object.entries(searchParameterToValue).forEach(([searchParameter, searchValue]) => {
                 if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
                     return;
                 }
-                const field = getDocumentField(searchParameter);
-                const query = {
-                    query_string: {
-                        fields: [field],
-                        query: value,
-                        default_operator: 'AND',
-                        lenient: true,
-                    },
-                };
-                must.push(query);
+                const value = escapeQueryString(searchValue as string);
+                const fhirSearchParam = this.fhirSearchParams.getSearchParameter(resourceType, searchParameter);
+                if (fhirSearchParam === undefined) {
+                    throw new InvalidSearchParameterError(
+                        `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,
+                    );
+                }
+
+                const queries = fhirSearchParam.compiled.map(compiled => {
+                    const fields = [compiled.path, `${compiled.path}.*`];
+
+                    const pathQuery = {
+                        query_string: {
+                            fields,
+                            query: value,
+                            default_operator: 'AND',
+                            lenient: true,
+                        },
+                    };
+
+                    // In most cases conditions are used for fields that are an array of objects
+                    // Ideally we should be using a nested query, but that'd require to update the index mappings.
+                    //
+                    // Simply using an array of bool.must is good enough for most cases. The result will contain the correct documents, however it MAY contain additional documents
+                    // https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html
+                    if (compiled.condition !== undefined) {
+                        return {
+                            bool: {
+                                must: [
+                                    pathQuery,
+                                    {
+                                        query_string: {
+                                            fields: [compiled.condition[0], `${compiled.condition[0]}.*`],
+                                            query: compiled.condition[2],
+                                            lenient: true,
+                                        },
+                                    },
+                                ],
+                            },
+                        };
+                    }
+                    return pathQuery;
+                });
+
+                if (queries.length === 1) {
+                    must.push(queries[0]);
+                } else {
+                    must.push({
+                        bool: {
+                            should: queries,
+                        },
+                    });
+                }
             });
 
             const filter = this.filterRulesForActiveResources;

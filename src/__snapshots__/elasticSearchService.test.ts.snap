@@ -1263,7 +1263,7 @@ Object {
 }
 `;
 
-exports[`typeSearch query snapshots for simple queryParams queryParams={"_count":10,"_getpagesoffset":2,"id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
+exports[`typeSearch query snapshots for simple queryParams queryParams={"_count":10,"_getpagesoffset":2,"_id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
 Array [
   Array [
     Object {
@@ -1283,6 +1283,7 @@ Array [
                   "default_operator": "AND",
                   "fields": Array [
                     "id",
+                    "id.*",
                   ],
                   "lenient": true,
                   "query": "11111111-1111-1111-1111-111111111111",
@@ -1292,6 +1293,7 @@ Array [
                 "query_string": Object {
                   "default_operator": "AND",
                   "fields": Array [
+                    "gender",
                     "gender.*",
                   ],
                   "lenient": true,
@@ -1302,6 +1304,7 @@ Array [
                 "query_string": Object {
                   "default_operator": "AND",
                   "fields": Array [
+                    "name",
                     "name.*",
                   ],
                   "lenient": true,
@@ -1392,6 +1395,7 @@ Array [
                   "default_operator": "AND",
                   "fields": Array [
                     "id",
+                    "id.*",
                   ],
                   "lenient": true,
                   "query": "11111111-1111-1111-1111-111111111111",
@@ -1428,6 +1432,7 @@ Array [
                 "query_string": Object {
                   "default_operator": "AND",
                   "fields": Array [
+                    "gender",
                     "gender.*",
                   ],
                   "lenient": true,
@@ -1438,47 +1443,11 @@ Array [
                 "query_string": Object {
                   "default_operator": "AND",
                   "fields": Array [
+                    "name",
                     "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily",
-                },
-              },
-            ],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient",
-      "size": 20,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for simple queryParams queryParams={"id":"11111111-1111-1111-1111-111111111111"} 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "id",
-                  ],
-                  "lenient": true,
-                  "query": "11111111-1111-1111-1111-111111111111",
                 },
               },
             ],
@@ -1513,6 +1482,223 @@ Array [
       },
       "from": 0,
       "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch search parameters with complex expressions queryParams={"depends-on":"something"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "relatedArtifact.resource",
+                          "relatedArtifact.resource.*",
+                        ],
+                        "lenient": true,
+                        "query": "something",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "fields": Array [
+                          "relatedArtifact.type",
+                          "relatedArtifact.type.*",
+                        ],
+                        "lenient": true,
+                        "query": "depends-on",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "library",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch search parameters with complex expressions queryParams={"phone":"1234567"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "telecom",
+                          "telecom.*",
+                        ],
+                        "lenient": true,
+                        "query": "1234567",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "fields": Array [
+                          "telecom.system",
+                          "telecom.system.*",
+                        ],
+                        "lenient": true,
+                        "query": "phone",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch search parameters with complex expressions queryParams={"relatedperson":"RelatedPerson/111"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "link.target",
+                          "link.target.*",
+                        ],
+                        "lenient": true,
+                        "query": "RelatedPerson\\\\/111",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "fields": Array [
+                          "link.target",
+                          "link.target.*",
+                        ],
+                        "lenient": true,
+                        "query": "RelatedPerson",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "person",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch search parameters with complex expressions queryParams={"value-string":"some value"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueString",
+                          "valueString.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueCodeableConcept.text",
+                          "valueCodeableConcept.text.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "observation",
       "size": 20,
     },
   ],
