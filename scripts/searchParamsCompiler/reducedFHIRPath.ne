@@ -23,6 +23,6 @@ simpleWhereExp-> IDENTIFIER "=" "'" IDENTIFIER "'"       {% d => [d[0], d[1], d[
 
 typeFn -> "as" | "is"                                    {% () => null %}
 
-IDENTIFIER -> [a-zA-z-]:+                                {% d => d[0].join("") %}
+IDENTIFIER -> [a-zA-Z-]:+                                {% d => d[0].join("") %}
 
 _ -> [\s]:*                                              {% () => null %}
