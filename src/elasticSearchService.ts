@@ -15,7 +15,6 @@ import {
     GlobalSearchRequest,
     SearchEntry,
     SearchFilter,
-    KeyValueMap,
     FhirVersion,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
@@ -80,11 +79,24 @@ export class ElasticSearchService implements Search {
 
             // Exp. {gender: 'male', name: 'john'}
             const searchParameterToValue = { ...queryParams };
-            console.log('searchParameterToValue:', searchParameterToValue);
-            const must: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery(
-                this.queryParamsToSearchFilter(searchParameterToValue),
-            );
-            console.log('must:', must);
+
+            const must: any = [];
+            // TODO Implement fuzzy matches
+            Object.entries(searchParameterToValue).forEach(([searchParameter, value]) => {
+                if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
+                    return;
+                }
+                const field = getDocumentField(searchParameter);
+                const query = {
+                    query_string: {
+                        fields: [field],
+                        query: value,
+                        default_operator: 'AND',
+                        lenient: true,
+                    },
+                };
+                must.push(query);
+            });
 
             const filter: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery([
                 ...this.searchFiltersForAllQueries,
@@ -327,40 +339,16 @@ export class ElasticSearchService implements Search {
         throw new Error('Method not implemented.');
     }
 
-    private queryParamsToSearchFilter(queryParams: KeyValueMap): SearchFilter[] {
-        // TODO Implement fuzzy matches
-        return Object.entries(queryParams)
-            .filter(([searchParameter, value]) => {
-                return !NON_SEARCHABLE_PARAMETERS.includes(searchParameter);
-            })
-            .map(([searchParameter, value]) => {
-                const field = getDocumentField(searchParameter);
-                return {
-                    filterKey: field,
-                    filterValue: value,
-                    filterOperator: '~',
-                };
-            });
-    }
-
-    private static searchFilterToElasticQuery(searchFilter: SearchFilter): any {
-        const { filterKey, filterValue, filterOperator } = searchFilter;
-
-        switch (filterOperator) {
-            case '~': {
-                return {
-                    query_string: {
-                        fields: [filterKey],
-                        query: filterValue,
-                        default_operator: 'AND',
-                        lenient: true,
-                    },
-                };
-            }
+    private static generateElasticQueryPart(
+        key: string,
+        value: string,
+        operator: '==' | '!=' | '>' | '<' | '>=' | '<=',
+    ): any {
+        switch (operator) {
             case '==': {
                 return {
                     match: {
-                        [filterKey]: filterValue,
+                        [key]: value,
                     },
                 };
             }
@@ -370,7 +358,7 @@ export class ElasticSearchService implements Search {
                         must_not: [
                             {
                                 term: {
-                                    [filterKey]: filterValue,
+                                    [key]: value,
                                 },
                             },
                         ],
@@ -380,8 +368,8 @@ export class ElasticSearchService implements Search {
             case '>': {
                 return {
                     range: {
-                        [filterKey]: {
-                            gt: filterValue,
+                        [key]: {
+                            gt: value,
                         },
                     },
                 };
@@ -389,8 +377,8 @@ export class ElasticSearchService implements Search {
             case '<': {
                 return {
                     range: {
-                        [filterKey]: {
-                            lt: filterValue,
+                        [key]: {
+                            lt: value,
                         },
                     },
                 };
@@ -398,8 +386,8 @@ export class ElasticSearchService implements Search {
             case '>=': {
                 return {
                     range: {
-                        [filterKey]: {
-                            gte: filterValue,
+                        [key]: {
+                            gte: value,
                         },
                     },
                 };
@@ -407,12 +395,35 @@ export class ElasticSearchService implements Search {
             case '<=': {
                 return {
                     range: {
-                        [filterKey]: {
-                            lte: filterValue,
+                        [key]: {
+                            lte: value,
                         },
                     },
                 };
             }
+            default: {
+                throw new Error('Unknown comparison operator');
+            }
+        }
+    }
+
+    private static searchFilterToElasticQuery(searchFilter: SearchFilter): any {
+        const { key, value, comparisonOperator, logicalOperator } = searchFilter;
+
+        if (value.length === 0) {
+            throw new Error('Malformed SearchFilter, at least 1 value is required for the comparison');
+        } else if (value.length === 1) {
+            return ElasticSearchService.generateElasticQueryPart(key, value[0], comparisonOperator);
+        } else {
+            const esLogicalOperator = logicalOperator === 'OR' ? 'should' : 'filter';
+            const esQueries = value.map((v: string) => {
+                return ElasticSearchService.generateElasticQueryPart(key, v, comparisonOperator);
+            });
+            return {
+                bool: {
+                    [esLogicalOperator]: esQueries,
+                },
+            };
         }
     }
 
