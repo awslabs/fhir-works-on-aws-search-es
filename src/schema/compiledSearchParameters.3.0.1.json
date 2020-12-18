@@ -2185,48 +2185,12 @@
       "description": "The classification of the type of observation",
       "compiled": [{"resourceType": "Observation", "path": "category"}]
     },
-    "code-value-concept": {
-      "type": "composite",
-      "description": "Code and coded value parameter pair",
-      "compiled": [{"resourceType": "Observation", "path": ""}]
-    },
-    "code-value-date": {
-      "type": "composite",
-      "description": "Code and date/time value parameter pair",
-      "compiled": [{"resourceType": "Observation", "path": ""}]
-    },
-    "code-value-quantity": {
-      "type": "composite",
-      "description": "Code and quantity value parameter pair",
-      "compiled": [{"resourceType": "Observation", "path": ""}]
-    },
-    "code-value-string": {
-      "type": "composite",
-      "description": "Code and string value parameter pair",
-      "compiled": [{"resourceType": "Observation", "path": ""}]
-    },
     "combo-code": {
       "type": "token",
       "description": "The code of the observation type or component type",
       "compiled": [
         {"resourceType": "Observation", "path": "code"},
         {"resourceType": "Observation", "path": "component.code"}
-      ]
-    },
-    "combo-code-value-concept": {
-      "type": "composite",
-      "description": "Code and coded value parameter pair, including in components",
-      "compiled": [
-        {"resourceType": "Observation", "path": ""},
-        {"resourceType": "Observation", "path": "component"}
-      ]
-    },
-    "combo-code-value-quantity": {
-      "type": "composite",
-      "description": "Code and quantity value parameter pair, including in components",
-      "compiled": [
-        {"resourceType": "Observation", "path": ""},
-        {"resourceType": "Observation", "path": "component"}
       ]
     },
     "combo-data-absent-reason": {
@@ -2257,16 +2221,6 @@
       "type": "token",
       "description": "The component code of the observation type",
       "compiled": [{"resourceType": "Observation", "path": "component.code"}]
-    },
-    "component-code-value-concept": {
-      "type": "composite",
-      "description": "Component code and component coded value parameter pair",
-      "compiled": [{"resourceType": "Observation", "path": "component"}]
-    },
-    "component-code-value-quantity": {
-      "type": "composite",
-      "description": "Component code and component quantity value parameter pair",
-      "compiled": [{"resourceType": "Observation", "path": "component"}]
     },
     "component-data-absent-reason": {
       "type": "token",
@@ -2310,11 +2264,6 @@
       "description": "Who performed the observation",
       "target": ["Practitioner", "Organization", "Patient", "RelatedPerson"],
       "compiled": [{"resourceType": "Observation", "path": "performer"}]
-    },
-    "related": {
-      "type": "composite",
-      "description": "Related Observations - search on related-type and related-target together",
-      "compiled": [{"resourceType": "Observation", "path": "related"}]
     },
     "related-target": {
       "type": "reference",
@@ -5090,11 +5039,6 @@
       "type": "token",
       "description": "replaces | transforms | signs | appends",
       "compiled": [{"resourceType": "DocumentReference", "path": "relatesTo.code"}]
-    },
-    "relationship": {
-      "type": "composite",
-      "description": "Combination of relation and relatesTo",
-      "compiled": [{"resourceType": "DocumentReference", "path": "relatesTo"}]
     },
     "securitylabel": {
       "type": "token",
@@ -8992,11 +8936,6 @@
       "description": "Kind of characteristic",
       "compiled": [{"resourceType": "Group", "path": "characteristic.code"}]
     },
-    "characteristic-value": {
-      "type": "composite",
-      "description": "A composite of both characteristic and value",
-      "compiled": [{"resourceType": "Group", "path": "characteristic"}]
-    },
     "code": {
       "type": "token",
       "description": "The kind of resources contained",
@@ -12328,11 +12267,6 @@
       "target": ["Organization"],
       "compiled": [{"resourceType": "Organization", "path": "partOf"}]
     },
-    "phonetic": {
-      "type": "string",
-      "description": "A portion of the organization's name using some kind of phonetic matching algorithm",
-      "compiled": [{"resourceType": "Organization", "path": "name"}]
-    },
     "type": {
       "type": "token",
       "description": "A code for the type of organization",
@@ -12490,11 +12424,6 @@
         }
       ]
     },
-    "phonetic": {
-      "type": "string",
-      "description": "Multiple Resources: \r\n\r\n* [RelatedPerson](relatedperson.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Practitioner](practitioner.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n* [Person](person.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Patient](patient.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n",
-      "compiled": [{"resourceType": "Patient", "path": "name"}]
-    },
     "telecom": {
       "type": "token",
       "description": "Multiple Resources: \r\n\r\n* [PractitionerRole](practitionerrole.html): The value in any kind of contact\r\n* [RelatedPerson](relatedperson.html): The value in any kind of contact\r\n* [Practitioner](practitioner.html): The value in any kind of contact\r\n* [Person](person.html): The value in any kind of contact\r\n* [Patient](patient.html): The value in any kind of telecom details of the patient\r\n",
@@ -12588,11 +12517,6 @@
           "condition": ["telecom.system", "=", "phone"]
         }
       ]
-    },
-    "phonetic": {
-      "type": "string",
-      "description": "Multiple Resources: \r\n\r\n* [RelatedPerson](relatedperson.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Practitioner](practitioner.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n* [Person](person.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Patient](patient.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n",
-      "compiled": [{"resourceType": "RelatedPerson", "path": "name"}]
     },
     "telecom": {
       "type": "token",
@@ -12714,11 +12638,6 @@
         }
       ]
     },
-    "phonetic": {
-      "type": "string",
-      "description": "Multiple Resources: \r\n\r\n* [RelatedPerson](relatedperson.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Practitioner](practitioner.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n* [Person](person.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Patient](patient.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n",
-      "compiled": [{"resourceType": "Practitioner", "path": "name"}]
-    },
     "telecom": {
       "type": "token",
       "description": "Multiple Resources: \r\n\r\n* [PractitionerRole](practitionerrole.html): The value in any kind of contact\r\n* [RelatedPerson](relatedperson.html): The value in any kind of contact\r\n* [Practitioner](practitioner.html): The value in any kind of contact\r\n* [Person](person.html): The value in any kind of contact\r\n* [Patient](patient.html): The value in any kind of telecom details of the patient\r\n",
@@ -12824,11 +12743,6 @@
       "compiled": [
         {"resourceType": "Person", "path": "telecom", "condition": ["telecom.system", "=", "phone"]}
       ]
-    },
-    "phonetic": {
-      "type": "string",
-      "description": "Multiple Resources: \r\n\r\n* [RelatedPerson](relatedperson.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Practitioner](practitioner.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n* [Person](person.html): A portion of name using some kind of phonetic matching algorithm\r\n* [Patient](patient.html): A portion of either family or given name using some kind of phonetic matching algorithm\r\n",
-      "compiled": [{"resourceType": "Person", "path": "name"}]
     },
     "telecom": {
       "type": "token",
@@ -15487,11 +15401,6 @@
       "type": "token",
       "description": "Chromosome number of the reference sequence",
       "compiled": [{"resourceType": "Sequence", "path": "referenceSeq.chromosome"}]
-    },
-    "coordinate": {
-      "type": "composite",
-      "description": "Search parameter for region of the reference DNA sequence string. This will refer to part of a locus or part of a gene where search region will be represented in 1-based system. Since the coordinateSystem can either be 0-based or 1-based, this search query will include the result of both coordinateSystem that contains the equivalent segment of the gene or whole genome sequence. For example, a search for sequence can be represented as `coordinate=1$lt345$gt123`, this means it will search for the Sequence resource on chromosome 1 and with position >123 and <345, where in 1-based system resource, all strings within region 1:124-344 will be revealed, while in 0-based system resource, all strings within region 1:123-344 will be revealed. You may want to check detail about 0-based v.s. 1-based above.",
-      "compiled": [{"resourceType": "Sequence", "path": "variant"}]
     },
     "end": {
       "type": "number",
