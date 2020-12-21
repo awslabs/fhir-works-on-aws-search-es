@@ -4,9 +4,7 @@
  */
 
 import each from 'jest-each';
-import {
-    SearchFilter,
-} from 'fhir-works-on-aws-interface';
+import { SearchFilter } from 'fhir-works-on-aws-interface';
 import { ElasticSearchService } from './elasticSearchService';
 import { ElasticSearch } from './elasticSearch';
 
@@ -396,57 +394,69 @@ describe('typeSearch', () => {
         each([
             [
                 'equal',
-                [{
-                    key: 'someFieldThatTellsIfTheResourceIsActive',
-                    value: ['AVAILABLE'],
-                    comparisonOperator: '==' as const,
-                    logicalOperator: 'AND' as const,
-                }]
+                [
+                    {
+                        key: 'someFieldThatTellsIfTheResourceIsActive',
+                        value: ['AVAILABLE'],
+                        comparisonOperator: '==' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
             ],
             [
                 'not equal',
-                [{
-                    key: 'someFieldThatTellsIfTheResourceIsActive',
-                    value: ['AVAILABLE'],
-                    comparisonOperator: '!=' as const,
-                    logicalOperator: 'AND' as const,
-                }]
+                [
+                    {
+                        key: 'someFieldThatTellsIfTheResourceIsActive',
+                        value: ['AVAILABLE'],
+                        comparisonOperator: '!=' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
             ],
             [
                 'greater than',
-                [{
-                    key: 'age',
-                    value: ['21'],
-                    comparisonOperator: '>' as const,
-                    logicalOperator: 'AND' as const,
-                }]
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '>' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
             ],
             [
                 'less than',
-                [{
-                    key: 'age',
-                    value: ['21'],
-                    comparisonOperator: '<' as const,
-                    logicalOperator: 'AND' as const,
-                }]
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '<' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
             ],
             [
                 'greater than or equal',
-                [{
-                    key: 'age',
-                    value: ['21'],
-                    comparisonOperator: '>=' as const,
-                    logicalOperator: 'AND' as const,
-                }]
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '>=' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
             ],
             [
                 'less than or equal',
-                [{
-                    key: 'age',
-                    value: ['21'],
-                    comparisonOperator: '<=' as const,
-                    logicalOperator: 'AND' as const,
-                }]
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '<=' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
             ],
             [
                 'AND combination',
@@ -456,8 +466,8 @@ describe('typeSearch', () => {
                         value: ['AVAILABLE', 'PENDING'],
                         comparisonOperator: '==' as const,
                         logicalOperator: 'AND' as const,
-                    }
-                ]
+                    },
+                ],
             ],
             [
                 'OR combination',
@@ -467,8 +477,8 @@ describe('typeSearch', () => {
                         value: ['AVAILABLE', 'PENDING'],
                         comparisonOperator: '==' as const,
                         logicalOperator: 'OR' as const,
-                    }
-                ]
+                    },
+                ],
             ],
         ]).test('- %s', async (scenario: string, searchFilters: SearchFilter[]) => {
             const fakeSearchResult = {
