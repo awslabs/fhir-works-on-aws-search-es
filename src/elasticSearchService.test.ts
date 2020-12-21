@@ -14,7 +14,7 @@ const FILTER_RULES_FOR_ACTIVE_RESOURCES = [
         key: 'someFieldThatTellsIfTheResourceIsActive',
         value: ['AVAILABLE'],
         comparisonOperator: '==' as const,
-        logicalOperator: 'AND' as const
+        logicalOperator: 'AND' as const,
     },
 ];
 
