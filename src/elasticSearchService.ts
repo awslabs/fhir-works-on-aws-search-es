@@ -102,7 +102,6 @@ export class ElasticSearchService implements Search {
                 ...this.searchFiltersForAllQueries,
                 ...(searchFilters ?? []),
             ]);
-            console.log('filter:', filter);
 
             const params = {
                 index: resourceType.toLowerCase(),
