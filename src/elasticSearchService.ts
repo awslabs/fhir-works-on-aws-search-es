@@ -248,29 +248,35 @@ export class ElasticSearchService implements Search {
         request: TypeSearchRequest,
         iterative?: true,
     ): Promise<SearchEntry[]> {
+        const { queryParams, searchFilters, allowedResourceTypes, baseUrl } = request;
+        const filter: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery([
+            ...this.searchFiltersForAllQueries,
+            ...(searchFilters ?? []),
+        ]);
+
         const includeSearchQueries = buildIncludeQueries(
-            request.queryParams,
+            queryParams,
             searchEntries.map(x => x.resource),
-            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForAllQueries),
+            filter,
             this.fhirVersion,
             iterative,
         );
 
         const revIncludeSearchQueries = buildRevIncludeQueries(
-            request.queryParams,
+            queryParams,
             searchEntries.map(x => x.resource),
-            ElasticSearchService.searchFiltersToElasticQuery(this.searchFiltersForAllQueries),
+            filter,
             this.fhirVersion,
             iterative,
         );
 
-        const lowerCaseAllowedResourceTypes = new Set(request.allowedResourceTypes.map(r => r.toLowerCase()));
+        const lowerCaseAllowedResourceTypes = new Set(allowedResourceTypes.map(r => r.toLowerCase()));
         const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
             lowerCaseAllowedResourceTypes.has(query.index),
         );
 
         const { hits } = await this.executeQueries(allowedInclusionQueries);
-        return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
+        return this.hitsToSearchEntries({ hits, baseUrl, mode: 'include' });
     }
 
     private async processIterativeSearchInclusions(
