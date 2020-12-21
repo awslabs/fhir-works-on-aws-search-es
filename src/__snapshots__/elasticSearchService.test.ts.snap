@@ -1315,7 +1315,7 @@ Array [
           "bool": Object {
             "filter": Array [
               Object {
-                "term": Object {
+                "match": Object {
                   "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
                 },
               },
@@ -1511,12 +1511,12 @@ Array [
                 "bool": Object {
                   "filter": Array [
                     Object {
-                      "term": Object {
+                      "match": Object {
                         "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
                       },
                     },
                     Object {
-                      "term": Object {
+                      "match": Object {
                         "someFieldThatTellsIfTheResourceIsActive": "PENDING",
                       },
                     },
@@ -1559,12 +1559,12 @@ Array [
                 "bool": Object {
                   "should": Array [
                     Object {
-                      "term": Object {
+                      "match": Object {
                         "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
                       },
                     },
                     Object {
-                      "term": Object {
+                      "match": Object {
                         "someFieldThatTellsIfTheResourceIsActive": "PENDING",
                       },
                     },
