@@ -510,7 +510,7 @@ describe('typeSearch', () => {
             await es.typeSearch({
                 resourceType: 'Patient',
                 baseUrl: 'https://base-url.com',
-                queryParams: [{}],
+                queryParams: {},
                 allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
             });
 

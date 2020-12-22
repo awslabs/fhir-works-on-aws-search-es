@@ -1283,18 +1283,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
@@ -1320,18 +1309,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
@@ -1359,18 +1337,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
@@ -1398,18 +1365,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
@@ -1437,18 +1393,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
@@ -1476,18 +1421,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
@@ -1524,18 +1458,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
@@ -1572,18 +1495,7 @@ Array [
                 },
               },
             ],
-            "must": Array [
-              Object {
-                "query_string": Object {
-                  "default_operator": "AND",
-                  "fields": Array [
-                    "0.*",
-                  ],
-                  "lenient": true,
-                  "query": Object {},
-                },
-              },
-            ],
+            "must": Array [],
           },
         },
       },
