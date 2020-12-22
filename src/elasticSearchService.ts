@@ -98,7 +98,7 @@ export class ElasticSearchService implements Search {
                 must.push(query);
             });
 
-            const filter: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery([
+            const filter: SearchFilter[] = ElasticSearchService.buildElasticSearchFilter([
                 ...this.searchFiltersForAllQueries,
                 ...(searchFilters ?? []),
             ]);
@@ -249,7 +249,7 @@ export class ElasticSearchService implements Search {
         iterative?: true,
     ): Promise<SearchEntry[]> {
         const { queryParams, searchFilters, allowedResourceTypes, baseUrl } = request;
-        const filter: SearchFilter[] = ElasticSearchService.searchFiltersToElasticQuery([
+        const filter: SearchFilter[] = ElasticSearchService.buildElasticSearchFilter([
             ...this.searchFiltersForAllQueries,
             ...(searchFilters ?? []),
         ]);
@@ -344,7 +344,7 @@ export class ElasticSearchService implements Search {
         throw new Error('Method not implemented.');
     }
 
-    private static generateElasticQueryPart(
+    private static buildElasticSearchFilterPart(
         key: string,
         value: string,
         operator: '==' | '!=' | '>' | '<' | '>=' | '<=',
@@ -412,27 +412,25 @@ export class ElasticSearchService implements Search {
         }
     }
 
-    private static searchFilterToElasticQuery(searchFilter: SearchFilter): any {
-        const { key, value, comparisonOperator, logicalOperator } = searchFilter;
+    private static buildElasticSearchFilter(searchFilters: SearchFilter[]): any {
+        return searchFilters.map((searchFilter: SearchFilter) => {
+            const { key, value, comparisonOperator, logicalOperator } = searchFilter;
 
-        if (value.length === 0) {
-            throw new Error('Malformed SearchFilter, at least 1 value is required for the comparison');
-        } else if (value.length === 1) {
-            return ElasticSearchService.generateElasticQueryPart(key, value[0], comparisonOperator);
-        } else {
-            const esLogicalOperator = logicalOperator === 'OR' ? 'should' : 'filter';
-            const esQueries = value.map((v: string) => {
-                return ElasticSearchService.generateElasticQueryPart(key, v, comparisonOperator);
-            });
-            return {
-                bool: {
-                    [esLogicalOperator]: esQueries,
-                },
-            };
-        }
-    }
-
-    private static searchFiltersToElasticQuery(searchFilters: SearchFilter[]): any {
-        return searchFilters.map(searchFilter => this.searchFilterToElasticQuery(searchFilter));
+            if (value.length === 0) {
+                throw new Error('Malformed SearchFilter, at least 1 value is required for the comparison');
+            } else if (value.length === 1) {
+                return this.buildElasticSearchFilterPart(key, value[0], comparisonOperator);
+            } else {
+                const esLogicalOperator = logicalOperator === 'OR' ? 'should' : 'filter';
+                const esQueries = value.map((v: string) => {
+                    return this.buildElasticSearchFilterPart(key, v, comparisonOperator);
+                });
+                return {
+                    bool: {
+                        [esLogicalOperator]: esQueries,
+                    },
+                };
+            }
+        });
     }
 }
