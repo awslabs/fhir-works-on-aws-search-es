@@ -14,6 +14,7 @@ import {
     SearchResponse,
     GlobalSearchRequest,
     SearchEntry,
+    SearchFilter,
     FhirVersion,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
@@ -36,28 +37,28 @@ const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
-    private readonly filterRulesForActiveResources: any[];
+    private readonly searchFiltersForAllQueries: SearchFilter[];
 
     private readonly cleanUpFunction: (resource: any) => any;
 
     private readonly fhirVersion: FhirVersion;
 
     /**
-     * @param filterRulesForActiveResources - If you are storing both History and Search resources
-     * in your elastic search you can filter out your History elements by supplying a filter argument like:
-     * [{ match: { documentStatus: 'AVAILABLE' }}]
+     * @param searchFiltersForAllQueries - If you are storing both History and Search resources
+     * in your elastic search you can filter out your History elements by supplying a list of SearchFilters
+     *
      * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
      * the return ES objects
      * @param fhirVersion
      */
     constructor(
-        filterRulesForActiveResources: any[] = [],
+        searchFiltersForAllQueries: SearchFilter[] = [],
         cleanUpFunction: (resource: any) => any = function passThrough(resource: any) {
             return resource;
         },
         fhirVersion: FhirVersion = '4.0.1',
     ) {
-        this.filterRulesForActiveResources = filterRulesForActiveResources;
+        this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
     }
@@ -66,7 +67,7 @@ export class ElasticSearchService implements Search {
     searchParams => {field: value}
      */
     async typeSearch(request: TypeSearchRequest): Promise<SearchResponse> {
-        const { queryParams, resourceType } = request;
+        const { queryParams, searchFilters, resourceType } = request;
         try {
             const from = queryParams[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET])
@@ -97,7 +98,10 @@ export class ElasticSearchService implements Search {
                 must.push(query);
             });
 
-            const filter = this.filterRulesForActiveResources;
+            const filter: SearchFilter[] = ElasticSearchService.buildElasticSearchFilter([
+                ...this.searchFiltersForAllQueries,
+                ...(searchFilters ?? []),
+            ]);
 
             const params = {
                 index: resourceType.toLowerCase(),
@@ -106,8 +110,8 @@ export class ElasticSearchService implements Search {
                 body: {
                     query: {
                         bool: {
-                            must,
                             filter,
+                            must,
                         },
                     },
                 },
@@ -244,29 +248,35 @@ export class ElasticSearchService implements Search {
         request: TypeSearchRequest,
         iterative?: true,
     ): Promise<SearchEntry[]> {
+        const { queryParams, searchFilters, allowedResourceTypes, baseUrl } = request;
+        const filter: SearchFilter[] = ElasticSearchService.buildElasticSearchFilter([
+            ...this.searchFiltersForAllQueries,
+            ...(searchFilters ?? []),
+        ]);
+
         const includeSearchQueries = buildIncludeQueries(
-            request.queryParams,
+            queryParams,
             searchEntries.map(x => x.resource),
-            this.filterRulesForActiveResources,
+            filter,
             this.fhirVersion,
             iterative,
         );
 
         const revIncludeSearchQueries = buildRevIncludeQueries(
-            request.queryParams,
+            queryParams,
             searchEntries.map(x => x.resource),
-            this.filterRulesForActiveResources,
+            filter,
             this.fhirVersion,
             iterative,
         );
 
-        const lowerCaseAllowedResourceTypes = new Set(request.allowedResourceTypes.map(r => r.toLowerCase()));
+        const lowerCaseAllowedResourceTypes = new Set(allowedResourceTypes.map(r => r.toLowerCase()));
         const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
             lowerCaseAllowedResourceTypes.has(query.index),
         );
 
         const { hits } = await this.executeQueries(allowedInclusionQueries);
-        return this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'include' });
+        return this.hitsToSearchEntries({ hits, baseUrl, mode: 'include' });
     }
 
     private async processIterativeSearchInclusions(
@@ -332,5 +342,95 @@ export class ElasticSearchService implements Search {
     async globalSearch(request: GlobalSearchRequest): Promise<SearchResponse> {
         console.log(request);
         throw new Error('Method not implemented.');
+    }
+
+    private static buildElasticSearchFilterPart(
+        key: string,
+        value: string,
+        operator: '==' | '!=' | '>' | '<' | '>=' | '<=',
+    ): any {
+        switch (operator) {
+            case '==': {
+                return {
+                    match: {
+                        [key]: value,
+                    },
+                };
+            }
+            case '!=': {
+                return {
+                    bool: {
+                        must_not: [
+                            {
+                                term: {
+                                    [key]: value,
+                                },
+                            },
+                        ],
+                    },
+                };
+            }
+            case '>': {
+                return {
+                    range: {
+                        [key]: {
+                            gt: value,
+                        },
+                    },
+                };
+            }
+            case '<': {
+                return {
+                    range: {
+                        [key]: {
+                            lt: value,
+                        },
+                    },
+                };
+            }
+            case '>=': {
+                return {
+                    range: {
+                        [key]: {
+                            gte: value,
+                        },
+                    },
+                };
+            }
+            case '<=': {
+                return {
+                    range: {
+                        [key]: {
+                            lte: value,
+                        },
+                    },
+                };
+            }
+            default: {
+                throw new Error('Unknown comparison operator');
+            }
+        }
+    }
+
+    private static buildElasticSearchFilter(searchFilters: SearchFilter[]): any {
+        return searchFilters.map((searchFilter: SearchFilter) => {
+            const { key, value, comparisonOperator, logicalOperator } = searchFilter;
+
+            if (value.length === 0) {
+                throw new Error('Malformed SearchFilter, at least 1 value is required for the comparison');
+            } else if (value.length === 1) {
+                return this.buildElasticSearchFilterPart(key, value[0], comparisonOperator);
+            } else {
+                const esLogicalOperator = logicalOperator === 'OR' ? 'should' : 'filter';
+                const esQueries = value.map((v: string) => {
+                    return this.buildElasticSearchFilterPart(key, v, comparisonOperator);
+                });
+                return {
+                    bool: {
+                        [esLogicalOperator]: esQueries,
+                    },
+                };
+            }
+        });
     }
 }
