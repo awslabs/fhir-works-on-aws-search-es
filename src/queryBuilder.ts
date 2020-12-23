@@ -122,7 +122,7 @@ export function buildQuery(queryParams: any, filterRulesForActiveResources: any)
     const filter: any[] = [];
     const mustNot: any[] = [];
     // Filter based on the user request
-    if (filterRulesForActiveResources.length > 0) filter.push(filterRulesForActiveResources);
+    if (filterRulesForActiveResources.length > 0) filter.push(...filterRulesForActiveResources);
 
     Object.entries(queryParams).forEach(([searchParameter, value]) => {
         // ignore search parameters
