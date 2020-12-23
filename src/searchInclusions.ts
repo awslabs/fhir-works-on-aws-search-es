@@ -4,10 +4,8 @@
  */
 import { groupBy, mapValues, uniq, get, uniqBy } from 'lodash';
 
-import { FhirVersion } from 'fhir-works-on-aws-interface';
-import resourceReferencesMatrixV4 from './schema/fhirResourceReferencesMatrix.v4.0.1.json';
-import resourceReferencesMatrixV3 from './schema/fhirResourceReferencesMatrix.v3.0.1.json';
 import { isPresent } from './tsUtils';
+import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 
 export type InclusionSearchParameter = {
     type: '_include' | '_revinclude';
@@ -15,6 +13,7 @@ export type InclusionSearchParameter = {
     isIterate?: true;
     sourceResource: string;
     searchParameter: string;
+    path?: string;
     targetResourceType?: string;
 };
 
@@ -30,7 +29,7 @@ export const inclusionParameterFromString = (
     if (s === '*') {
         return { isWildcard: true };
     }
-    const INCLUSION_PARAM_REGEX = /^(?<sourceResource>[A-Za-z]+):(?<searchParameter>[A-Za-z.]+)(?::(?<targetResourceType>[A-Za-z]+))?$/;
+    const INCLUSION_PARAM_REGEX = /^(?<sourceResource>[A-Za-z]+):(?<searchParameter>[A-Za-z-]+)(?::(?<targetResourceType>[A-Za-z]+))?$/;
     const match = s.match(INCLUSION_PARAM_REGEX);
     if (match === null) {
         // Malformed inclusion search parameters are ignored. No exception is thrown.
@@ -49,39 +48,37 @@ export const inclusionParameterFromString = (
 
 const expandRevIncludeWildcard = (
     resourceTypes: string[],
-    resourceReferencesMatrix: string[][],
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
 ): InclusionSearchParameter[] => {
     return resourceTypes.flatMap(resourceType => {
-        return resourceReferencesMatrix
-            .filter(
-                // Some Resources have fields that can reference any resource type. They have their type noted as Reference(Any) on the FHIR website.
-                // In those cases the targetResourceType is noted as 'Resource' in the references matrix.
-                ([, , targetResourceType]) => targetResourceType === resourceType || targetResourceType === 'Resource',
-            )
-            .map(([sourceResource, searchParameter, targetResourceType]) => ({
+        return fhirSearchParametersRegistry.getRevIncludeSearchParameters(resourceType).flatMap(searchParam => {
+            return searchParam.target!.map(target => ({
                 type: '_revinclude',
                 isWildcard: false,
-                sourceResource,
-                searchParameter,
-                targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
+                sourceResource: searchParam.base,
+                searchParameter: searchParam.name,
+                path: searchParam.compiled[0].path,
+                targetResourceType: target,
             }));
+        });
     });
 };
 
 const expandIncludeWildcard = (
     resourceTypes: string[],
-    resourceReferencesMatrix: string[][],
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
 ): InclusionSearchParameter[] => {
     return resourceTypes.flatMap(resourceType => {
-        return resourceReferencesMatrix
-            .filter(([sourceResource, ,]) => sourceResource === resourceType)
-            .map(([sourceResource, searchParameter, targetResourceType]) => ({
+        return fhirSearchParametersRegistry.getIncludeSearchParameters(resourceType).flatMap(searchParam => {
+            return searchParam.target!.map(target => ({
                 type: '_include',
                 isWildcard: false,
-                sourceResource,
-                searchParameter,
-                targetResourceType: targetResourceType === 'Resource' ? undefined : targetResourceType,
+                sourceResource: searchParam.base,
+                searchParameter: searchParam.name,
+                path: searchParam.compiled[0].path,
+                targetResourceType: target,
             }));
+        });
     });
 };
 
@@ -115,7 +112,7 @@ export const getIncludeReferencesFromResources = (
     const references = includes.flatMap(include => {
         return resources
             .filter(resource => resource.resourceType === include.sourceResource)
-            .map(resource => get(resource, `${include.searchParameter}`) as any)
+            .map(resource => get(resource, `${include.path}`) as any)
             .flatMap(valueAtPath => {
                 if (Array.isArray(valueAtPath)) {
                     return valueAtPath.map(v => get(v, 'reference'));
@@ -179,7 +176,7 @@ export const buildRevIncludeQuery = (
     references: string[],
     filterRulesForActiveResources: any[],
 ) => {
-    const { sourceResource, searchParameter } = revIncludeSearchParameter;
+    const { sourceResource, path } = revIncludeSearchParameter;
     return {
         index: sourceResource.toLowerCase(),
         body: {
@@ -188,7 +185,7 @@ export const buildRevIncludeQuery = (
                     filter: [
                         {
                             terms: {
-                                [`${searchParameter}.reference.keyword`]: references,
+                                [`${path}.reference.keyword`]: references,
                             },
                         },
                         ...filterRulesForActiveResources,
@@ -199,22 +196,32 @@ export const buildRevIncludeQuery = (
     };
 };
 
-const getResourceReferenceMatrix = (fhirVersion: FhirVersion): string[][] => {
-    if (fhirVersion === '4.0.1') {
-        return resourceReferencesMatrixV4;
-    }
+const validateAndAddPath = (
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
+    inclusionSearchParameters: InclusionSearchParameter[],
+): InclusionSearchParameter[] => {
+    return inclusionSearchParameters
+        .map(includeParam => {
+            const searchParam = fhirSearchParametersRegistry.getReferenceSearchParameter(
+                includeParam.sourceResource,
+                includeParam.searchParameter,
+                includeParam.targetResourceType,
+            );
 
-    if (fhirVersion === '3.0.1') {
-        return resourceReferencesMatrixV3;
-    }
-    return [];
+            if (searchParam === undefined) {
+                return undefined;
+            }
+
+            return { ...includeParam, path: searchParam.compiled[0].path };
+        })
+        .filter(isPresent);
 };
 
 export const buildIncludeQueries = (
     queryParams: any,
     resources: any[],
     filterRulesForActiveResources: any[],
-    fhirVersion: FhirVersion,
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     iterate?: true,
 ): any[] => {
     const allIncludeParameters = getInclusionParametersFromQueryParams(
@@ -231,9 +238,9 @@ export const buildIncludeQueries = (
                       new Set() as Set<string>,
                   ),
               ],
-              getResourceReferenceMatrix(fhirVersion),
+              fhirSearchParametersRegistry,
           )
-        : (allIncludeParameters as InclusionSearchParameter[]);
+        : validateAndAddPath(fhirSearchParametersRegistry, allIncludeParameters);
 
     const resourceReferences: { resourceType: string; id: string }[] = getIncludeReferencesFromResources(
         includeParameters,
@@ -255,7 +262,7 @@ export const buildRevIncludeQueries = (
     queryParams: any,
     resources: any[],
     filterRulesForActiveResources: any[],
-    fhirVersion: FhirVersion,
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     iterate?: true,
 ) => {
     const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams, iterate);
@@ -268,9 +275,9 @@ export const buildRevIncludeQueries = (
                       new Set() as Set<string>,
                   ),
               ],
-              getResourceReferenceMatrix(fhirVersion),
+              fhirSearchParametersRegistry,
           )
-        : (allRevincludeParameters as InclusionSearchParameter[]);
+        : validateAndAddPath(fhirSearchParametersRegistry, allRevincludeParameters as InclusionSearchParameter[]);
 
     const revincludeReferences = getRevincludeReferencesFromResources(revIncludeParameters, resources);
 

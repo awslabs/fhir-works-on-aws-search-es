@@ -29,29 +29,6 @@ Array [
           },
         },
         Object {
-          "index": "practitionerrole",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "id": Array [
-                      "practitionerRole-id-555",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
           "index": "practitioner",
         },
         Object {
@@ -75,7 +52,7 @@ Array [
           },
         },
         Object {
-          "index": "immunizationrecommendation",
+          "index": "practitionerrole",
         },
         Object {
           "query": Object {
@@ -84,7 +61,7 @@ Array [
                 Object {
                   "terms": Object {
                     "id": Array [
-                      "immunizationRec-id-444",
+                      "practitionerRole-id-555",
                     ],
                   },
                 },
@@ -217,7 +194,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:performer"]}: msearch queries 1`] = `
+exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:intended-performer"]}: msearch queries 1`] = `
 Array [
   Array [
     Object {
@@ -274,7 +251,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:performer"]}: search queries 1`] = `
+exports[`typeSearch _include queryParams={"_include":["MedicationRequest:subject","MedicationRequest:intended-performer"]}: search queries 1`] = `
 Array [
   Array [
     Object {
@@ -483,7 +460,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "claim",
+          "index": "medicationadministration",
         },
         Object {
           "query": Object {
@@ -491,30 +468,7 @@ Array [
               "filter": Array [
                 Object {
                   "terms": Object {
-                    "prescription.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "claim",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "originalPrescription.reference.keyword": Array [
+                    "request.reference.keyword": Array [
                       "MedicationRequest/medicationrequest-id-111",
                     ],
                   },
@@ -575,29 +529,6 @@ Array [
           },
         },
         Object {
-          "index": "communication",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "about.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
           "index": "immunizationrecommendation",
         },
         Object {
@@ -621,7 +552,7 @@ Array [
           },
         },
         Object {
-          "index": "medicationadministration",
+          "index": "provenance",
         },
         Object {
           "query": Object {
@@ -629,145 +560,7 @@ Array [
               "filter": Array [
                 Object {
                   "terms": Object {
-                    "supportingInformation.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "medicationadministration",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "request.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "medicationrequest",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "supportingInformation.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "medicationrequest",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "basedOn.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "medicationrequest",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "priorPrescription.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "medicationstatement",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "basedOn.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "medicationstatement",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "derivedFrom.reference.keyword": Array [
+                    "entity.what.reference.keyword": Array [
                       "MedicationRequest/medicationrequest-id-111",
                     ],
                   },
@@ -791,29 +584,6 @@ Array [
                 Object {
                   "terms": Object {
                     "target.reference.keyword": Array [
-                      "MedicationRequest/medicationrequest-id-111",
-                    ],
-                  },
-                },
-                Object {
-                  "match": Object {
-                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        Object {
-          "index": "provenance",
-        },
-        Object {
-          "query": Object {
-            "bool": Object {
-              "filter": Array [
-                Object {
-                  "terms": Object {
-                    "entity.what.reference.keyword": Array [
                       "MedicationRequest/medicationrequest-id-111",
                     ],
                   },

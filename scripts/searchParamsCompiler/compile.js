@@ -62,10 +62,11 @@ const compileSearchParams = searchParams => {
         .flatMap(searchParam => {
             return searchParam.base.map(base => ({
                 name: searchParam.name,
+                url: searchParam.url,
                 type: searchParam.type,
                 description: searchParam.description,
-                target: searchParam.target,
                 base,
+                target: searchParam.target,
                 compiled: searchParam.compiled.filter(x => x.resourceType === base),
             }));
         });
@@ -74,7 +75,7 @@ const compileSearchParams = searchParams => {
 
     compiledSearchParams.forEach(x => {
         compiledOutput[x.base] = compiledOutput[x.base] || {};
-        compiledOutput[x.base][x.name] = _.omit(x, 'base', 'name');
+        compiledOutput[x.base][x.name] = x;
     });
 
     return compiledOutput;

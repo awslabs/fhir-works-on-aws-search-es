@@ -247,7 +247,7 @@ describe('typeSearch', () => {
             [{ _include: '*' }],
             [{ _include: 'MedicationRequest:subject' }],
             [{ _include: 'MedicationRequest:subject:Group' }],
-            [{ _include: ['MedicationRequest:subject', 'MedicationRequest:performer'] }],
+            [{ _include: ['MedicationRequest:subject', 'MedicationRequest:intended-performer'] }],
             [{ _include: ['MedicationRequest:subject', 'MedicationRequest:subject'] }],
         ]).test('queryParams=%j', async (queryParams: any) => {
             (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
@@ -362,7 +362,7 @@ describe('typeSearch', () => {
                 ],
             },
         });
-        const queryParams = { '_include:iterate': ['MedicationRequest:subject', 'Patient:managingOrganization'] };
+        const queryParams = { '_include:iterate': ['MedicationRequest:subject', 'Patient:organization'] };
         const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
         await es.typeSearch({
             resourceType: 'MedicationRequest',
@@ -423,7 +423,7 @@ describe('typeSearch', () => {
         const queryParams = {
             '_revinclude:iterate': [
                 'MedicationAdministration:request:MedicationRequest',
-                'MedicationStatement:partOf:MedicationAdministration',
+                'MedicationStatement:part-of:MedicationAdministration',
             ],
         };
         const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
