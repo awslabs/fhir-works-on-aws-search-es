@@ -60,25 +60,53 @@ export type SearchParam = {
     target?: string[];
     compiled: { resourceType: string; path: string; condition?: string[] }[];
 };
-export type CompiledSearchParams = {
-    [resourceType: string]: {
-        [name: string]: SearchParam;
-    };
-};
 
 /**
  * This class is the single authority over the supported FHIR SearchParameters and their definitions
  */
 // eslint-disable-next-line import/prefer-default-export
 export class FHIRSearchParametersRegistry {
-    private readonly compiledSearchParams: CompiledSearchParams;
+    private readonly includeMap: {
+        [resourceType: string]: SearchParam[];
+    };
+
+    private readonly revincludeMap: {
+        [resourceType: string]: SearchParam[];
+    };
+
+    private readonly typeNameMap: {
+        [resourceType: string]: {
+            [name: string]: SearchParam;
+        };
+    };
 
     constructor(fhirVersion: FhirVersion) {
+        let compiledSearchParams: SearchParam[];
         if (fhirVersion === '4.0.1') {
-            this.compiledSearchParams = compiledSearchParamsV4 as any;
+            compiledSearchParams = compiledSearchParamsV4 as SearchParam[];
         } else {
-            this.compiledSearchParams = compiledSearchParamsV3 as any;
+            compiledSearchParams = compiledSearchParamsV3 as SearchParam[];
         }
+
+        this.includeMap = {};
+        this.revincludeMap = {};
+        this.typeNameMap = {};
+
+        compiledSearchParams.forEach(searchParam => {
+            this.typeNameMap[searchParam.base] = this.typeNameMap[searchParam.base] ?? {};
+            this.typeNameMap[searchParam.base][searchParam.name] = searchParam;
+
+            if (searchParam.type === 'reference') {
+                this.includeMap[searchParam.base] = this.includeMap[searchParam.type] ?? [];
+                this.includeMap[searchParam.base].push();
+
+                // eslint-disable-next-line no-unused-expressions
+                searchParam.target?.forEach(target => {
+                    this.revincludeMap[target] = this.revincludeMap[target] ?? [];
+                    this.revincludeMap[target].push(searchParam);
+                });
+            }
+        });
     }
 
     /**
@@ -88,7 +116,7 @@ export class FHIRSearchParametersRegistry {
      * @return the matching SearchParam or undefined if there's no match
      */
     getSearchParameter(resourceType: string, name: string): SearchParam | undefined {
-        return this.compiledSearchParams?.[resourceType]?.[name];
+        return this.typeNameMap?.[resourceType]?.[name] || this.typeNameMap?.['Resource']?.[name];
     }
 
     /**
@@ -124,7 +152,7 @@ export class FHIRSearchParametersRegistry {
      * @param resourceType
      */
     getIncludeSearchParameters(resourceType: string): SearchParam[] {
-        return Object.values(this.compiledSearchParams?.[resourceType]).filter(s => s.type === 'reference');
+        return this.includeMap[resourceType] ?? [];
     }
 
     /**
@@ -132,15 +160,6 @@ export class FHIRSearchParametersRegistry {
      * @param resourceType
      */
     getRevIncludeSearchParameters(resourceType: string): SearchParam[] {
-        const searchParams: SearchParam[] = [];
-        Object.values(this.compiledSearchParams).forEach(x => {
-            Object.values(x).forEach(searchParam => {
-                if (searchParam.type === 'reference' && searchParam.target?.includes(resourceType)) {
-                    searchParams.push(searchParam);
-                }
-            });
-        });
-
-        return searchParams;
+        return this.revincludeMap[resourceType] ?? [];
     }
 }

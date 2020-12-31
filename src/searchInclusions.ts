@@ -200,21 +200,21 @@ const validateAndAddPath = (
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     inclusionSearchParameters: InclusionSearchParameter[],
 ): InclusionSearchParameter[] => {
-    return inclusionSearchParameters
-        .map(includeParam => {
-            const searchParam = fhirSearchParametersRegistry.getReferenceSearchParameter(
-                includeParam.sourceResource,
-                includeParam.searchParameter,
-                includeParam.targetResourceType,
-            );
+    const validInclusionSearchParams: InclusionSearchParameter[] = [];
 
-            if (searchParam === undefined) {
-                return undefined;
-            }
+    inclusionSearchParameters.forEach(includeParam => {
+        const searchParam = fhirSearchParametersRegistry.getReferenceSearchParameter(
+            includeParam.sourceResource,
+            includeParam.searchParameter,
+            includeParam.targetResourceType,
+        );
 
-            return { ...includeParam, path: searchParam.compiled[0].path };
-        })
-        .filter(isPresent);
+        if (searchParam !== undefined) {
+            validInclusionSearchParams.push({ ...includeParam, path: searchParam.compiled[0].path });
+        }
+    });
+
+    return validInclusionSearchParams;
 };
 
 export const buildIncludeQueries = (
