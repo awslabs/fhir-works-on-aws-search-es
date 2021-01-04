@@ -7,6 +7,23 @@ import { groupBy, mapValues, uniq, get, uniqBy } from 'lodash';
 import { isPresent } from './tsUtils';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 
+/**
+ * @example
+ * The following query:
+ * https://my-fwoa-server/ImmunizationRecommendation?_include=ImmunizationRecommendation:information:Patient
+ * results in:
+ * {
+ *   type: '_include',
+ *   isWildcard: false,
+ *   sourceResource: 'ImmunizationRecommendation',
+ *   searchParameter: 'information',
+ *   path: 'ImmunizationRecommendation.recommendation.supportingPatientInformation'
+ *   targetResourceType: 'Patient'
+ * }
+ *
+ * path is the actual object path where the reference value can be found. All valid search params have a path.
+ * path is optional since InclusionSearchParameter is first built from the query params and the path is added afterwards if it is indeed a valid search parameter.
+ */
 export type InclusionSearchParameter = {
     type: '_include' | '_revinclude';
     isWildcard: false;
