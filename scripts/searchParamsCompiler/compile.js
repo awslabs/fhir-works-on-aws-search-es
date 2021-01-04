@@ -62,40 +62,20 @@ const compileSearchParams = searchParams => {
         .flatMap(searchParam => {
             return searchParam.base.map(base => ({
                 name: searchParam.name,
+                url: searchParam.url,
                 type: searchParam.type,
                 description: searchParam.description,
-                target: searchParam.target,
                 base,
+                target: searchParam.target,
                 compiled: searchParam.compiled.filter(x => x.resourceType === base),
             }));
         });
 
-    const compiledOutput = {};
-
-    compiledSearchParams.forEach(x => {
-        compiledOutput[x.base] = compiledOutput[x.base] || {};
-        compiledOutput[x.base][x.name] = _.omit(x, 'base', 'name');
-    });
-
-    return compiledOutput;
-};
-
-/*
-SearchParameters with base "Resource" are special and apply to all resources.
-This function copies them to all other resource types.
- */
-const postProcessResourceParams = compiledObj => {
-    const resourceSearchParams = compiledObj.Resource;
-    _.unset(compiledObj, 'Resource');
-    Object.keys(compiledObj).forEach(k => {
-        Object.assign(compiledObj[k], resourceSearchParams);
-    });
+    return compiledSearchParams;
 };
 
 const compile = searchParams => {
     const compiledSearchParams = compileSearchParams(searchParams);
-    postProcessResourceParams(compiledSearchParams);
-
     return compiledSearchParams;
 };
 

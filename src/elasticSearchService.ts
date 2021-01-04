@@ -47,7 +47,7 @@ export class ElasticSearchService implements Search {
 
     private readonly fhirVersion: FhirVersion;
 
-    private readonly fhirSearchParams: FHIRSearchParametersRegistry;
+    private readonly fhirSearchParametersRegistry: FHIRSearchParametersRegistry;
 
     /**
      * @param filterRulesForActiveResources - If you are storing both History and Search resources
@@ -67,7 +67,7 @@ export class ElasticSearchService implements Search {
         this.filterRulesForActiveResources = filterRulesForActiveResources;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
-        this.fhirSearchParams = new FHIRSearchParametersRegistry(fhirVersion);
+        this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion);
     }
 
     /*
@@ -94,7 +94,7 @@ export class ElasticSearchService implements Search {
                     return;
                 }
                 const value = escapeQueryString(searchValue as string);
-                const fhirSearchParam = this.fhirSearchParams.getSearchParameter(resourceType, searchParameter);
+                const fhirSearchParam = this.fhirSearchParametersRegistry.getSearchParameter(resourceType, searchParameter);
                 if (fhirSearchParam === undefined) {
                     throw new InvalidSearchParameterError(
                         `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,
@@ -299,7 +299,7 @@ export class ElasticSearchService implements Search {
             request.queryParams,
             searchEntries.map(x => x.resource),
             this.filterRulesForActiveResources,
-            this.fhirVersion,
+            this.fhirSearchParametersRegistry,
             iterative,
         );
 
@@ -307,7 +307,7 @@ export class ElasticSearchService implements Search {
             request.queryParams,
             searchEntries.map(x => x.resource),
             this.filterRulesForActiveResources,
-            this.fhirVersion,
+            this.fhirSearchParametersRegistry,
             iterative,
         );
 

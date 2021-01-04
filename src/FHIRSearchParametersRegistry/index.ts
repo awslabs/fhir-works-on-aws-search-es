@@ -8,9 +8,15 @@ import compiledSearchParamsV4 from '../schema/compiledSearchParameters.4.0.1.jso
 import compiledSearchParamsV3 from '../schema/compiledSearchParameters.3.0.1.json';
 
 /**
+ * name: SearchParameter name
+ *
+ * url: SearchParameter canonical url
+ *
  * type: SearchParameter type
  *
  * description: SearchParameter description
+ *
+ * base: SearchParameter base resource type
  *
  * target: SearchParameter target. Only used for parameters with type reference
  *
@@ -24,8 +30,11 @@ import compiledSearchParamsV3 from '../schema/compiledSearchParameters.3.0.1.jso
  *
  * @example
  * {
+ *    "name": "depends-on",
+ *    "url": "http://hl7.org/fhir/SearchParameter/ActivityDefinition-depends-on",
  *    "type": "reference",
  *    "description": "What resource is being referenced",
+ *    "base": "ActivityDefinition",
  *    "target": [
  *      "Library",
  *      "Account",
@@ -43,15 +52,13 @@ import compiledSearchParamsV3 from '../schema/compiledSearchParameters.3.0.1.jso
  *
  */
 export type SearchParam = {
+    name: string;
+    url: string;
     type: 'composite' | 'date' | 'number' | 'quantity' | 'reference' | 'special' | 'string' | 'token' | 'uri';
     description: string;
+    base: string;
     target?: string[];
     compiled: { resourceType: string; path: string; condition?: string[] }[];
-};
-export type CompiledSearchParams = {
-    [resourceType: string]: {
-        [name: string]: SearchParam;
-    };
 };
 
 /**
@@ -59,22 +66,100 @@ export type CompiledSearchParams = {
  */
 // eslint-disable-next-line import/prefer-default-export
 export class FHIRSearchParametersRegistry {
-    private readonly compiledSearchParams: CompiledSearchParams;
+    private readonly includeMap: {
+        [resourceType: string]: SearchParam[];
+    };
+
+    private readonly revincludeMap: {
+        [resourceType: string]: SearchParam[];
+    };
+
+    private readonly typeNameMap: {
+        [resourceType: string]: {
+            [name: string]: SearchParam;
+        };
+    };
 
     constructor(fhirVersion: FhirVersion) {
+        let compiledSearchParams: SearchParam[];
         if (fhirVersion === '4.0.1') {
-            this.compiledSearchParams = compiledSearchParamsV4 as any;
+            compiledSearchParams = compiledSearchParamsV4 as SearchParam[];
         } else {
-            this.compiledSearchParams = compiledSearchParamsV3 as any;
+            compiledSearchParams = compiledSearchParamsV3 as SearchParam[];
         }
+
+        this.includeMap = {};
+        this.revincludeMap = {};
+        this.typeNameMap = {};
+
+        compiledSearchParams.forEach(searchParam => {
+            this.typeNameMap[searchParam.base] = this.typeNameMap[searchParam.base] ?? {};
+            this.typeNameMap[searchParam.base][searchParam.name] = searchParam;
+
+            if (searchParam.type === 'reference') {
+                this.includeMap[searchParam.base] = this.includeMap[searchParam.type] ?? [];
+                this.includeMap[searchParam.base].push();
+
+                // eslint-disable-next-line no-unused-expressions
+                searchParam.target?.forEach(target => {
+                    this.revincludeMap[target] = this.revincludeMap[target] ?? [];
+                    this.revincludeMap[target].push(searchParam);
+                });
+            }
+        });
     }
 
     /**
      * Retrieve a search parameter. Returns undefined if the parameter is not found on the registry.
      * @param resourceType FHIR resource type
      * @param name search parameter name
+     * @return the matching SearchParam or undefined if there's no match
      */
     getSearchParameter(resourceType: string, name: string): SearchParam | undefined {
-        return this.compiledSearchParams?.[resourceType]?.[name];
+        return this.typeNameMap?.[resourceType]?.[name] || this.typeNameMap?.['Resource']?.[name];
+    }
+
+    /**
+     * Retrieve a search parameter of type "reference"
+     * @param resourceType
+     * @param name
+     * @param targetResourceType
+     * @return the matching SearchParam or undefined if there's no match
+     */
+    getReferenceSearchParameter(
+        resourceType: string,
+        name: string,
+        targetResourceType?: string,
+    ): SearchParam | undefined {
+        const searchParam = this.getSearchParameter(resourceType, name);
+
+        if (searchParam === undefined) {
+            return undefined;
+        }
+
+        if (searchParam.type !== 'reference') {
+            return undefined;
+        }
+
+        if (targetResourceType !== undefined && !searchParam.target?.includes(targetResourceType)) {
+            return undefined;
+        }
+        return searchParam;
+    }
+
+    /**
+     * Retrieve all the SearchParams that can be used in _include queries for a given resource type
+     * @param resourceType
+     */
+    getIncludeSearchParameters(resourceType: string): SearchParam[] {
+        return this.includeMap[resourceType] ?? [];
+    }
+
+    /**
+     * Retrieve all the SearchParams that can be used in _revinclude queries for a given resource type
+     * @param resourceType
+     */
+    getRevIncludeSearchParameters(resourceType: string): SearchParam[] {
+        return this.revincludeMap[resourceType] ?? [];
     }
 }
