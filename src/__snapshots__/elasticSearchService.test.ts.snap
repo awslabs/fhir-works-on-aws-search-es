@@ -1,6 +1,84 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`typeSearch _include queryParams={"_include":"*"}: msearch queries 1`] = `Array []`;
+exports[`typeSearch _include queryParams={"_include":"*"}: msearch queries 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Array [
+        Object {
+          "index": "patient",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "patient-id-333",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "practitioner",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "practitioner-id-222",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        Object {
+          "index": "practitionerrole",
+        },
+        Object {
+          "query": Object {
+            "bool": Object {
+              "filter": Array [
+                Object {
+                  "terms": Object {
+                    "id": Array [
+                      "practitionerRole-id-555",
+                    ],
+                  },
+                },
+                Object {
+                  "match": Object {
+                    "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+]
+`;
 
 exports[`typeSearch _include queryParams={"_include":"*"}: search queries 1`] = `
 Array [

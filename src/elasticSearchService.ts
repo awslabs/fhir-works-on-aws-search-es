@@ -94,7 +94,10 @@ export class ElasticSearchService implements Search {
                     return;
                 }
                 const value = escapeQueryString(searchValue as string);
-                const fhirSearchParam = this.fhirSearchParametersRegistry.getSearchParameter(resourceType, searchParameter);
+                const fhirSearchParam = this.fhirSearchParametersRegistry.getSearchParameter(
+                    resourceType,
+                    searchParameter,
+                );
                 if (fhirSearchParam === undefined) {
                     throw new InvalidSearchParameterError(
                         `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,

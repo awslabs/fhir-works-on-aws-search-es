@@ -97,8 +97,8 @@ export class FHIRSearchParametersRegistry {
             this.typeNameMap[searchParam.base][searchParam.name] = searchParam;
 
             if (searchParam.type === 'reference') {
-                this.includeMap[searchParam.base] = this.includeMap[searchParam.type] ?? [];
-                this.includeMap[searchParam.base].push();
+                this.includeMap[searchParam.base] = this.includeMap[searchParam.base] ?? [];
+                this.includeMap[searchParam.base].push(searchParam);
 
                 // eslint-disable-next-line no-unused-expressions
                 searchParam.target?.forEach(target => {
