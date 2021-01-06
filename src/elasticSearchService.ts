@@ -70,6 +70,10 @@ export class ElasticSearchService implements Search {
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion);
     }
 
+    async getCapabilities() {
+        return this.fhirSearchParametersRegistry.getCapabilities();
+    }
+
     /*
     searchParams => {field: value}
      */
