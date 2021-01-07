@@ -92,9 +92,9 @@ export class FHIRSearchParametersRegistry {
     constructor(fhirVersion: FhirVersion) {
         let compiledSearchParams: SearchParam[];
         if (fhirVersion === '4.0.1') {
-            compiledSearchParams = (compiledSearchParamsV4 as unknown) as SearchParam[];
+            compiledSearchParams = compiledSearchParamsV4 as SearchParam[];
         } else {
-            compiledSearchParams = (compiledSearchParamsV3 as unknown) as SearchParam[];
+            compiledSearchParams = compiledSearchParamsV3 as SearchParam[];
         }
 
         this.includeMap = {};
@@ -129,19 +129,20 @@ export class FHIRSearchParametersRegistry {
 
             this.capabilityStatement[resourceType].searchInclude = [
                 '*',
-                ...(this.includeMap[resourceType]?.map(x => `${x.base}:${x.name}`) ?? []),
+                ...(this.includeMap[resourceType]?.map(searchParam => `${searchParam.base}:${searchParam.name}`) ?? []),
             ];
 
             this.capabilityStatement[resourceType].searchRevInclude = [
                 '*',
-                ...(this.revincludeMap[resourceType]?.map(x => `${x.base}:${x.name}`) ?? []),
+                ...(this.revincludeMap[resourceType]?.map(searchParam => `${searchParam.base}:${searchParam.name}`) ??
+                    []),
             ];
         });
 
         const resourceSearchParams = Object.values(this.typeNameMap.Resource).map(toCapabilityStatement);
 
-        Object.values(this.capabilityStatement).forEach(x => {
-            x.searchParam.push(...resourceSearchParams);
+        Object.values(this.capabilityStatement).forEach(searchCapabilities => {
+            searchCapabilities.searchParam.push(...resourceSearchParams);
         });
     }
 
