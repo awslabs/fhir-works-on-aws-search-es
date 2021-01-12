@@ -153,7 +153,7 @@ export class FHIRSearchParametersRegistry {
      * @return the matching SearchParam or undefined if there's no match
      */
     getSearchParameter(resourceType: string, name: string): SearchParam | undefined {
-        return this.typeNameMap?.[resourceType]?.[name] || this.typeNameMap?.['Resource']?.[name];
+        return this.typeNameMap?.[resourceType]?.[name] || this.typeNameMap?.Resource?.[name];
     }
 
     /**

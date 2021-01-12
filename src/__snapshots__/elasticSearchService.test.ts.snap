@@ -1033,6 +1033,250 @@ Object {
 }
 `;
 
+exports[`typeSearch filter snapshots for simple filters - AND combination 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "bool": Object {
+                  "filter": Array [
+                    Object {
+                      "match": Object {
+                        "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                      },
+                    },
+                    Object {
+                      "match": Object {
+                        "someFieldThatTellsIfTheResourceIsActive": "PENDING",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch filter snapshots for simple filters - OR combination 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "match": Object {
+                        "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                      },
+                    },
+                    Object {
+                      "match": Object {
+                        "someFieldThatTellsIfTheResourceIsActive": "PENDING",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch filter snapshots for simple filters - equal 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch filter snapshots for simple filters - greater than 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "range": Object {
+                  "age": Object {
+                    "gt": "21",
+                  },
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch filter snapshots for simple filters - greater than or equal 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "range": Object {
+                  "age": Object {
+                    "gte": "21",
+                  },
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch filter snapshots for simple filters - less than 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "range": Object {
+                  "age": Object {
+                    "lt": "21",
+                  },
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch filter snapshots for simple filters - less than or equal 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "range": Object {
+                  "age": Object {
+                    "lte": "21",
+                  },
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch filter snapshots for simple filters - not equal 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "bool": Object {
+                  "must_not": Array [
+                    Object {
+                      "term": Object {
+                        "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            "must": Array [],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch query snapshots for simple queryParams queryParams={"_count":10,"_getpagesoffset":2,"_id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
 Array [
   Array [

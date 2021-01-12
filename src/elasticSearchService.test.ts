@@ -4,13 +4,21 @@
  */
 
 import each from 'jest-each';
-import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
+import { InvalidSearchParameterError, SearchFilter } from 'fhir-works-on-aws-interface';
 import { ElasticSearchService } from './elasticSearchService';
 import { ElasticSearch } from './elasticSearch';
 
 jest.mock('./elasticSearch');
 
-const FILTER_RULES_FOR_ACTIVE_RESOURCES = [{ match: { someFieldThatTellsIfTheResourceIsActive: 'AVAILABLE' } }];
+const FILTER_RULES_FOR_ACTIVE_RESOURCES = [
+    {
+        key: 'someFieldThatTellsIfTheResourceIsActive',
+        value: ['AVAILABLE'],
+        comparisonOperator: '==' as const,
+        logicalOperator: 'AND' as const,
+    },
+];
+
 const ALLOWED_RESOURCE_TYPES = [
     'Claim',
     'Communication',
@@ -436,5 +444,133 @@ describe('typeSearch', () => {
 
         expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
         expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+    });
+
+    describe('filter snapshots for simple filters', () => {
+        each([
+            [
+                'equal',
+                [
+                    {
+                        key: 'someFieldThatTellsIfTheResourceIsActive',
+                        value: ['AVAILABLE'],
+                        comparisonOperator: '==' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
+            ],
+            [
+                'not equal',
+                [
+                    {
+                        key: 'someFieldThatTellsIfTheResourceIsActive',
+                        value: ['AVAILABLE'],
+                        comparisonOperator: '!=' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
+            ],
+            [
+                'greater than',
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '>' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
+            ],
+            [
+                'less than',
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '<' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
+            ],
+            [
+                'greater than or equal',
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '>=' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
+            ],
+            [
+                'less than or equal',
+                [
+                    {
+                        key: 'age',
+                        value: ['21'],
+                        comparisonOperator: '<=' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
+            ],
+            [
+                'AND combination',
+                [
+                    {
+                        key: 'someFieldThatTellsIfTheResourceIsActive',
+                        value: ['AVAILABLE', 'PENDING'],
+                        comparisonOperator: '==' as const,
+                        logicalOperator: 'AND' as const,
+                    },
+                ],
+            ],
+            [
+                'OR combination',
+                [
+                    {
+                        key: 'someFieldThatTellsIfTheResourceIsActive',
+                        value: ['AVAILABLE', 'PENDING'],
+                        comparisonOperator: '==' as const,
+                        logicalOperator: 'OR' as const,
+                    },
+                ],
+            ],
+        ]).test('- %s', async (scenario: string, searchFilters: SearchFilter[]) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 1,
+                        hits: [
+                            {
+                                _index: 'patient',
+                                _type: '_doc',
+                                _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                _score: 1,
+                                _source: {
+                                    vid: '1',
+                                    id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                    resourceType: 'Patient',
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService(searchFilters);
+            await es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams: {},
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
     });
 });
