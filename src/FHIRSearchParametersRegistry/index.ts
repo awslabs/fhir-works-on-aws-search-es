@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { FhirVersion } from 'fhir-works-on-aws-interface';
+import { FhirVersion, SearchCapabilityStatement } from 'fhir-works-on-aws-interface';
 import compiledSearchParamsV4 from '../schema/compiledSearchParameters.4.0.1.json';
 import compiledSearchParamsV3 from '../schema/compiledSearchParameters.3.0.1.json';
 
@@ -61,6 +61,13 @@ export type SearchParam = {
     compiled: { resourceType: string; path: string; condition?: string[] }[];
 };
 
+const toCapabilityStatement = (searchParam: SearchParam) => ({
+    name: searchParam.name,
+    definition: searchParam.url,
+    type: searchParam.type,
+    documentation: searchParam.description,
+});
+
 /**
  * This class is the single authority over the supported FHIR SearchParameters and their definitions
  */
@@ -80,6 +87,8 @@ export class FHIRSearchParametersRegistry {
         };
     };
 
+    private readonly capabilityStatement: SearchCapabilityStatement;
+
     constructor(fhirVersion: FhirVersion) {
         let compiledSearchParams: SearchParam[];
         if (fhirVersion === '4.0.1') {
@@ -91,6 +100,7 @@ export class FHIRSearchParametersRegistry {
         this.includeMap = {};
         this.revincludeMap = {};
         this.typeNameMap = {};
+        this.capabilityStatement = {};
 
         compiledSearchParams.forEach(searchParam => {
             this.typeNameMap[searchParam.base] = this.typeNameMap[searchParam.base] ?? {};
@@ -106,6 +116,33 @@ export class FHIRSearchParametersRegistry {
                     this.revincludeMap[target].push(searchParam);
                 });
             }
+        });
+
+        Object.entries(this.typeNameMap).forEach(([resourceType, searchParams]) => {
+            if (resourceType === 'Resource') {
+                // search params of type Resource are handled separately since they must appear on ALL resource types
+                return;
+            }
+
+            this.capabilityStatement[resourceType] = this.capabilityStatement[resourceType] ?? {};
+            this.capabilityStatement[resourceType].searchParam = Object.values(searchParams).map(toCapabilityStatement);
+
+            this.capabilityStatement[resourceType].searchInclude = [
+                '*',
+                ...(this.includeMap[resourceType]?.map(searchParam => `${searchParam.base}:${searchParam.name}`) ?? []),
+            ];
+
+            this.capabilityStatement[resourceType].searchRevInclude = [
+                '*',
+                ...(this.revincludeMap[resourceType]?.map(searchParam => `${searchParam.base}:${searchParam.name}`) ??
+                    []),
+            ];
+        });
+
+        const resourceSearchParams = Object.values(this.typeNameMap.Resource).map(toCapabilityStatement);
+
+        Object.values(this.capabilityStatement).forEach(searchCapabilities => {
+            searchCapabilities.searchParam.push(...resourceSearchParams);
         });
     }
 
@@ -161,5 +198,13 @@ export class FHIRSearchParametersRegistry {
      */
     getRevIncludeSearchParameters(resourceType: string): SearchParam[] {
         return this.revincludeMap[resourceType] ?? [];
+    }
+
+    /**
+     * Retrieve a subset of the CapabilityStatement with the search-related fields for all resources
+     * See https://www.hl7.org/fhir/capabilitystatement.html
+     */
+    getCapabilities(): SearchCapabilityStatement {
+        return this.capabilityStatement;
     }
 }
