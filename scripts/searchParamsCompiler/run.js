@@ -18,7 +18,6 @@ Run the script:
  */
 
 const fs = require('fs');
-const stringify = require('json-stringify-pretty-compact');
 const compile = require('./compile');
 
 const readSearchParamsFile = path => {
@@ -49,7 +48,7 @@ const run = () => {
 
     fs.writeFileSync(
         `../../src/schema/compiledSearchParameters.${fhirVersion}.json`,
-        stringify(compiledSearchParams, { maxLength: 100 }),
+        JSON.stringify(compiledSearchParams),
     );
 };
 
