@@ -17,7 +17,7 @@ If you are modifying the grammar at reducedFHIRPath.ne you need to compile it. T
 > nearleyc reducedFHIRPath.ne -o ../src/implementationGuides/reducedFHIRPath.js
 
 Run the script:
-> ts-node run.js <fhirVersion>
+> ts-node run.ts <fhirVersion>
  */
 
 import * as fs from 'fs';
@@ -32,7 +32,7 @@ const run = async () => {
     const args = process.argv.slice(2);
     if (!args[0]) {
         console.log('Error. Missing fhirVersion parameter');
-        console.log('Usage: ts-node run.js <fhirVersion>');
+        console.log('Usage: ts-node run.ts <fhirVersion>');
     }
     const fhirVersion = args[0];
     const searchParams = readSearchParamsFile('search-parameters.json');
