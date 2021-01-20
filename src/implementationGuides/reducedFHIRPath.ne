@@ -4,6 +4,8 @@
 # Minimal subset of the FHIRPath grammar required to parse the FHIRPath SearchParameter expressions
 # See the docs for the syntax of this file at https://nearley.js.org/docs/grammar
 
+@preprocessor typescript
+
 Main -> unionExpression                                  {% id %}
 
 unionExpression -> unionExpression _ "|" _ expression    {% d => ([ Array.isArray(d[0]) ? d[0].flat() : d[0], d[4]]).flat() %}

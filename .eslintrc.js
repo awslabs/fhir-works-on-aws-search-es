@@ -17,7 +17,7 @@ module.exports = {
     },
     rules: {
         'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
-        'no-console': ['warn', { allow: ['log', 'error'] }],
+        'no-console': ['warn', { allow: ['log', 'error', 'warn'] }],
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
         'no-useless-constructor': 'off',

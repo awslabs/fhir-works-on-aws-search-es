@@ -20,7 +20,7 @@
     "lint-fix": "eslint --fix . --ext .ts,.tsx",
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest src --silent && jest scripts --silent",
+    "test": "jest src --silent",
     "test-coverage": "jest --coverage",
     "release": "yarn run build && yarn run lint && yarn run test",
     "clean": "rm -rf build/* node_modules/* dist/* .serverless/* .nyc_output/* lib/*",
@@ -38,6 +38,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.19",
     "@types/lodash": "^4.14.161",
+    "@types/nearley": "^2.11.1",
     "@types/node": "^12",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",

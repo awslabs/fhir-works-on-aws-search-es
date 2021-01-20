@@ -4,3 +4,4 @@
  */
 
 export * from './elasticSearchService';
+export * from './implementationGuides';
