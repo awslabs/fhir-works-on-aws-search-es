@@ -37,7 +37,7 @@ describe('typeSearch', () => {
     beforeEach(() => {
         jest.resetAllMocks();
     });
-    describe('query snapshots for simple queryParams', () => {
+    describe('query snapshots for simple queryParams; with ACTIVE filter', () => {
         each([
             [{}],
             [{ _count: 10, _getpagesoffset: 2 }],
@@ -86,6 +86,132 @@ describe('typeSearch', () => {
                 baseUrl: 'https://base-url.com',
                 queryParams,
                 allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
+    });
+    describe('query snapshots for simple queryParams; without ACTIVE filter', () => {
+        each([
+            [{}],
+            [
+                {
+                    _count: 10,
+                    _getpagesoffset: 2,
+                    _id: '11111111-1111-1111-1111-111111111111',
+                    gender: 'female',
+                    name: 'Emily',
+                    _format: 'json',
+                },
+            ],
+        ]).test('queryParams=%j', async (queryParams: any) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 1,
+                        hits: [
+                            {
+                                _index: 'patient',
+                                _type: '_doc',
+                                _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                _score: 1,
+                                _source: {
+                                    vid: '1',
+                                    id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                    resourceType: 'Patient',
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService();
+            await es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams,
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
+    });
+    describe('query snapshots for no queryParams, ACTIVE filter & changing filters', () => {
+        const id = '3bdd8948-5e3b-4411-8f3f-d352a82bb07d';
+        const patientId = `Patient/${id}`;
+        const patientIdentity = `https://gdieqbxycl.execute-api.us-west-2.amazonaws.com/dev/${patientId}`;
+        each([
+            [
+                [
+                    {
+                        key: '_reference',
+                        logicalOperator: 'OR',
+                        comparisonOperator: '==',
+                        value: [patientIdentity, patientId],
+                    },
+                ],
+            ],
+            [
+                [
+                    {
+                        key: '_reference',
+                        logicalOperator: 'OR',
+                        comparisonOperator: '==',
+                        value: [patientIdentity],
+                    },
+                    {
+                        key: 'id',
+                        logicalOperator: 'OR',
+                        comparisonOperator: '==',
+                        value: [id],
+                    },
+                    {
+                        key: 'gender',
+                        logicalOperator: 'AND',
+                        comparisonOperator: '==',
+                        value: ['male', 'female'],
+                    },
+                ],
+            ],
+            [[]],
+        ]).test('filterParams=%j', async (searchFilters: SearchFilter[]) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 1,
+                        hits: [
+                            {
+                                _index: 'patient',
+                                _type: '_doc',
+                                _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                _score: 1,
+                                _source: {
+                                    vid: '1',
+                                    id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                    resourceType: 'Patient',
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams: {},
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+                searchFilters,
             });
 
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
