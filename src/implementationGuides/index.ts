@@ -87,7 +87,6 @@ const compile = async (searchParams: any[]): Promise<any> => {
     });
 
     const compiledSearchParams = validFhirSearchParams
-        .filter(s => s.expression)
         .filter(isParamSupported)
         .map(searchParam => {
             const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
