@@ -3,12 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-const compile = require('./compile');
+import { SearchImplementationGuides } from './index';
+
+const { compile } = SearchImplementationGuides;
 
 describe('compile', () => {
-    test(`simple path - Patient.communication.language`, () => {
+    test(`simple path - Patient.communication.language`, async () => {
         const compiled = compile([
             {
+                resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/Patient-language',
                 name: 'language',
                 type: 'token',
@@ -18,12 +21,14 @@ describe('compile', () => {
             },
         ]);
 
-        expect(compiled).toMatchSnapshot();
+        await expect(compiled).resolves.toMatchSnapshot();
     });
 
-    test(`simple where - Library.relatedArtifact.where(type='predecessor').resource`, () => {
+    test(`simple where - Library.relatedArtifact.where(type='predecessor').resource`, async () => {
         const compiled = compile([
             {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/SearchParameter/Library-predecessor',
                 name: 'predecessor',
                 description: 'What resource is being referenced',
                 base: ['Library'],
@@ -32,12 +37,13 @@ describe('compile', () => {
                 target: ['Account', 'ActivityDefinition'],
             },
         ]);
-        expect(compiled).toMatchSnapshot();
+        await expect(compiled).resolves.toMatchSnapshot();
     });
 
-    test(`where with resolve() is - Person.link.target.where(resolve() is RelatedPerson)`, () => {
+    test(`where with resolve() is - Person.link.target.where(resolve() is RelatedPerson)`, async () => {
         const compiled = compile([
             {
+                resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/Person-relatedperson',
                 name: 'relatedperson',
                 type: 'reference',
@@ -47,11 +53,12 @@ describe('compile', () => {
                 target: ['RelatedPerson'],
             },
         ]);
-        expect(compiled).toMatchSnapshot();
+        await expect(compiled).resolves.toMatchSnapshot();
     });
-    test(`as - (ConceptMap.source as uri)`, () => {
+    test(`as - (ConceptMap.source as uri)`, async () => {
         const compiled = compile([
             {
+                resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/ConceptMap-source-uri',
                 name: 'source-uri',
                 type: 'reference',
@@ -61,11 +68,12 @@ describe('compile', () => {
                 target: ['ValueSet'],
             },
         ]);
-        expect(compiled).toMatchSnapshot();
+        await expect(compiled).resolves.toMatchSnapshot();
     });
-    test(`OR operator - CapabilityStatement.title | CodeSystem.title | ConceptMap.title | ImplementationGuide.title | MessageDefinition.title | OperationDefinition.title | StructureDefinition.title | StructureMap.title | TerminologyCapabilities.title | ValueSet.title`, () => {
+    test(`OR operator - CapabilityStatement.title | CodeSystem.title | ConceptMap.title | ImplementationGuide.title | MessageDefinition.title | OperationDefinition.title | StructureDefinition.title | StructureMap.title | TerminologyCapabilities.title | ValueSet.title`, async () => {
         const compiled = compile([
             {
+                resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/conformance-title',
                 name: 'title',
                 type: 'string',
@@ -86,11 +94,12 @@ describe('compile', () => {
                     'CapabilityStatement.title | CodeSystem.title | ConceptMap.title | ImplementationGuide.title | MessageDefinition.title | OperationDefinition.title | StructureDefinition.title | StructureMap.title | TerminologyCapabilities.title | ValueSet.title',
             },
         ]);
-        expect(compiled).toMatchSnapshot();
+        await expect(compiled).resolves.toMatchSnapshot();
     });
-    test(`OR operator with same base resource - (ExampleScenario.useContext.value as Quantity) | (ExampleScenario.useContext.value as Range)`, () => {
+    test(`OR operator with same base resource - (ExampleScenario.useContext.value as Quantity) | (ExampleScenario.useContext.value as Range)`, async () => {
         const compiled = compile([
             {
+                resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/ExampleScenario-context-quantity',
                 name: 'context-quantity',
                 type: 'quantity',
@@ -100,6 +109,30 @@ describe('compile', () => {
                     '(ExampleScenario.useContext.value as Quantity) | (ExampleScenario.useContext.value as Range)',
             },
         ]);
-        expect(compiled).toMatchSnapshot();
+        await expect(compiled).resolves.toMatchSnapshot();
+    });
+
+    test(`Invalid input`, async () => {
+        const compiled = compile([
+            {
+                foo: 'bar',
+            },
+        ]);
+        await expect(compiled).rejects.toThrowError();
+    });
+
+    test(`unparsable FHIRPath expression`, async () => {
+        const compiled = compile([
+            {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/SearchParameter/test',
+                name: 'test',
+                type: 'token',
+                description: 'test',
+                base: ['Patient'],
+                expression: 'some random FHIRPath expression that cannot be parsed',
+            },
+        ]);
+        await expect(compiled).rejects.toThrowError();
     });
 });
