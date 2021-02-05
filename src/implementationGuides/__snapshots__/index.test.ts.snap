@@ -189,6 +189,30 @@ Array [
 ]
 `;
 
+exports[`compile expression with extra whitespaces 1`] = `
+Array [
+  Object {
+    "base": "Patient",
+    "compiled": Array [
+      Object {
+        "condition": Array [
+          "x.field",
+          "=",
+          "value",
+        ],
+        "path": "x",
+        "resourceType": "Patient",
+      },
+    ],
+    "description": "test",
+    "name": "test",
+    "target": undefined,
+    "type": "token",
+    "url": "http://hl7.org/fhir/SearchParameter/test",
+  },
+]
+`;
+
 exports[`compile simple path - Patient.communication.language 1`] = `
 Array [
   Object {
@@ -231,6 +255,30 @@ Array [
     ],
     "type": "reference",
     "url": "http://hl7.org/fhir/SearchParameter/Library-predecessor",
+  },
+]
+`;
+
+exports[`compile simple where url value - Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.value.code 1`] = `
+Array [
+  Object {
+    "base": "Patient",
+    "compiled": Array [
+      Object {
+        "condition": Array [
+          "extension.url",
+          "=",
+          "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+        ],
+        "path": "extension.extension.value.code",
+        "resourceType": "Patient",
+      },
+    ],
+    "description": "test",
+    "name": "test",
+    "target": undefined,
+    "type": "token",
+    "url": "http://hl7.org/fhir/SearchParameter/test",
   },
 ]
 `;

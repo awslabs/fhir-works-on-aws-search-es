@@ -14,6 +14,7 @@ describe('compile', () => {
                 resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/Patient-language',
                 name: 'language',
+                code: 'language',
                 type: 'token',
                 description: 'Language code (irrespective of use value)',
                 base: ['Patient'],
@@ -30,6 +31,7 @@ describe('compile', () => {
                 resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/Library-predecessor',
                 name: 'predecessor',
+                code: 'predecessor',
                 description: 'What resource is being referenced',
                 base: ['Library'],
                 type: 'reference',
@@ -46,6 +48,7 @@ describe('compile', () => {
                 resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/Person-relatedperson',
                 name: 'relatedperson',
+                code: 'relatedperson',
                 type: 'reference',
                 description: 'The Person links to this RelatedPerson',
                 base: ['Person'],
@@ -61,6 +64,7 @@ describe('compile', () => {
                 resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/ConceptMap-source-uri',
                 name: 'source-uri',
+                code: 'source-uri',
                 type: 'reference',
                 description: 'The source value set that contains the concepts that are being mapped',
                 base: ['ConceptMap'],
@@ -76,6 +80,7 @@ describe('compile', () => {
                 resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/conformance-title',
                 name: 'title',
+                code: 'title',
                 type: 'string',
                 description: 'Multiple Resources...',
                 base: [
@@ -102,11 +107,45 @@ describe('compile', () => {
                 resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/ExampleScenario-context-quantity',
                 name: 'context-quantity',
+                code: 'context-quantity',
                 type: 'quantity',
                 description: 'A quantity- or range-valued use context assigned to the example scenario',
                 base: ['ExampleScenario'],
                 expression:
                     '(ExampleScenario.useContext.value as Quantity) | (ExampleScenario.useContext.value as Range)',
+            },
+        ]);
+        await expect(compiled).resolves.toMatchSnapshot();
+    });
+
+    test(`simple where url value - Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.value.code`, async () => {
+        const compiled = compile([
+            {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/SearchParameter/test',
+                name: 'test',
+                code: 'test',
+                type: 'token',
+                description: 'test',
+                base: ['Patient'],
+                expression:
+                    "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.value.code",
+            },
+        ]);
+        await expect(compiled).resolves.toMatchSnapshot();
+    });
+
+    test(`expression with extra whitespaces`, async () => {
+        const compiled = compile([
+            {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/SearchParameter/test',
+                name: 'test',
+                code: 'test',
+                type: 'token',
+                description: 'test',
+                base: ['Patient'],
+                expression: "Patient.x.where(field         =         'value')",
             },
         ]);
         await expect(compiled).resolves.toMatchSnapshot();
@@ -127,6 +166,7 @@ describe('compile', () => {
                 resourceType: 'SearchParameter',
                 url: 'http://hl7.org/fhir/SearchParameter/test',
                 name: 'test',
+                code: 'test',
                 type: 'token',
                 description: 'test',
                 base: ['Patient'],
