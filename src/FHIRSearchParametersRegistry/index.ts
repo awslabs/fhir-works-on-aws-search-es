@@ -89,12 +89,15 @@ export class FHIRSearchParametersRegistry {
 
     private readonly capabilityStatement: SearchCapabilityStatement;
 
-    constructor(fhirVersion: FhirVersion) {
+    constructor(fhirVersion: FhirVersion, compiledImplementationGuides?: any[]) {
         let compiledSearchParams: SearchParam[];
         if (fhirVersion === '4.0.1') {
             compiledSearchParams = compiledSearchParamsV4 as SearchParam[];
         } else {
             compiledSearchParams = compiledSearchParamsV3 as SearchParam[];
+        }
+        if (compiledImplementationGuides !== undefined) {
+            compiledSearchParams = [...compiledSearchParams, ...compiledImplementationGuides];
         }
 
         this.includeMap = {};
