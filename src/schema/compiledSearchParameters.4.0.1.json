@@ -1747,6 +1747,14 @@
       {
         "resourceType": "DiagnosticReport",
         "path": "effective"
+      },
+      {
+        "resourceType": "DiagnosticReport",
+        "path": "effectiveDateTime"
+      },
+      {
+        "resourceType": "DiagnosticReport",
+        "path": "effectivePeriod"
       }
     ]
   },
@@ -1812,6 +1820,14 @@
       {
         "resourceType": "Immunization",
         "path": "occurrence"
+      },
+      {
+        "resourceType": "Immunization",
+        "path": "occurrenceDateTime"
+      },
+      {
+        "resourceType": "Immunization",
+        "path": "occurrenceString"
       }
     ]
   },
@@ -1838,6 +1854,22 @@
       {
         "resourceType": "Observation",
         "path": "effective"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "effectiveDateTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "effectivePeriod"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "effectiveTiming"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "effectiveInstant"
       }
     ]
   },
@@ -1851,6 +1883,26 @@
       {
         "resourceType": "Procedure",
         "path": "performed"
+      },
+      {
+        "resourceType": "Procedure",
+        "path": "performedDateTime"
+      },
+      {
+        "resourceType": "Procedure",
+        "path": "performedPeriod"
+      },
+      {
+        "resourceType": "Procedure",
+        "path": "performedString"
+      },
+      {
+        "resourceType": "Procedure",
+        "path": "performedAge"
+      },
+      {
+        "resourceType": "Procedure",
+        "path": "performedRange"
       }
     ]
   },
@@ -6693,6 +6745,18 @@
       {
         "resourceType": "CarePlan",
         "path": "activity.detail.scheduled"
+      },
+      {
+        "resourceType": "CarePlan",
+        "path": "activity.detail.scheduledTiming"
+      },
+      {
+        "resourceType": "CarePlan",
+        "path": "activity.detail.scheduledPeriod"
+      },
+      {
+        "resourceType": "CarePlan",
+        "path": "activity.detail.scheduledString"
       }
     ]
   },
@@ -7140,6 +7204,18 @@
       {
         "resourceType": "ChargeItem",
         "path": "occurrence"
+      },
+      {
+        "resourceType": "ChargeItem",
+        "path": "occurrenceDateTime"
+      },
+      {
+        "resourceType": "ChargeItem",
+        "path": "occurrencePeriod"
+      },
+      {
+        "resourceType": "ChargeItem",
+        "path": "occurrenceTiming"
       }
     ]
   },
@@ -10885,6 +10961,14 @@
       {
         "resourceType": "Consent",
         "path": "source"
+      },
+      {
+        "resourceType": "Consent",
+        "path": "sourceAttachment"
+      },
+      {
+        "resourceType": "Consent",
+        "path": "sourceReference"
       }
     ]
   },
@@ -11640,6 +11724,14 @@
       {
         "resourceType": "DetectedIssue",
         "path": "identified"
+      },
+      {
+        "resourceType": "DetectedIssue",
+        "path": "identifiedDateTime"
+      },
+      {
+        "resourceType": "DetectedIssue",
+        "path": "identifiedPeriod"
       }
     ]
   },
@@ -11821,6 +11913,10 @@
       {
         "resourceType": "Device",
         "path": "type.text"
+      },
+      {
+        "resourceType": "Device",
+        "path": "deviceName"
       }
     ]
   },
@@ -11947,6 +12043,10 @@
       {
         "resourceType": "Device",
         "path": "udiCarrier.carrierHRF"
+      },
+      {
+        "resourceType": "Device",
+        "path": "udiCarrier"
       }
     ]
   },
@@ -11960,6 +12060,10 @@
       {
         "resourceType": "Device",
         "path": "udiCarrier.deviceIdentifier"
+      },
+      {
+        "resourceType": "Device",
+        "path": "udiCarrier"
       }
     ]
   },
@@ -18291,6 +18395,18 @@
       {
         "resourceType": "Group",
         "path": "characteristic.valueBoolean"
+      },
+      {
+        "resourceType": "Group",
+        "path": "characteristic.valueQuantity"
+      },
+      {
+        "resourceType": "Group",
+        "path": "characteristic.valueRange"
+      },
+      {
+        "resourceType": "Group",
+        "path": "characteristic.valueReference"
       }
     ]
   },
@@ -19637,7 +19753,16 @@
     "type": "string",
     "description": "A portion of the organization's name or alias",
     "base": "InsurancePlan",
-    "compiled": []
+    "compiled": [
+      {
+        "resourceType": "InsurancePlan",
+        "path": "name"
+      },
+      {
+        "resourceType": "InsurancePlan",
+        "path": "alias"
+      }
+    ]
   },
   {
     "name": "owned-by",
@@ -23072,6 +23197,14 @@
       {
         "resourceType": "Media",
         "path": "created"
+      },
+      {
+        "resourceType": "Media",
+        "path": "createdDateTime"
+      },
+      {
+        "resourceType": "Media",
+        "path": "createdPeriod"
       }
     ]
   },
@@ -23405,6 +23538,14 @@
       {
         "resourceType": "MedicationAdministration",
         "path": "effective"
+      },
+      {
+        "resourceType": "MedicationAdministration",
+        "path": "effectiveDateTime"
+      },
+      {
+        "resourceType": "MedicationAdministration",
+        "path": "effectivePeriod"
       }
     ]
   },
@@ -24152,6 +24293,14 @@
       {
         "resourceType": "MedicationStatement",
         "path": "effective"
+      },
+      {
+        "resourceType": "MedicationStatement",
+        "path": "effectiveDateTime"
+      },
+      {
+        "resourceType": "MedicationStatement",
+        "path": "effectivePeriod"
       }
     ]
   },
@@ -24483,6 +24632,14 @@
       {
         "resourceType": "MessageDefinition",
         "path": "event"
+      },
+      {
+        "resourceType": "MessageDefinition",
+        "path": "eventCoding"
+      },
+      {
+        "resourceType": "MessageDefinition",
+        "path": "eventUri"
       }
     ]
   },
@@ -24599,6 +24756,14 @@
       {
         "resourceType": "MessageHeader",
         "path": "event"
+      },
+      {
+        "resourceType": "MessageHeader",
+        "path": "eventCoding"
+      },
+      {
+        "resourceType": "MessageHeader",
+        "path": "eventUri"
       }
     ]
   },
@@ -25327,6 +25492,42 @@
       {
         "resourceType": "Observation",
         "path": "component.valueSampledData"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueCodeableConcept"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueString"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueBoolean"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueInteger"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueRange"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueRatio"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueDateTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valuePeriod"
       }
     ]
   },
@@ -25383,6 +25584,42 @@
       {
         "resourceType": "Observation",
         "path": "component.valueSampledData"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueCodeableConcept"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueString"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueBoolean"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueInteger"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueRange"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueRatio"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valueDateTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "component.valuePeriod"
       }
     ]
   },
@@ -25762,6 +25999,42 @@
       {
         "resourceType": "Observation",
         "path": "valueSampledData"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueCodeableConcept"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueString"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueBoolean"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueInteger"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueRange"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueRatio"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueDateTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valuePeriod"
       }
     ]
   },
@@ -25779,6 +26052,46 @@
       {
         "resourceType": "Observation",
         "path": "valueCodeableConcept.text"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueQuantity"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueCodeableConcept"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueBoolean"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueInteger"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueRange"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueRatio"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueSampledData"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valueDateTime"
+      },
+      {
+        "resourceType": "Observation",
+        "path": "valuePeriod"
       }
     ]
   },
@@ -27952,6 +28265,14 @@
       {
         "resourceType": "PlanDefinition",
         "path": "action.definition"
+      },
+      {
+        "resourceType": "PlanDefinition",
+        "path": "action.definitionCanonical"
+      },
+      {
+        "resourceType": "PlanDefinition",
+        "path": "action.definitionUri"
       }
     ]
   },
@@ -32809,6 +33130,14 @@
       {
         "resourceType": "RiskAssessment",
         "path": "prediction.probability"
+      },
+      {
+        "resourceType": "RiskAssessment",
+        "path": "prediction.probabilityDecimal"
+      },
+      {
+        "resourceType": "RiskAssessment",
+        "path": "prediction.probabilityRange"
       }
     ]
   },
@@ -33322,6 +33651,18 @@
       {
         "resourceType": "ServiceRequest",
         "path": "occurrence"
+      },
+      {
+        "resourceType": "ServiceRequest",
+        "path": "occurrenceDateTime"
+      },
+      {
+        "resourceType": "ServiceRequest",
+        "path": "occurrencePeriod"
+      },
+      {
+        "resourceType": "ServiceRequest",
+        "path": "occurrenceTiming"
       }
     ]
   },
@@ -33615,6 +33956,14 @@
       {
         "resourceType": "Specimen",
         "path": "collection.collected"
+      },
+      {
+        "resourceType": "Specimen",
+        "path": "collection.collectedDateTime"
+      },
+      {
+        "resourceType": "Specimen",
+        "path": "collection.collectedPeriod"
       }
     ]
   },

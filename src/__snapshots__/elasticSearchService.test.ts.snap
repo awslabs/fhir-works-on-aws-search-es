@@ -1904,6 +1904,116 @@ Array [
                         "query": "some value",
                       },
                     },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueQuantity",
+                          "valueQuantity.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueCodeableConcept",
+                          "valueCodeableConcept.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueBoolean",
+                          "valueBoolean.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueInteger",
+                          "valueInteger.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueRange",
+                          "valueRange.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueRatio",
+                          "valueRatio.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueSampledData",
+                          "valueSampledData.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueTime",
+                          "valueTime.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valueDateTime",
+                          "valueDateTime.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
+                    Object {
+                      "query_string": Object {
+                        "default_operator": "AND",
+                        "fields": Array [
+                          "valuePeriod",
+                          "valuePeriod.*",
+                        ],
+                        "lenient": true,
+                        "query": "some value",
+                      },
+                    },
                   ],
                 },
               },
