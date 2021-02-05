@@ -10,6 +10,10 @@ Main -> unionExpression                                                         
 
 unionExpression -> unionExpression _ "|" _ expression                                {% d => ([ Array.isArray(d[0]) ? d[0].flat() : d[0], d[4]]).flat() %}
 	| expression                                                                     {% d => ([d[0]]) %}
+	| _id                                                                            {% d => ([d[0]]) %}
+
+# This is NOT a valid XPath expression, but for some reason many Implementation Guides "_id" reuse the fhirPath expression as XPath, so we allow it.
+_id -> IDENTIFIER ".id"                                                              {% d=>({resourceType:d[0], path:'id'})%}
 
 expression-> path                                                                    {% id %}
 	| path simpleWhere pathContinuation "/@value":?                                  {% d => ({...d[0], path:`${d[0].path}${d[2]? '.'+d[2] : ''}`, condition:[`${d[0].path}.${d[1][0]}`, d[1][1], d[1][2]]}) %}
