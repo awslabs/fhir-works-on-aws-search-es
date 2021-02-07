@@ -15,6 +15,7 @@ type FhirSearchParam = {
     resourceType: 'SearchParameter';
     url: string;
     name: string;
+    code: string;
     description: string;
     base: string[];
     type: string;
@@ -29,6 +30,7 @@ const isFhirSearchParam = (x: any): x is FhirSearchParam => {
         x.resourceType === 'SearchParameter' &&
         typeof x.url === 'string' &&
         typeof x.name === 'string' &&
+        typeof x.code === 'string' &&
         typeof x.description === 'string' &&
         Array.isArray(x.base) &&
         x.base.every((y: any) => typeof y === 'string') &&
@@ -95,7 +97,7 @@ const compile = async (searchParams: any[]): Promise<any> => {
             } catch (e) {
                 throw new Error(
                     `The FHIRPath expressions for the following search parameter could not be parsed:
-${JSON.stringify(searchParam, null, 2)}
+${JSON.stringify({ name: searchParam.name, url: searchParam.url, expression: searchParam.expression }, null, 2)}
 Either it is an invalid FHIRPath expression or it is using FHIRPath features not supported by this compiler.
 Original error message was: ${e.message}`,
                 );
@@ -107,7 +109,10 @@ Original error message was: ${e.message}`,
         })
         .flatMap(searchParam => {
             return searchParam.base.map((base: any) => ({
-                name: searchParam.name,
+                // Explicitly returning 'code' as 'name'. For the base FHIR resources code and name happen to be the same.
+                // This is not true for search parameters from Implementation Guides. However, all the FHIR documentation and
+                // the capability statement use "name" to refer to the value of "code"
+                name: searchParam.code,
                 url: searchParam.url,
                 type: searchParam.type,
                 description: searchParam.description,
