@@ -4,8 +4,10 @@
  */
 
 import { ImplementationGuides } from 'fhir-works-on-aws-interface';
-import * as nearley from 'nearley';
-import grammar from './reducedFHIRPath';
+import { Parser, Grammar } from 'nearley';
+import { uniqBy } from 'lodash';
+import fhirPathGrammar from './reducedFHIRPath';
+import xPathGrammar from './reducedXPath';
 
 /**
  * Based on the FHIR SearchParameter. This type only includes the fields that are required for the compile process.
@@ -20,6 +22,7 @@ type FhirSearchParam = {
     base: string[];
     type: string;
     expression?: string;
+    xpath?: string;
     target?: string[];
 };
 
@@ -36,6 +39,7 @@ const isFhirSearchParam = (x: any): x is FhirSearchParam => {
         x.base.every((y: any) => typeof y === 'string') &&
         typeof x.type === 'string' &&
         (x.expression === undefined || typeof x.expression === 'string') &&
+        (x.xpath === undefined || typeof x.xpath === 'string') &&
         (x.target === undefined || (Array.isArray(x.target) && x.target.every((y: any) => typeof y === 'string')))
     );
 };
@@ -55,11 +59,6 @@ const isParamSupported = (searchParam: FhirSearchParam) => {
         return false;
     }
 
-    if (!searchParam.expression) {
-        console.warn(`search parameters without a FHIRPath expression are not supported. Skipping ${searchParam.url}`);
-        return false;
-    }
-
     if (searchParam.type === 'composite') {
         console.warn(`search parameters of type "composite" are not supported. Skipping ${searchParam.url}`);
         return false;
@@ -70,8 +69,26 @@ const isParamSupported = (searchParam: FhirSearchParam) => {
         console.warn(`search parameters of type "special" are not supported. Skipping ${searchParam.url}`);
         return false;
     }
+
+    if (!searchParam.expression || !searchParam.xpath) {
+        console.warn(
+            `search parameters without both a FHIRPath and an XPath expression are not supported. Skipping ${searchParam.url}`,
+        );
+        return false;
+    }
     return true;
 };
+
+function mergeParserResults(primaryParser: Parser, secondaryParser: Parser) {
+    // this takes advantage of the fact that _.uniq traverses the array in order, giving primaryParser an higher priority
+    return uniqBy(
+        [
+            ...primaryParser.results[0], // nearley returns an array of results. The array always has exactly one element for non ambiguous grammars
+            ...secondaryParser.results[0],
+        ],
+        x => `${x.resourceType}.${x.path}`,
+    );
+}
 
 /**
  * Compiles the contents of an Implementation Guide into an internal representation used to build Elasticsearch queries.
@@ -91,20 +108,33 @@ const compile = async (searchParams: any[]): Promise<any> => {
     const compiledSearchParams = validFhirSearchParams
         .filter(isParamSupported)
         .map(searchParam => {
-            const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+            const fhirPathparser = new Parser(Grammar.fromCompiled(fhirPathGrammar));
+            const xPathParser = new Parser(Grammar.fromCompiled(xPathGrammar));
             try {
-                parser.feed(searchParam.expression!);
+                fhirPathparser.feed(searchParam.expression!);
+                xPathParser.feed(searchParam.xpath!);
             } catch (e) {
                 throw new Error(
-                    `The FHIRPath expressions for the following search parameter could not be parsed:
-${JSON.stringify({ name: searchParam.name, url: searchParam.url, expression: searchParam.expression }, null, 2)}
+                    `The expressions for the following search parameter could not be parsed:
+${JSON.stringify(
+    { name: searchParam.name, url: searchParam.url, expression: searchParam.expression, xpath: searchParam.xpath },
+    null,
+    2,
+)}
 Either it is an invalid FHIRPath expression or it is using FHIRPath features not supported by this compiler.
 Original error message was: ${e.message}`,
                 );
             }
+
+            // fhirPath is given higher priority since it sometimes has more specific conditions due to supporting the "resolve()" expression
+            // i.e. for http://hl7.org/fhir/SearchParameter/Invoice-patient the expressions are:
+            // Invoice.subject.where(resolve() is Patient)
+            // f:Invoice/f:subject
+            const compiled = mergeParserResults(fhirPathparser, xPathParser);
+
             return {
                 ...searchParam,
-                compiled: parser.results[0], // nearley returns an array of results. The array always has exactly one element for non ambiguous grammars
+                compiled,
             };
         })
         .flatMap(searchParam => {

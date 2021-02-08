@@ -19,6 +19,7 @@ describe('compile', () => {
                 description: 'Language code (irrespective of use value)',
                 base: ['Patient'],
                 expression: 'Patient.communication.language',
+                xpath: 'f:Patient/f:communication/f:language',
             },
         ]);
 
@@ -36,6 +37,7 @@ describe('compile', () => {
                 base: ['Library'],
                 type: 'reference',
                 expression: "Library.relatedArtifact.where(type='predecessor').resource",
+                xpath: "f:Library/f:relatedArtifact[f:type/@value='predecessor']/f:resource",
                 target: ['Account', 'ActivityDefinition'],
             },
         ]);
@@ -53,6 +55,7 @@ describe('compile', () => {
                 description: 'The Person links to this RelatedPerson',
                 base: ['Person'],
                 expression: 'Person.link.target.where(resolve() is RelatedPerson)',
+                xpath: 'f:Person/f:link/f:target',
                 target: ['RelatedPerson'],
             },
         ]);
@@ -69,6 +72,7 @@ describe('compile', () => {
                 description: 'The source value set that contains the concepts that are being mapped',
                 base: ['ConceptMap'],
                 expression: '(ConceptMap.source as uri)',
+                xpath: 'f:ConceptMap/f:sourceUri',
                 target: ['ValueSet'],
             },
         ]);
@@ -97,6 +101,8 @@ describe('compile', () => {
                 ],
                 expression:
                     'CapabilityStatement.title | CodeSystem.title | ConceptMap.title | ImplementationGuide.title | MessageDefinition.title | OperationDefinition.title | StructureDefinition.title | StructureMap.title | TerminologyCapabilities.title | ValueSet.title',
+                xpath:
+                    'f:CapabilityStatement/f:title | f:CodeSystem/f:title | f:ConceptMap/f:title | f:ImplementationGuide/f:title | f:MessageDefinition/f:title | f:OperationDefinition/f:title | f:StructureDefinition/f:title | f:StructureMap/f:title | f:TerminologyCapabilities/f:title | f:ValueSet/f:title',
             },
         ]);
         await expect(compiled).resolves.toMatchSnapshot();
@@ -113,6 +119,7 @@ describe('compile', () => {
                 base: ['ExampleScenario'],
                 expression:
                     '(ExampleScenario.useContext.value as Quantity) | (ExampleScenario.useContext.value as Range)',
+                xpath: 'f:ExampleScenario/f:useContext/f:valueQuantity | f:ExampleScenario/f:useContext/f:valueRange',
             },
         ]);
         await expect(compiled).resolves.toMatchSnapshot();
@@ -130,6 +137,42 @@ describe('compile', () => {
                 base: ['Patient'],
                 expression:
                     "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.value.code",
+                xpath:
+                    "f:Patient/f:extension[@url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race']/f:extension/f:valueCoding/f:code/@value",
+            },
+        ]);
+        await expect(compiled).resolves.toMatchSnapshot();
+    });
+
+    test(`xpath explicitly expands choice of data types and fhirPath does not`, async () => {
+        const compiled = compile([
+            {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/SearchParameter/Consent-source-reference',
+                name: 'source-reference',
+                code: 'source-reference',
+                type: 'reference',
+                description: 'test',
+                base: ['Consent'],
+                expression: 'Consent.source',
+                xpath: 'f:Consent/f:sourceAttachment | f:Consent/f:sourceReference',
+            },
+        ]);
+        await expect(compiled).resolves.toMatchSnapshot();
+    });
+
+    test(`fhirPath with broader conditions than xPath`, async () => {
+        const compiled = compile([
+            {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/SearchParameter/Device-device-name',
+                name: 'device-name',
+                code: 'device-name',
+                type: 'string',
+                description: 'test',
+                base: ['Device'],
+                expression: 'Device.deviceName.name | Device.type.coding.display | Device.type.text',
+                xpath: 'f:Device/f:deviceName',
             },
         ]);
         await expect(compiled).resolves.toMatchSnapshot();
@@ -146,6 +189,7 @@ describe('compile', () => {
                 description: 'test',
                 base: ['Patient'],
                 expression: "Patient.x.where(field         =         'value')",
+                xpath: "f:Patient/f:x[f:field  =  'value']",
             },
         ]);
         await expect(compiled).resolves.toMatchSnapshot();
@@ -171,6 +215,7 @@ describe('compile', () => {
                 description: 'test',
                 base: ['Patient'],
                 expression: 'some random FHIRPath expression that cannot be parsed',
+                xpath: 'some random FHIRPath expression that cannot be parsed',
             },
         ]);
         await expect(compiled).rejects.toThrowError();
