@@ -4,8 +4,7 @@
  */
 
 import { ImplementationGuides } from 'fhir-works-on-aws-interface';
-import * as nearley from 'nearley';
-import { Parser } from 'nearley';
+import { Parser, Grammar } from 'nearley';
 import { uniqBy } from 'lodash';
 import fhirPathGrammar from './reducedFHIRPath';
 import xPathGrammar from './reducedXPath';
@@ -109,8 +108,8 @@ const compile = async (searchParams: any[]): Promise<any> => {
     const compiledSearchParams = validFhirSearchParams
         .filter(isParamSupported)
         .map(searchParam => {
-            const fhirPathparser = new nearley.Parser(nearley.Grammar.fromCompiled(fhirPathGrammar));
-            const xPathParser = new nearley.Parser(nearley.Grammar.fromCompiled(xPathGrammar));
+            const fhirPathparser = new Parser(Grammar.fromCompiled(fhirPathGrammar));
+            const xPathParser = new Parser(Grammar.fromCompiled(xPathGrammar));
             try {
                 fhirPathparser.feed(searchParam.expression!);
                 xPathParser.feed(searchParam.xpath!);
