@@ -1,2 +1,3 @@
 lib/
 src/implementationGuides/reducedFHIRPath.ts
+src/implementationGuides/reducedXPath.ts

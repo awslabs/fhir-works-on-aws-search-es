@@ -213,6 +213,37 @@ Array [
 ]
 `;
 
+exports[`compile fhirPath with broader conditions than xPath 1`] = `
+Array [
+  Object {
+    "base": "Device",
+    "compiled": Array [
+      Object {
+        "path": "deviceName.name",
+        "resourceType": "Device",
+      },
+      Object {
+        "path": "type.coding.display",
+        "resourceType": "Device",
+      },
+      Object {
+        "path": "type.text",
+        "resourceType": "Device",
+      },
+      Object {
+        "path": "deviceName",
+        "resourceType": "Device",
+      },
+    ],
+    "description": "test",
+    "name": "device-name",
+    "target": undefined,
+    "type": "string",
+    "url": "http://hl7.org/fhir/SearchParameter/Device-device-name",
+  },
+]
+`;
+
 exports[`compile simple path - Patient.communication.language 1`] = `
 Array [
   Object {
@@ -273,6 +304,15 @@ Array [
         "path": "extension.extension.value.code",
         "resourceType": "Patient",
       },
+      Object {
+        "condition": Array [
+          "extension.url",
+          "=",
+          "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+        ],
+        "path": "extension.extension.valueCoding.code",
+        "resourceType": "Patient",
+      },
     ],
     "description": "test",
     "name": "test",
@@ -305,6 +345,33 @@ Array [
     ],
     "type": "reference",
     "url": "http://hl7.org/fhir/SearchParameter/Person-relatedperson",
+  },
+]
+`;
+
+exports[`compile xpath explicitly expands choice of data types and fhirPath does not 1`] = `
+Array [
+  Object {
+    "base": "Consent",
+    "compiled": Array [
+      Object {
+        "path": "source",
+        "resourceType": "Consent",
+      },
+      Object {
+        "path": "sourceAttachment",
+        "resourceType": "Consent",
+      },
+      Object {
+        "path": "sourceReference",
+        "resourceType": "Consent",
+      },
+    ],
+    "description": "test",
+    "name": "source-reference",
+    "target": undefined,
+    "type": "reference",
+    "url": "http://hl7.org/fhir/SearchParameter/Consent-source-reference",
   },
 ]
 `;
