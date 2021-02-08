@@ -97,6 +97,7 @@ export class FHIRSearchParametersRegistry {
             compiledSearchParams = compiledSearchParamsV3 as SearchParam[];
         }
         if (compiledImplementationGuides !== undefined) {
+            // order is important. params from IGs are added last so that they overwrite base FHIR params with the same name
             compiledSearchParams = [...compiledSearchParams, ...compiledImplementationGuides];
         }
 
