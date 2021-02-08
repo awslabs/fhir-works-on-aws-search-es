@@ -114,10 +114,9 @@ export class ElasticSearchService implements Search {
                     const fields = [compiled.path, `${compiled.path}.*`];
 
                     const pathQuery = {
-                        query_string: {
+                        multi_match: {
                             fields,
                             query: value,
-                            default_operator: 'AND',
                             lenient: true,
                         },
                     };
@@ -133,7 +132,7 @@ export class ElasticSearchService implements Search {
                                 must: [
                                     pathQuery,
                                     {
-                                        query_string: {
+                                        multi_match: {
                                             fields: [compiled.condition[0], `${compiled.condition[0]}.*`],
                                             query: compiled.condition[2],
                                             lenient: true,

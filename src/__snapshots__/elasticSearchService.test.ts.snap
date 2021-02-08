@@ -1419,8 +1419,7 @@ Array [
             ],
             "must": Array [
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "id",
                     "id.*",
@@ -1430,8 +1429,7 @@ Array [
                 },
               },
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "gender",
                     "gender.*",
@@ -1441,8 +1439,7 @@ Array [
                 },
               },
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "name",
                     "name.*",
@@ -1531,8 +1528,7 @@ Array [
             ],
             "must": Array [
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "id",
                     "id.*",
@@ -1569,8 +1565,7 @@ Array [
             ],
             "must": Array [
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "gender",
                     "gender.*",
@@ -1580,8 +1575,7 @@ Array [
                 },
               },
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "name",
                     "name.*",
@@ -1638,8 +1632,7 @@ Array [
             "filter": Array [],
             "must": Array [
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "id",
                     "id.*",
@@ -1649,8 +1642,7 @@ Array [
                 },
               },
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "gender",
                     "gender.*",
@@ -1660,8 +1652,7 @@ Array [
                 },
               },
               Object {
-                "query_string": Object {
-                  "default_operator": "AND",
+                "multi_match": Object {
                   "fields": Array [
                     "name",
                     "name.*",
@@ -1721,8 +1712,7 @@ Array [
                 "bool": Object {
                   "must": Array [
                     Object {
-                      "query_string": Object {
-                        "default_operator": "AND",
+                      "multi_match": Object {
                         "fields": Array [
                           "relatedArtifact.resource",
                           "relatedArtifact.resource.*",
@@ -1732,7 +1722,7 @@ Array [
                       },
                     },
                     Object {
-                      "query_string": Object {
+                      "multi_match": Object {
                         "fields": Array [
                           "relatedArtifact.type",
                           "relatedArtifact.type.*",
@@ -1775,8 +1765,7 @@ Array [
                 "bool": Object {
                   "must": Array [
                     Object {
-                      "query_string": Object {
-                        "default_operator": "AND",
+                      "multi_match": Object {
                         "fields": Array [
                           "telecom",
                           "telecom.*",
@@ -1786,7 +1775,7 @@ Array [
                       },
                     },
                     Object {
-                      "query_string": Object {
+                      "multi_match": Object {
                         "fields": Array [
                           "telecom.system",
                           "telecom.system.*",
@@ -1829,8 +1818,7 @@ Array [
                 "bool": Object {
                   "must": Array [
                     Object {
-                      "query_string": Object {
-                        "default_operator": "AND",
+                      "multi_match": Object {
                         "fields": Array [
                           "link.target",
                           "link.target.*",
@@ -1840,7 +1828,7 @@ Array [
                       },
                     },
                     Object {
-                      "query_string": Object {
+                      "multi_match": Object {
                         "fields": Array [
                           "link.target",
                           "link.target.*",
@@ -1883,8 +1871,7 @@ Array [
                 "bool": Object {
                   "should": Array [
                     Object {
-                      "query_string": Object {
-                        "default_operator": "AND",
+                      "multi_match": Object {
                         "fields": Array [
                           "valueString",
                           "valueString.*",
@@ -1894,8 +1881,7 @@ Array [
                       },
                     },
                     Object {
-                      "query_string": Object {
-                        "default_operator": "AND",
+                      "multi_match": Object {
                         "fields": Array [
                           "valueCodeableConcept.text",
                           "valueCodeableConcept.text.*",
