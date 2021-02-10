@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.0.1...v2.1.0) (2021-02-09)
+
+
+### Features
+
+* Add ImplementationGuides compile method ([#38](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/38)) ([e0024a4](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/e0024a4812591cbb2a056851be06cf7e9bfb35a7))
+* parse xpath expressions to support choice of data types ([#44](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/44)) ([ca70bdd](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/ca70bdd16c84134b9b5da0662c69fabdd5f98565))
+* update compiler to properly handle params from IGs ([#41](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/41)) ([b616c78](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/b616c78e3b9d87b1955e38af6c3242abc2f449da))
+
+
+### Bug Fixes
+
+* properly handle special characters in queries ([#43](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/43)) ([e586b57](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/e586b576c71c4583b61834af7aa209fa2f8ec4eb))
+
 ### [2.0.1](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.0.0...v2.0.1) (2021-01-27)
 
 
