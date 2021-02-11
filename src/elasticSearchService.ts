@@ -58,6 +58,8 @@ export class ElasticSearchService implements Search {
      * @param cleanUpFunction - If you are storing non-fhir related parameters pass this function to clean
      * the return ES objects
      * @param fhirVersion
+     * @param compiledImplementationGuides - The output of ImplementationGuides.compile.
+     * This parameter enables support for search parameters defined in Implementation Guides.
      */
     constructor(
         searchFiltersForAllQueries: SearchFilter[] = [],
@@ -65,11 +67,12 @@ export class ElasticSearchService implements Search {
             return resource;
         },
         fhirVersion: FhirVersion = '4.0.1',
+        compiledImplementationGuides?: any,
     ) {
         this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
-        this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion);
+        this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
     }
 
     async getCapabilities() {
