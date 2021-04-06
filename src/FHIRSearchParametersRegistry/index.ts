@@ -51,6 +51,9 @@ import compiledSearchParamsV3 from '../schema/compiledSearchParameters.3.0.1.jso
  *  }
  *
  */
+
+export type CompiledSearchParam = { resourceType: string; path: string; condition?: string[] };
+
 export type SearchParam = {
     name: string;
     url: string;
@@ -58,7 +61,7 @@ export type SearchParam = {
     description: string;
     base: string;
     target?: string[];
-    compiled: { resourceType: string; path: string; condition?: string[] }[];
+    compiled: CompiledSearchParam[];
 };
 
 const toCapabilityStatement = (searchParam: SearchParam) => ({
