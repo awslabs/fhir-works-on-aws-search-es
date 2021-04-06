@@ -11,3 +11,12 @@ export const enum SEARCH_PAGINATION_PARAMS {
 }
 
 export const SEPARATOR: string = '_';
+export const ITERATIVE_INCLUSION_PARAMETERS = ['_include:iterate', '_revinclude:iterate'];
+export const NON_SEARCHABLE_PARAMETERS = [
+    SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
+    SEARCH_PAGINATION_PARAMS.COUNT,
+    '_format',
+    '_include',
+    '_revinclude',
+    ...ITERATIVE_INCLUSION_PARAMETERS,
+];

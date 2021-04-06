@@ -17,29 +17,14 @@ import {
     SearchEntry,
     SearchFilter,
     FhirVersion,
-    InvalidSearchParameterError,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
-import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS } from './constants';
+import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS, ITERATIVE_INCLUSION_PARAMETERS } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
-
-const ITERATIVE_INCLUSION_PARAMETERS = ['_include:iterate', '_revinclude:iterate'];
-
-const NON_SEARCHABLE_PARAMETERS = [
-    SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
-    SEARCH_PAGINATION_PARAMS.COUNT,
-    '_format',
-    '_include',
-    '_revinclude',
-    ...ITERATIVE_INCLUSION_PARAMETERS,
-];
+import { buildQueryForAllSearchParameters } from './QueryBuilder';
 
 const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
-
-const escapeQueryString = (string: string) => {
-    return string.replace(/\//g, '\\/');
-};
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
@@ -93,88 +78,18 @@ export class ElasticSearchService implements Search {
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.COUNT])
                 : DEFAULT_SEARCH_RESULTS_PER_PAGE;
 
-            // Exp. {gender: 'male', name: 'john'}
-            const searchParameterToValue = { ...queryParams };
-
-            const must: any[] = [];
-            // TODO Implement fuzzy matches
-            Object.entries(searchParameterToValue).forEach(([searchParameter, searchValue]) => {
-                if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
-                    return;
-                }
-                const value = escapeQueryString(searchValue as string);
-                const fhirSearchParam = this.fhirSearchParametersRegistry.getSearchParameter(
-                    resourceType,
-                    searchParameter,
-                );
-                if (fhirSearchParam === undefined) {
-                    throw new InvalidSearchParameterError(
-                        `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,
-                    );
-                }
-
-                const queries = fhirSearchParam.compiled.map(compiled => {
-                    const fields = [compiled.path, `${compiled.path}.*`];
-
-                    const pathQuery = {
-                        multi_match: {
-                            fields,
-                            query: value,
-                            lenient: true,
-                        },
-                    };
-
-                    // In most cases conditions are used for fields that are an array of objects
-                    // Ideally we should be using a nested query, but that'd require to update the index mappings.
-                    //
-                    // Simply using an array of bool.must is good enough for most cases. The result will contain the correct documents, however it MAY contain additional documents
-                    // https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html
-                    if (compiled.condition !== undefined) {
-                        return {
-                            bool: {
-                                must: [
-                                    pathQuery,
-                                    {
-                                        multi_match: {
-                                            fields: [compiled.condition[0], `${compiled.condition[0]}.*`],
-                                            query: compiled.condition[2],
-                                            lenient: true,
-                                        },
-                                    },
-                                ],
-                            },
-                        };
-                    }
-                    return pathQuery;
-                });
-
-                if (queries.length === 1) {
-                    must.push(queries[0]);
-                } else {
-                    must.push({
-                        bool: {
-                            should: queries,
-                        },
-                    });
-                }
-            });
-
             const filter: any[] = ElasticSearchService.buildElasticSearchFilter([
                 ...this.searchFiltersForAllQueries,
                 ...(searchFilters ?? []),
             ]);
+            const query = buildQueryForAllSearchParameters(this.fhirSearchParametersRegistry, request, filter);
 
             const params = {
                 index: resourceType.toLowerCase(),
                 from,
                 size,
                 body: {
-                    query: {
-                        bool: {
-                            filter,
-                            must,
-                        },
-                    },
+                    query,
                 },
             };
             const { total, hits } = await this.executeQuery(params);
@@ -188,7 +103,7 @@ export class ElasticSearchService implements Search {
                 result.previousResultUrl = this.createURL(
                     request.baseUrl,
                     {
-                        ...searchParameterToValue,
+                        ...queryParams,
                         [SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]: from - size,
                         [SEARCH_PAGINATION_PARAMS.COUNT]: size,
                     },
@@ -199,7 +114,7 @@ export class ElasticSearchService implements Search {
                 result.nextResultUrl = this.createURL(
                     request.baseUrl,
                     {
-                        ...searchParameterToValue,
+                        ...queryParams,
                         [SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]: from + size,
                         [SEARCH_PAGINATION_PARAMS.COUNT]: size,
                     },
