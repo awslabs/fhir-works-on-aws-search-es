@@ -66,13 +66,13 @@ export const parseDateSearchParam = (param: string): DateSearchParameter => {
 
 // eslint-disable-next-line import/prefer-default-export
 export const dateQuery = (compiledSearchParam: CompiledSearchParam, value: string): any => {
-    const dateSearchParameter = parseDateSearchParam(value);
-    const { start, end } = dateSearchParameter.range;
+    const { prefix, range } = parseDateSearchParam(value);
+    const { start, end } = range;
 
     // See https://www.hl7.org/fhir/search.html#prefix
-    if (dateSearchParameter.prefix !== 'ne') {
+    if (prefix !== 'ne') {
         let elasticSearchRange;
-        switch (dateSearchParameter.prefix) {
+        switch (prefix) {
             case 'eq': // equal
                 elasticSearchRange = {
                     gte: start,
@@ -113,7 +113,7 @@ export const dateQuery = (compiledSearchParam: CompiledSearchParam, value: strin
                 throw new InvalidSearchParameterError('Unsupported prefix: ap');
             default:
                 // this should never happen
-                throw new Error(`unknown search prefix: ${dateSearchParameter.prefix}`);
+                throw new Error(`unknown search prefix: ${prefix}`);
         }
 
         return {

@@ -107,8 +107,8 @@ describe('parseDateSearchParam', () => {
     });
 });
 
-describe('buildDateQuery', () => {
-    test('np prefix', () => {
+describe('dateQuery', () => {
+    test('no prefix', () => {
         expect(dateQuery(birthdateParam, '1999-09-09')).toMatchInlineSnapshot(`
             Object {
               "range": Object {
