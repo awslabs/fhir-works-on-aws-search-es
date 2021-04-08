@@ -548,6 +548,18 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ******************************
 
+date-fns
+2.19.0 <https://github.com/date-fns/date-fns>
+Copyright (C) 2020 Sasha Koss and Lesha Koss
+
+# License
+
+date-fns is licensed under the [MIT license](http://kossnocorp.mit-license.org).
+Read more about MIT at [TLDRLegal](https://tldrlegal.com/license/mit-license).
+
+
+******************************
+
 debug
 4.1.1 <https://github.com/visionmedia/debug>
 (The MIT License)

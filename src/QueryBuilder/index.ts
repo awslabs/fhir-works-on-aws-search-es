@@ -7,6 +7,7 @@ import { InvalidSearchParameterError, TypeSearchRequest } from 'fhir-works-on-aw
 import { NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { stringQuery } from './typeQueries/stringQuery';
+import { dateQuery } from './typeQueries/dateQuery';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -18,8 +19,10 @@ function typeQueryWithConditions(
         case 'string':
             typeQuery = stringQuery(compiledSearchParam, searchValue);
             break;
-        case 'composite':
         case 'date':
+            typeQuery = dateQuery(compiledSearchParam, searchValue);
+            break;
+        case 'composite':
         case 'number':
         case 'quantity':
         case 'reference':

@@ -42,6 +42,7 @@ describe('typeSearch', () => {
             [{}],
             [{ _count: 10, _getpagesoffset: 2 }],
             [{ gender: 'female', name: 'Emily' }],
+            [{ gender: 'female', birthdate: 'gt1990' }],
             [{ _id: '11111111-1111-1111-1111-111111111111' }],
             [{ _format: 'json' }],
             [

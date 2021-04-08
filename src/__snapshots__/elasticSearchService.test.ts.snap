@@ -1549,6 +1549,50 @@ Array [
 ]
 `;
 
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"gender":"female","birthdate":"gt1990"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "gender",
+                    "gender.*",
+                  ],
+                  "lenient": true,
+                  "query": "female",
+                },
+              },
+              Object {
+                "range": Object {
+                  "birthDate": Object {
+                    "gt": 1990-01-01T00:00:00.000Z,
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"gender":"female","name":"Emily"} 1`] = `
 Array [
   Array [
