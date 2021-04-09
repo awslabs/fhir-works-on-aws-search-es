@@ -57,12 +57,24 @@ describe('parseTokenSearchParam', () => {
                 }
             `);
         });
+        test('empty string', () => {
+            expect(parseTokenSearchParam('')).toMatchInlineSnapshot(`
+                Object {
+                  "code": "",
+                  "explicitNoSystemProperty": false,
+                  "system": undefined,
+                }
+            `);
+        });
     });
 
     describe('invalid inputs', () => {
         // there are actually very few invalid inputs since almost any string can potentially be a code
         test('a|b|c', () => {
             expect(() => parseTokenSearchParam('a|b|c')).toThrow(InvalidSearchParameterError);
+        });
+        test('|', () => {
+            expect(() => parseTokenSearchParam('|')).toThrow(InvalidSearchParameterError);
         });
     });
 });

@@ -14,6 +14,9 @@ interface TokenSearchParameter {
 
 // eslint-disable-next-line import/prefer-default-export
 export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
+    if (param === '|') {
+        throw new InvalidSearchParameterError(`Invalid token search parameter: ${param}`);
+    }
     const parts = param.split('|');
     if (parts.length > 2) {
         throw new InvalidSearchParameterError(`Invalid token search parameter: ${param}`);
@@ -29,8 +32,10 @@ export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
             system = undefined;
             explicitNoSystemProperty = true;
         }
+        if (code === '') {
+            code = undefined;
+        }
     }
-    code = code === '' ? undefined : code;
     return { system, code, explicitNoSystemProperty };
 };
 
