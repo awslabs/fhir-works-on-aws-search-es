@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.2.0...v2.3.0) (2021-04-09)
+
+
+### Features
+
+* allow milliseconds in date queries ([#55](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/55)) ([86dbccd](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/86dbccd6f8c75d90a0e0df15bbd908c030a84be7))
+* support prefixes and proper range queries for date parameters ([#54](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/54)) ([b082508](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/b08250866f01269f70f32f171653ac4ea1a59275))
+* support token parameters ([#56](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/56)) ([19589b9](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/19589b9dfbc7f19b57019f37f7232b71c5015a41))
+
 ## [2.2.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.1.0...v2.2.0) (2021-03-29)
 
 
