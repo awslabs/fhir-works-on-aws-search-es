@@ -8,6 +8,7 @@ import { NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { stringQuery } from './typeQueries/stringQuery';
 import { dateQuery } from './typeQueries/dateQuery';
+import { tokenQuery } from './typeQueries/tokenQuery';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -22,12 +23,14 @@ function typeQueryWithConditions(
         case 'date':
             typeQuery = dateQuery(compiledSearchParam, searchValue);
             break;
+        case 'token':
+            typeQuery = tokenQuery(compiledSearchParam, searchValue);
+            break;
         case 'composite':
         case 'number':
         case 'quantity':
         case 'reference':
         case 'special':
-        case 'token':
         case 'uri':
         default:
             typeQuery = stringQuery(compiledSearchParam, searchValue);
