@@ -23,85 +23,81 @@ interface DateRange {
 const prefixRange = (prefix: string, range: Range, path: string): any => {
     const { start, end } = range;
 
-    // See https://www.hl7.org/fhir/search.html#prefix
-    if (prefix !== 'ne') {
-        let elasticSearchRange;
-        switch (prefix) {
-            case 'eq': // equal
-                elasticSearchRange = {
-                    gte: start,
-                    lte: end,
-                };
-                break;
-            case 'lt': // less than
-                elasticSearchRange = {
-                    lt: end,
-                };
-                break;
-            case 'le': // less or equal
-                elasticSearchRange = {
-                    lte: end,
-                };
-                break;
-            case 'gt': // greater than
-                elasticSearchRange = {
-                    gt: start,
-                };
-                break;
-            case 'ge': // greater or equal
-                elasticSearchRange = {
-                    gte: start,
-                };
-                break;
-            case 'sa': // starts after
-                elasticSearchRange = {
-                    gt: end,
-                };
-                break;
-            case 'eb': // ends before
-                elasticSearchRange = {
-                    lt: start,
-                };
-                break;
-            case 'ap': // approximately
-                throw new InvalidSearchParameterError('Unsupported prefix: ap');
-            default:
-                // this should never happen
-                throw new Error(`unknown search prefix: ${prefix}`);
-        }
-
+    // not equal
+    if (prefix === 'ne') {
         return {
-            range: {
-                [path]: elasticSearchRange,
+            bool: {
+                should: [
+                    {
+                        range: {
+                            [path]: {
+                                gt: end,
+                            },
+                        },
+                    },
+                    {
+                        range: {
+                            [path]: {
+                                lt: start,
+                            },
+                        },
+                    },
+                ],
             },
         };
     }
 
-    // ne prefix is the only case that requires a bool query;
-    const neQuery = {
-        bool: {
-            should: [
-                {
-                    range: {
-                        [path]: {
-                            gt: end,
-                        },
-                    },
-                },
-                {
-                    range: {
-                        [path]: {
-                            lt: start,
-                        },
-                    },
-                },
-            ],
+    // See https://www.hl7.org/fhir/search.html#prefix
+    let elasticSearchRange;
+    switch (prefix) {
+        case 'eq': // equal
+            elasticSearchRange = {
+                gte: start,
+                lte: end,
+            };
+            break;
+        case 'lt': // less than
+            elasticSearchRange = {
+                lt: end,
+            };
+            break;
+        case 'le': // less or equal
+            elasticSearchRange = {
+                lte: end,
+            };
+            break;
+        case 'gt': // greater than
+            elasticSearchRange = {
+                gt: start,
+            };
+            break;
+        case 'ge': // greater or equal
+            elasticSearchRange = {
+                gte: start,
+            };
+            break;
+        case 'sa': // starts after
+            elasticSearchRange = {
+                gt: end,
+            };
+            break;
+        case 'eb': // ends before
+            elasticSearchRange = {
+                lt: start,
+            };
+            break;
+        case 'ap': // approximately
+            throw new InvalidSearchParameterError('Unsupported prefix: ap');
+        default:
+            // this should never happen
+            throw new Error(`unknown search prefix: ${prefix}`);
+    }
+    return {
+        range: {
+            [path]: elasticSearchRange,
         },
     };
-
-    return neQuery;
 };
-
 export const prefixRangeNumber = (prefix: string, number: number, implicitRange: NumberRange, path: string): any => {
     if (prefix === 'eq' || prefix === 'ne') {
         return prefixRange(prefix, implicitRange, path);
