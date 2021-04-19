@@ -10,6 +10,7 @@ import lastDayOfMonth from 'date-fns/lastDayOfMonth';
 import set from 'date-fns/set';
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
+import { prefixRangeDate } from './common/prefixRange';
 
 interface DateSearchParameter {
     prefix: string;
@@ -69,83 +70,5 @@ export const parseDateSearchParam = (param: string): DateSearchParameter => {
 // eslint-disable-next-line import/prefer-default-export
 export const dateQuery = (compiledSearchParam: CompiledSearchParam, value: string): any => {
     const { prefix, range } = parseDateSearchParam(value);
-    const { start, end } = range;
-
-    // See https://www.hl7.org/fhir/search.html#prefix
-    if (prefix !== 'ne') {
-        let elasticSearchRange;
-        switch (prefix) {
-            case 'eq': // equal
-                elasticSearchRange = {
-                    gte: start,
-                    lte: end,
-                };
-                break;
-            case 'lt': // less than
-                elasticSearchRange = {
-                    lt: end,
-                };
-                break;
-            case 'le': // less or equal
-                elasticSearchRange = {
-                    lte: end,
-                };
-                break;
-            case 'gt': // greater than
-                elasticSearchRange = {
-                    gt: start,
-                };
-                break;
-            case 'ge': // greater or equal
-                elasticSearchRange = {
-                    gte: start,
-                };
-                break;
-            case 'sa': // starts after
-                elasticSearchRange = {
-                    gt: end,
-                };
-                break;
-            case 'eb': // ends before
-                elasticSearchRange = {
-                    lt: start,
-                };
-                break;
-            case 'ap': // approximately
-                throw new InvalidSearchParameterError('Unsupported prefix: ap');
-            default:
-                // this should never happen
-                throw new Error(`unknown search prefix: ${prefix}`);
-        }
-
-        return {
-            range: {
-                [compiledSearchParam.path]: elasticSearchRange,
-            },
-        };
-    }
-
-    // ne prefix is the only case that requires a bool query;
-    const neQuery = {
-        bool: {
-            should: [
-                {
-                    range: {
-                        [compiledSearchParam.path]: {
-                            gt: end,
-                        },
-                    },
-                },
-                {
-                    range: {
-                        [compiledSearchParam.path]: {
-                            lt: start,
-                        },
-                    },
-                },
-            ],
-        },
-    };
-
-    return neQuery;
+    return prefixRangeDate(prefix, range, compiledSearchParam.path);
 };

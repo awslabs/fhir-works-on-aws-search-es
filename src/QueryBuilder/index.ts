@@ -9,6 +9,8 @@ import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '
 import { stringQuery } from './typeQueries/stringQuery';
 import { dateQuery } from './typeQueries/dateQuery';
 import { tokenQuery } from './typeQueries/tokenQuery';
+import { numberQuery } from './typeQueries/numberQuery';
+import { quantityQuery } from './typeQueries/quantityQuery';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -26,9 +28,13 @@ function typeQueryWithConditions(
         case 'token':
             typeQuery = tokenQuery(compiledSearchParam, searchValue);
             break;
-        case 'composite':
         case 'number':
+            typeQuery = numberQuery(compiledSearchParam, searchValue);
+            break;
         case 'quantity':
+            typeQuery = quantityQuery(compiledSearchParam, searchValue);
+            break;
+        case 'composite':
         case 'reference':
         case 'special':
         case 'uri':
