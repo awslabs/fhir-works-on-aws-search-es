@@ -1466,7 +1466,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"_count":10,"_getpagesoffset":2} 1`] = `
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"_count":10,"_getpagesoffset":2,"_sort":"_lastUpdated"} 1`] = `
 Array [
   Array [
     Object {
@@ -1483,6 +1483,14 @@ Array [
             "must": Array [],
           },
         },
+        "sort": Array [
+          Object {
+            "meta.lastUpdated": Object {
+              "order": "asc",
+              "unmapped_type": "long",
+            },
+          },
+        ],
       },
       "from": 2,
       "index": "patient",

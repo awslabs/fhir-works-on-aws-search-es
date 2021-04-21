@@ -19,10 +19,15 @@ import {
     FhirVersion,
 } from 'fhir-works-on-aws-interface';
 import { ElasticSearch } from './elasticSearch';
-import { DEFAULT_SEARCH_RESULTS_PER_PAGE, SEARCH_PAGINATION_PARAMS, ITERATIVE_INCLUSION_PARAMETERS } from './constants';
+import {
+    DEFAULT_SEARCH_RESULTS_PER_PAGE,
+    SEARCH_PAGINATION_PARAMS,
+    ITERATIVE_INCLUSION_PARAMETERS,
+    SORT_PARAMETER,
+} from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
-import { buildQueryForAllSearchParameters } from './QueryBuilder';
+import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
 
 const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
@@ -84,7 +89,7 @@ export class ElasticSearchService implements Search {
             ]);
             const query = buildQueryForAllSearchParameters(this.fhirSearchParametersRegistry, request, filter);
 
-            const params = {
+            const params: any = {
                 index: resourceType.toLowerCase(),
                 from,
                 size,
@@ -92,6 +97,15 @@ export class ElasticSearchService implements Search {
                     query,
                 },
             };
+
+            if (request.queryParams[SORT_PARAMETER]) {
+                params.body.sort = buildSortClause(
+                    this.fhirSearchParametersRegistry,
+                    resourceType,
+                    request.queryParams[SORT_PARAMETER],
+                );
+            }
+
             const { total, hits } = await this.executeQuery(params);
             const result: SearchResult = {
                 numberOfResults: total,
