@@ -28,10 +28,7 @@ export const buildSortClause = (
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     resourceType: string,
     sortQueryParam: string | string[],
-    // request: TypeSearchRequest,
 ): any => {
-    // const sortQueryParam = request.queryParams[SORT_PARAMETER];
-
     if (Array.isArray(sortQueryParam)) {
         throw new InvalidSearchParameterError('_sort parameter cannot be used multiple times on a search query');
     }
