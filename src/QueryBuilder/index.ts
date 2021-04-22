@@ -111,3 +111,5 @@ export const buildQueryForAllSearchParameters = (
         },
     };
 };
+
+export { buildSortClause } from './sort';

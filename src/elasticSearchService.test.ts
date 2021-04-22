@@ -40,7 +40,7 @@ describe('typeSearch', () => {
     describe('query snapshots for simple queryParams; with ACTIVE filter', () => {
         each([
             [{}],
-            [{ _count: 10, _getpagesoffset: 2 }],
+            [{ _count: 10, _getpagesoffset: 2, _sort: '_lastUpdated' }],
             [{ gender: 'female', name: 'Emily' }],
             [{ gender: 'female', birthdate: 'gt1990' }],
             [{ gender: 'female', identifier: 'http://acme.org/patient|2345' }],
