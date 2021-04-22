@@ -52,7 +52,7 @@ export const buildSortClause = (
         }
         if (searchParameter.type !== 'date') {
             throw new InvalidSearchParameterError(
-                `Invalid _sort parameter: ${sortParam.searchParam}. Only date type parameters can be used for sorting`,
+                `Invalid _sort parameter: ${sortParam.searchParam}. Only date type parameters can currently be used for sorting`,
             );
         }
         return searchParameter.compiled.flatMap(compiledParam => {
