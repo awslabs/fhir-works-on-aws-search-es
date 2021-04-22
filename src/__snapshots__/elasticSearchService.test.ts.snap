@@ -1601,10 +1601,23 @@ Array [
                 },
               },
               Object {
-                "range": Object {
-                  "birthDate": Object {
-                    "gt": 1990-01-01T00:00:00.000Z,
-                  },
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "range": Object {
+                        "birthDate": Object {
+                          "gt": 1990-01-01T00:00:00.000Z,
+                        },
+                      },
+                    },
+                    Object {
+                      "range": Object {
+                        "birthDate.end": Object {
+                          "gte": 1990-01-01T00:00:00.000Z,
+                        },
+                      },
+                    },
+                  ],
                 },
               },
             ],
