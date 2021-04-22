@@ -42,7 +42,19 @@ describe('buildSortClause', () => {
                 },
               },
               Object {
+                "meta.lastUpdated.end": Object {
+                  "order": "desc",
+                  "unmapped_type": "long",
+                },
+              },
+              Object {
                 "birthDate": Object {
+                  "order": "asc",
+                  "unmapped_type": "long",
+                },
+              },
+              Object {
+                "birthDate.start": Object {
                   "order": "asc",
                   "unmapped_type": "long",
                 },

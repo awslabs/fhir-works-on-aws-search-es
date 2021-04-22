@@ -1490,6 +1490,12 @@ Array [
               "unmapped_type": "long",
             },
           },
+          Object {
+            "meta.lastUpdated.start": Object {
+              "order": "asc",
+              "unmapped_type": "long",
+            },
+          },
         ],
       },
       "from": 2,

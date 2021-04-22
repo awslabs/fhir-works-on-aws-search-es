@@ -23,12 +23,21 @@ export const parseSortParameter = (param: string): SortParameter[] => {
     });
 };
 
+const elasticsearchSort = (field: string, order: 'asc' | 'desc') => ({
+    [field]: {
+        order,
+        // unmapped_type makes queries more fault tolerant. Since we are using dynamic mapping there's no guarantee
+        // that the mapping exists at query time. This ignores the unmapped field instead of failing
+        unmapped_type: 'long',
+    },
+});
+
 // eslint-disable-next-line import/prefer-default-export
 export const buildSortClause = (
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     resourceType: string,
     sortQueryParam: string | string[],
-): any => {
+): any[] => {
     if (Array.isArray(sortQueryParam)) {
         throw new InvalidSearchParameterError('_sort parameter cannot be used multiple times on a search query');
     }
@@ -46,15 +55,18 @@ export const buildSortClause = (
                 `Invalid _sort parameter: ${sortParam.searchParam}. Only date type parameters can be used for sorting`,
             );
         }
-        return searchParameter.compiled.map(compiledParam => {
-            return {
-                [compiledParam.path]: {
-                    order: sortParam.order,
-                    // unmapped_type makes queries more fault tolerant. Since we are using dynamic mapping there's no guarantee
-                    // that the mapping exists at query time. This ignores the unmapped field instead of failing
-                    unmapped_type: 'long',
-                },
-            };
+        return searchParameter.compiled.flatMap(compiledParam => {
+            return [
+                elasticsearchSort(compiledParam.path, sortParam.order),
+
+                // Date search params may target fields of type Period, so we add a sort clause for them.
+                // The FHIR spec does not fully specify how to sort by Period, but it makes sense that the most recent
+                // record is the one with the most recent "end" date and vice versa.
+                elasticsearchSort(
+                    sortParam.order === 'desc' ? `${compiledParam.path}.end` : `${compiledParam.path}.start`,
+                    sortParam.order,
+                ),
+            ];
         });
     });
 };
