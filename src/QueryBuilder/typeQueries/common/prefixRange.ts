@@ -3,8 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
-
 interface Range {
     start: Date | number;
     end: Date | number;
@@ -19,6 +17,91 @@ interface DateRange {
     start: Date;
     end: Date;
 }
+
+// See the interpretation of prefixes when applied to ranges: https://www.hl7.org/fhir/search.html#prefix. It can be counterintuitive at first
+const prefixRangePeriod = (prefix: string, range: Range, periodTypeField: string): any => {
+    const { start, end } = range;
+    const startField = `${periodTypeField}.start`;
+    const endField = `${periodTypeField}.end`;
+
+    const eqQuery = {
+        bool: {
+            must: [
+                {
+                    range: {
+                        [startField]: {
+                            gte: start,
+                        },
+                    },
+                },
+                {
+                    range: {
+                        [endField]: {
+                            lte: end,
+                        },
+                    },
+                },
+            ],
+        },
+    };
+
+    const saQuery = {
+        range: {
+            [startField]: {
+                gt: end,
+            },
+        },
+    };
+    const ebQuery = {
+        range: {
+            [endField]: {
+                lt: start,
+            },
+        },
+    };
+
+    switch (prefix) {
+        case 'eq':
+            return eqQuery;
+        case 'ne':
+            return {
+                bool: {
+                    must_not: eqQuery,
+                },
+            };
+        case 'lt':
+        case 'le':
+            return {
+                range: {
+                    [startField]: {
+                        lte: end,
+                    },
+                },
+            };
+        case 'gt':
+        case 'ge':
+            return {
+                range: {
+                    [endField]: {
+                        gte: start,
+                    },
+                },
+            };
+        case 'eb':
+            return ebQuery;
+        case 'sa':
+            return saQuery;
+        case 'ap':
+            return {
+                bool: {
+                    must_not: [ebQuery, saQuery],
+                },
+            };
+        default:
+            // this should never happen
+            throw new Error(`unknown search prefix: ${prefix}`);
+    }
+};
 
 const prefixRange = (prefix: string, range: Range, path: string): any => {
     const { start, end } = range;
@@ -87,7 +170,12 @@ const prefixRange = (prefix: string, range: Range, path: string): any => {
             };
             break;
         case 'ap': // approximately
-            throw new InvalidSearchParameterError('Unsupported prefix: ap');
+            elasticSearchRange = {
+                // same as eq for now
+                gte: start,
+                lte: end,
+            };
+            break;
         default:
             // this should never happen
             throw new Error(`unknown search prefix: ${prefix}`);
@@ -116,5 +204,12 @@ export const prefixRangeNumber = (prefix: string, number: number, implicitRange:
 };
 
 export const prefixRangeDate = (prefix: string, range: DateRange, path: string): any => {
-    return prefixRange(prefix, range, path);
+    return {
+        bool: {
+            should: [
+                prefixRange(prefix, range, path), // date, dateTime, instant
+                prefixRangePeriod(prefix, range, path), // Period
+            ],
+        },
+    };
 };
