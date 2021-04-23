@@ -40,16 +40,17 @@ describe('typeSearch', () => {
     describe('query snapshots for simple queryParams; with ACTIVE filter', () => {
         each([
             [{}],
-            [{ _count: 10, _getpagesoffset: 2, _sort: '_lastUpdated' }],
+            [{ _count: '10', _getpagesoffset: '2', _sort: '_lastUpdated' }],
             [{ gender: 'female', name: 'Emily' }],
+            [{ gender: 'female', name: ['Emily', 'Smith'] }],
             [{ gender: 'female', birthdate: 'gt1990' }],
             [{ gender: 'female', identifier: 'http://acme.org/patient|2345' }],
             [{ _id: '11111111-1111-1111-1111-111111111111' }],
             [{ _format: 'json' }],
             [
                 {
-                    _count: 10,
-                    _getpagesoffset: 2,
+                    _count: '10',
+                    _getpagesoffset: '2',
                     _id: '11111111-1111-1111-1111-111111111111',
                     gender: 'female',
                     name: 'Emily',
@@ -98,8 +99,8 @@ describe('typeSearch', () => {
             [{}],
             [
                 {
-                    _count: 10,
-                    _getpagesoffset: 2,
+                    _count: '10',
+                    _getpagesoffset: '2',
                     _id: '11111111-1111-1111-1111-111111111111',
                     gender: 'female',
                     name: 'Emily',

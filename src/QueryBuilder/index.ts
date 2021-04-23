@@ -80,21 +80,42 @@ function searchParamQuery(searchParam: SearchParam, searchValue: string): any {
     };
 }
 
+function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
+    const normalizedQueryParams: { [key: string]: string[] } = {};
+
+    Object.entries(queryParams).forEach(([searchParameter, searchValue]) => {
+        if (typeof searchValue === 'string') {
+            normalizedQueryParams[searchParameter] = [searchValue];
+            return;
+        }
+        if (Array.isArray(searchValue) && searchValue.every(s => typeof s === 'string')) {
+            normalizedQueryParams[searchParameter] = searchValue;
+            return;
+        }
+
+        // This may occur if the router has advanced querystring parsing enabled
+        // e.g. {{API_URL}}/Patient?name[key]=Smith may be parsed into {"name":{"key":"Smith"}}
+        throw new InvalidSearchParameterError(`Invalid search parameter: '${searchParameter}'`);
+    });
+
+    return normalizedQueryParams;
+}
+
 function searchRequestQuery(
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     request: TypeSearchRequest,
 ): any[] {
     const { queryParams, resourceType } = request;
-    return Object.entries(queryParams)
+    return Object.entries(normalizeQueryParams(queryParams))
         .filter(([searchParameter]) => !NON_SEARCHABLE_PARAMETERS.includes(searchParameter))
-        .map(([searchParameter, searchValue]) => {
+        .flatMap(([searchParameter, searchValues]) => {
             const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(resourceType, searchParameter);
             if (fhirSearchParam === undefined) {
                 throw new InvalidSearchParameterError(
                     `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,
                 );
             }
-            return searchParamQuery(fhirSearchParam, searchValue as string);
+            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue));
         });
 }
 

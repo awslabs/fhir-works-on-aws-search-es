@@ -1403,7 +1403,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"_count":10,"_getpagesoffset":2,"_id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"_count":"10","_getpagesoffset":"2","_id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
 Array [
   Array [
     Object {
@@ -1466,7 +1466,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"_count":10,"_getpagesoffset":2,"_sort":"_lastUpdated"} 1`] = `
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"_count":"10","_getpagesoffset":"2","_sort":"_lastUpdated"} 1`] = `
 Array [
   Array [
     Object {
@@ -1751,6 +1751,66 @@ Array [
 ]
 `;
 
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"gender":"female","name":["Emily","Smith"]} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "gender.code.keyword",
+                    "gender.coding.code.keyword",
+                    "gender.value.keyword",
+                    "gender.value",
+                    "gender",
+                  ],
+                  "lenient": true,
+                  "query": "female",
+                },
+              },
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "name",
+                    "name.*",
+                  ],
+                  "lenient": true,
+                  "query": "Emily",
+                },
+              },
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "name",
+                    "name.*",
+                  ],
+                  "lenient": true,
+                  "query": "Smith",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={} 1`] = `
 Array [
   Array [
@@ -1777,7 +1837,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch query snapshots for simple queryParams; without ACTIVE filter queryParams={"_count":10,"_getpagesoffset":2,"_id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
+exports[`typeSearch query snapshots for simple queryParams; without ACTIVE filter queryParams={"_count":"10","_getpagesoffset":"2","_id":"11111111-1111-1111-1111-111111111111","gender":"female","name":"Emily","_format":"json"} 1`] = `
 Array [
   Array [
     Object {
