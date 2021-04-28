@@ -67,8 +67,7 @@ export function tokenQuery(compiled: CompiledSearchParam, value: string): any {
         const fields = [
             `${compiled.path}.code.keyword`, // Coding
             `${compiled.path}.coding.code.keyword`, // CodeableConcept
-            `${compiled.path}.value.keyword`, // Identifier
-            `${compiled.path}.value`, // ContactPoint
+            `${compiled.path}.value.keyword`, // Identifier, ContactPoint
             `${compiled.path}`, // code, boolean, uri, string
         ];
 
