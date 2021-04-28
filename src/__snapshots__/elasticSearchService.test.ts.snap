@@ -1607,10 +1607,26 @@ Array [
                       },
                     },
                     Object {
-                      "range": Object {
-                        "birthDate.end": Object {
-                          "gte": 1990-01-01T00:00:00.000Z,
-                        },
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "birthDate.start",
+                            },
+                          },
+                          Object {
+                            "exists": Object {
+                              "field": "birthDate.end",
+                            },
+                          },
+                          Object {
+                            "range": Object {
+                              "birthDate.end": Object {
+                                "gte": 1990-01-01T00:00:00.000Z,
+                              },
+                            },
+                          },
+                        ],
                       },
                     },
                   ],

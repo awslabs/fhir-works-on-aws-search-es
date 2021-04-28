@@ -136,17 +136,33 @@ describe('dateQuery', () => {
                     "bool": Object {
                       "must": Array [
                         Object {
-                          "range": Object {
-                            "birthDate.start": Object {
-                              "gte": 1999-09-09T00:00:00.000Z,
-                            },
+                          "exists": Object {
+                            "field": "birthDate.start",
                           },
                         },
                         Object {
-                          "range": Object {
-                            "birthDate.end": Object {
-                              "lte": 1999-09-09T23:59:59.999Z,
-                            },
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "bool": Object {
+                            "must": Array [
+                              Object {
+                                "range": Object {
+                                  "birthDate.start": Object {
+                                    "gte": 1999-09-09T00:00:00.000Z,
+                                  },
+                                },
+                              },
+                              Object {
+                                "range": Object {
+                                  "birthDate.end": Object {
+                                    "lte": 1999-09-09T23:59:59.999Z,
+                                  },
+                                },
+                              },
+                            ],
                           },
                         },
                       ],
@@ -174,17 +190,33 @@ describe('dateQuery', () => {
                     "bool": Object {
                       "must": Array [
                         Object {
-                          "range": Object {
-                            "birthDate.start": Object {
-                              "gte": 1999-09-09T00:00:00.000Z,
-                            },
+                          "exists": Object {
+                            "field": "birthDate.start",
                           },
                         },
                         Object {
-                          "range": Object {
-                            "birthDate.end": Object {
-                              "lte": 1999-09-09T23:59:59.999Z,
-                            },
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "bool": Object {
+                            "must": Array [
+                              Object {
+                                "range": Object {
+                                  "birthDate.start": Object {
+                                    "gte": 1999-09-09T00:00:00.000Z,
+                                  },
+                                },
+                              },
+                              Object {
+                                "range": Object {
+                                  "birthDate.end": Object {
+                                    "lte": 1999-09-09T23:59:59.999Z,
+                                  },
+                                },
+                              },
+                            ],
                           },
                         },
                       ],
@@ -222,26 +254,42 @@ describe('dateQuery', () => {
                   },
                   Object {
                     "bool": Object {
-                      "must_not": Object {
-                        "bool": Object {
-                          "must": Array [
-                            Object {
-                              "range": Object {
-                                "birthDate.start": Object {
-                                  "gte": 1999-09-09T00:00:00.000Z,
-                                },
-                              },
-                            },
-                            Object {
-                              "range": Object {
-                                "birthDate.end": Object {
-                                  "lte": 1999-09-09T23:59:59.999Z,
-                                },
-                              },
-                            },
-                          ],
+                      "must": Array [
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.start",
+                          },
                         },
-                      },
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "bool": Object {
+                            "must_not": Object {
+                              "bool": Object {
+                                "must": Array [
+                                  Object {
+                                    "range": Object {
+                                      "birthDate.start": Object {
+                                        "gte": 1999-09-09T00:00:00.000Z,
+                                      },
+                                    },
+                                  },
+                                  Object {
+                                    "range": Object {
+                                      "birthDate.end": Object {
+                                        "lte": 1999-09-09T23:59:59.999Z,
+                                      },
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          },
+                        },
+                      ],
                     },
                   },
                 ],
@@ -262,10 +310,26 @@ describe('dateQuery', () => {
                     },
                   },
                   Object {
-                    "range": Object {
-                      "birthDate.start": Object {
-                        "lte": 1999-09-09T23:59:59.999Z,
-                      },
+                    "bool": Object {
+                      "must": Array [
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.start",
+                          },
+                        },
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "range": Object {
+                            "birthDate.start": Object {
+                              "lte": 1999-09-09T23:59:59.999Z,
+                            },
+                          },
+                        },
+                      ],
                     },
                   },
                 ],
@@ -286,10 +350,26 @@ describe('dateQuery', () => {
                     },
                   },
                   Object {
-                    "range": Object {
-                      "birthDate.start": Object {
-                        "lte": 1999-09-09T23:59:59.999Z,
-                      },
+                    "bool": Object {
+                      "must": Array [
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.start",
+                          },
+                        },
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "range": Object {
+                            "birthDate.start": Object {
+                              "lte": 1999-09-09T23:59:59.999Z,
+                            },
+                          },
+                        },
+                      ],
                     },
                   },
                 ],
@@ -310,10 +390,26 @@ describe('dateQuery', () => {
                     },
                   },
                   Object {
-                    "range": Object {
-                      "birthDate.end": Object {
-                        "gte": 1999-09-09T00:00:00.000Z,
-                      },
+                    "bool": Object {
+                      "must": Array [
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.start",
+                          },
+                        },
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "range": Object {
+                            "birthDate.end": Object {
+                              "gte": 1999-09-09T00:00:00.000Z,
+                            },
+                          },
+                        },
+                      ],
                     },
                   },
                 ],
@@ -334,10 +430,26 @@ describe('dateQuery', () => {
                     },
                   },
                   Object {
-                    "range": Object {
-                      "birthDate.end": Object {
-                        "gte": 1999-09-09T00:00:00.000Z,
-                      },
+                    "bool": Object {
+                      "must": Array [
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.start",
+                          },
+                        },
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "range": Object {
+                            "birthDate.end": Object {
+                              "gte": 1999-09-09T00:00:00.000Z,
+                            },
+                          },
+                        },
+                      ],
                     },
                   },
                 ],
@@ -358,10 +470,26 @@ describe('dateQuery', () => {
                     },
                   },
                   Object {
-                    "range": Object {
-                      "birthDate.start": Object {
-                        "gt": 1999-09-09T23:59:59.999Z,
-                      },
+                    "bool": Object {
+                      "must": Array [
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.start",
+                          },
+                        },
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "range": Object {
+                            "birthDate.start": Object {
+                              "gt": 1999-09-09T23:59:59.999Z,
+                            },
+                          },
+                        },
+                      ],
                     },
                   },
                 ],
@@ -382,10 +510,26 @@ describe('dateQuery', () => {
                     },
                   },
                   Object {
-                    "range": Object {
-                      "birthDate.end": Object {
-                        "lt": 1999-09-09T00:00:00.000Z,
-                      },
+                    "bool": Object {
+                      "must": Array [
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.start",
+                          },
+                        },
+                        Object {
+                          "exists": Object {
+                            "field": "birthDate.end",
+                          },
+                        },
+                        Object {
+                          "range": Object {
+                            "birthDate.end": Object {
+                              "lt": 1999-09-09T00:00:00.000Z,
+                            },
+                          },
+                        },
+                      ],
                     },
                   },
                 ],

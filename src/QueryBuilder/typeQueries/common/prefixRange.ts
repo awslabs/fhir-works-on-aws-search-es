@@ -59,48 +59,77 @@ const prefixRangePeriod = (prefix: string, range: Range, periodTypeField: string
             },
         },
     };
+    let query;
 
     switch (prefix) {
         case 'eq':
-            return eqQuery;
+            query = eqQuery;
+            break;
         case 'ne':
-            return {
+            query = {
                 bool: {
                     must_not: eqQuery,
                 },
             };
+            break;
         case 'lt':
         case 'le':
-            return {
+            query = {
                 range: {
                     [startField]: {
                         lte: end,
                     },
                 },
             };
+            break;
         case 'gt':
         case 'ge':
-            return {
+            query = {
                 range: {
                     [endField]: {
                         gte: start,
                     },
                 },
             };
+            break;
         case 'eb':
-            return ebQuery;
+            query = ebQuery;
+            break;
         case 'sa':
-            return saQuery;
+            query = saQuery;
+            break;
         case 'ap':
-            return {
+            query = {
                 bool: {
                     must_not: [ebQuery, saQuery],
                 },
             };
+            break;
         default:
             // this should never happen
             throw new Error(`unknown search prefix: ${prefix}`);
     }
+
+    return {
+        bool: {
+            must: [
+                // Explicitly check that fields exist.
+                // Otherwise the implicit failure of range queries for non-existent fields can be confusing,
+                // especially when must_not clauses are involved
+                {
+                    exists: {
+                        field: startField,
+                    },
+                },
+                {
+                    exists: {
+                        field: endField,
+                    },
+                },
+                query,
+            ],
+        },
+    };
 };
 
 const prefixRange = (prefix: string, range: Range, path: string): any => {
