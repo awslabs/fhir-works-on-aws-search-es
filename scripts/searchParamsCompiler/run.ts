@@ -22,6 +22,9 @@ Run the script:
 
 import * as fs from 'fs';
 import { SearchImplementationGuides } from '../../src/implementationGuides';
+import getComponentLogger from '../../src/loggerBuilder';
+
+const logger = getComponentLogger();
 
 const readSearchParamsFile = (path: string) => {
     const data = JSON.parse(fs.readFileSync(path, { encoding: 'utf8' }));
@@ -31,8 +34,8 @@ const readSearchParamsFile = (path: string) => {
 const run = async () => {
     const args = process.argv.slice(2);
     if (!args[0]) {
-        console.log('Error. Missing fhirVersion parameter');
-        console.log('Usage: ts-node run.ts <fhirVersion>');
+        logger.error('Error. Missing fhirVersion parameter');
+        logger.error('Usage: ts-node run.ts <fhirVersion>');
     }
     const fhirVersion = args[0];
     const searchParams = readSearchParamsFile('search-parameters.json');
@@ -45,5 +48,5 @@ const run = async () => {
 };
 
 run()
-    .then(console.log)
-    .catch(console.error);
+    .then(logger.info)
+    .catch(logger.error);
