@@ -6,6 +6,9 @@ import { groupBy, mapValues, uniq, get, uniqBy } from 'lodash';
 
 import { isPresent } from './tsUtils';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
+import getComponentLogger from './loggerBuilder';
+
+const logger = getComponentLogger();
 
 /**
  * @example
@@ -51,7 +54,7 @@ export const inclusionParameterFromString = (
     if (match === null) {
         // Malformed inclusion search parameters are ignored. No exception is thrown.
         // This allows the regular search to complete successfully
-        console.log(`Ignoring invalid include/revinclude search parameter: ${s}`);
+        logger.info(`Ignoring invalid include/revinclude search parameter: ${s}`);
         return null;
     }
     const { sourceResource, searchParameter, targetResourceType } = match.groups!;
