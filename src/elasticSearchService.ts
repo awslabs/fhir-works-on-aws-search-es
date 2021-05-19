@@ -28,6 +28,9 @@ import {
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
+import getComponentLogger from './loggerBuilder';
+
+const logger = getComponentLogger();
 
 const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
@@ -144,7 +147,7 @@ export class ElasticSearchService implements Search {
 
             return { result };
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             throw error;
         }
     }
@@ -160,7 +163,7 @@ export class ElasticSearchService implements Search {
         } catch (error) {
             // Indexes are created the first time a resource of a given type is written to DDB.
             if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
-                console.log(`Search index for ${searchQuery.index} does not exist. Returning an empty search result`);
+                logger.info(`Search index for ${searchQuery.index} does not exist. Returning an empty search result`);
                 return {
                     total: 0,
                     hits: [],
@@ -186,7 +189,7 @@ export class ElasticSearchService implements Search {
                 if (response.error) {
                     if (response.error.type === 'index_not_found_exception') {
                         // Indexes are created the first time a resource of a given type is written to DDB.
-                        console.log(
+                        logger.info(
                             `Search index for ${response.error.index} does not exist. Returning an empty search result`,
                         );
                         return false;
@@ -286,7 +289,7 @@ export class ElasticSearchService implements Search {
         );
         const resourceIdsWithInclusionsAlreadyResolved: Set<string> = new Set();
 
-        console.log('Iterative inclusion search starts');
+        logger.info('Iterative inclusion search starts');
 
         let resourcesToIterate = searchEntries;
         for (let i = 0; i < MAX_INCLUDE_ITERATIVE_DEPTH; i += 1) {
@@ -295,7 +298,7 @@ export class ElasticSearchService implements Search {
 
             resourcesToIterate.forEach(resource => resourceIdsWithInclusionsAlreadyResolved.add(resource.resource.id));
             if (resourcesFound.length === 0) {
-                console.log(`Iteration ${i} found zero results. Stopping`);
+                logger.info(`Iteration ${i} found zero results. Stopping`);
                 break;
             }
 
@@ -308,13 +311,13 @@ export class ElasticSearchService implements Search {
             });
 
             if (i === MAX_INCLUDE_ITERATIVE_DEPTH - 1) {
-                console.log('MAX_INCLUDE_ITERATIVE_DEPTH reached. Stopping');
+                logger.info('MAX_INCLUDE_ITERATIVE_DEPTH reached. Stopping');
                 break;
             }
             resourcesToIterate = resourcesFound.filter(
                 r => !resourceIdsWithInclusionsAlreadyResolved.has(r.resource.id),
             );
-            console.log(`Iteration ${i} found ${resourcesFound.length} resources`);
+            logger.info(`Iteration ${i} found ${resourcesFound.length} resources`);
         }
         return result;
     }
@@ -330,7 +333,7 @@ export class ElasticSearchService implements Search {
 
     // eslint-disable-next-line class-methods-use-this
     async globalSearch(request: GlobalSearchRequest): Promise<SearchResponse> {
-        console.log(request);
+        logger.info(request);
         throw new Error('Method not implemented.');
     }
 

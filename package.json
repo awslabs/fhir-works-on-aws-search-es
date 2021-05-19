@@ -32,7 +32,7 @@
     "aws-elasticsearch-connector": "^8.2.0",
     "aws-sdk": "^2.610.0",
     "date-fns": "^2.19.0",
-    "fhir-works-on-aws-interface": "^7.1.0",
+    "fhir-works-on-aws-interface": "^9.0.0",
     "lodash": "^4.17.20",
     "nearley": "^2.20.0"
   },

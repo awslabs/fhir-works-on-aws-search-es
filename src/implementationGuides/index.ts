@@ -8,6 +8,9 @@ import { Parser, Grammar } from 'nearley';
 import { uniqBy } from 'lodash';
 import fhirPathGrammar from './reducedFHIRPath';
 import xPathGrammar from './reducedXPath';
+import getComponentLogger from '../loggerBuilder';
+
+const logger = getComponentLogger();
 
 /**
  * Based on the FHIR SearchParameter. This type only includes the fields that are required for the compile process.
@@ -60,18 +63,18 @@ const isParamSupported = (searchParam: FhirSearchParam) => {
     }
 
     if (searchParam.type === 'composite') {
-        console.warn(`search parameters of type "composite" are not supported. Skipping ${searchParam.url}`);
+        logger.warn(`search parameters of type "composite" are not supported. Skipping ${searchParam.url}`);
         return false;
     }
 
     if (searchParam.type === 'special') {
         // requires custom code. i.e. Location.near is supposed to do a geospatial search.
-        console.warn(`search parameters of type "special" are not supported. Skipping ${searchParam.url}`);
+        logger.warn(`search parameters of type "special" are not supported. Skipping ${searchParam.url}`);
         return false;
     }
 
     if (!searchParam.expression || !searchParam.xpath) {
-        console.warn(
+        logger.warn(
             `search parameters without both a FHIRPath and an XPath expression are not supported. Skipping ${searchParam.url}`,
         );
         return false;
