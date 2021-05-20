@@ -18,6 +18,7 @@ import {
     SearchFilter,
     FhirVersion,
 } from 'fhir-works-on-aws-interface';
+import { Client } from '@elastic/elasticsearch';
 import { ElasticSearch } from './elasticSearch';
 import {
     DEFAULT_SEARCH_RESULTS_PER_PAGE,
@@ -36,6 +37,8 @@ const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
+    private readonly esClient: Client;
+
     private readonly searchFiltersForAllQueries: SearchFilter[];
 
     private readonly cleanUpFunction: (resource: any) => any;
@@ -53,6 +56,7 @@ export class ElasticSearchService implements Search {
      * @param fhirVersion
      * @param compiledImplementationGuides - The output of ImplementationGuides.compile.
      * This parameter enables support for search parameters defined in Implementation Guides.
+     * @param esClient
      */
     constructor(
         searchFiltersForAllQueries: SearchFilter[] = [],
@@ -61,11 +65,13 @@ export class ElasticSearchService implements Search {
         },
         fhirVersion: FhirVersion = '4.0.1',
         compiledImplementationGuides?: any,
+        esClient: Client = ElasticSearch,
     ) {
         this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
+        this.esClient = esClient;
     }
 
     async getCapabilities() {
@@ -155,7 +161,8 @@ export class ElasticSearchService implements Search {
     // eslint-disable-next-line class-methods-use-this
     private async executeQuery(searchQuery: any): Promise<{ hits: any[]; total: number }> {
         try {
-            const apiResponse = await ElasticSearch.search(searchQuery);
+            console.log(`Query: ${JSON.stringify(searchQuery, null, 2)}`);
+            const apiResponse = await this.esClient.search(searchQuery);
             return {
                 total: apiResponse.body.hits.total.value,
                 hits: apiResponse.body.hits.hits,
@@ -180,7 +187,7 @@ export class ElasticSearchService implements Search {
                 hits: [],
             };
         }
-        const apiResponse = await ElasticSearch.msearch({
+        const apiResponse = await this.esClient.msearch({
             body: searchQueries.flatMap(query => [{ index: query.index }, { query: query.body.query }]),
         });
 
