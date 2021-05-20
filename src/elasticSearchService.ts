@@ -161,7 +161,6 @@ export class ElasticSearchService implements Search {
     // eslint-disable-next-line class-methods-use-this
     private async executeQuery(searchQuery: any): Promise<{ hits: any[]; total: number }> {
         try {
-            console.log(`Query: ${JSON.stringify(searchQuery, null, 2)}`);
             const apiResponse = await this.esClient.search(searchQuery);
             return {
                 total: apiResponse.body.hits.total.value,
