@@ -11,6 +11,7 @@ import { dateQuery } from './typeQueries/dateQuery';
 import { tokenQuery } from './typeQueries/tokenQuery';
 import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
+import { referenceQuery } from './typeQueries/referenceQuery';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -34,8 +35,10 @@ function typeQueryWithConditions(
         case 'quantity':
             typeQuery = quantityQuery(compiledSearchParam, searchValue);
             break;
-        case 'composite':
         case 'reference':
+            typeQuery = referenceQuery(compiledSearchParam, searchValue);
+            break;
+        case 'composite':
         case 'special':
         case 'uri':
         default:
