@@ -1941,8 +1941,7 @@ Array [
                     Object {
                       "multi_match": Object {
                         "fields": Array [
-                          "relatedArtifact.resource",
-                          "relatedArtifact.resource.*",
+                          "relatedArtifact.resource.reference.keyword",
                         ],
                         "lenient": true,
                         "query": "something",
@@ -2049,11 +2048,10 @@ Array [
                     Object {
                       "multi_match": Object {
                         "fields": Array [
-                          "link.target",
-                          "link.target.*",
+                          "link.target.reference.keyword",
                         ],
                         "lenient": true,
-                        "query": "RelatedPerson\\\\/111",
+                        "query": "RelatedPerson/111",
                       },
                     },
                     Object {
