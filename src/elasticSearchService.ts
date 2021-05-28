@@ -17,6 +17,7 @@ import {
     SearchEntry,
     SearchFilter,
     FhirVersion,
+    InvalidSearchParameterError,
 } from 'fhir-works-on-aws-interface';
 import { Client } from '@elastic/elasticsearch';
 import { ElasticSearch } from './elasticSearch';
@@ -102,6 +103,7 @@ export class ElasticSearchService implements Search {
                 index: resourceType.toLowerCase(),
                 from,
                 size,
+                track_total_hits: true,
                 body: {
                     query,
                 },
@@ -174,6 +176,14 @@ export class ElasticSearchService implements Search {
                     total: 0,
                     hits: [],
                 };
+            }
+            if (
+                error instanceof ResponseError &&
+                error.message === 'search_phase_execution_exception' &&
+                error.body.error.caused_by.type === 'illegal_argument_exception'
+            ) {
+                logger.info(`Invalid arguments; query: ${searchQuery}\n reason: ${error.body.error.caused_by.reason}`);
+                throw new InvalidSearchParameterError('Invalid search parameters');
             }
             throw error;
         }
