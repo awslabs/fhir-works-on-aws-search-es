@@ -26,6 +26,7 @@ import {
     SEARCH_PAGINATION_PARAMS,
     ITERATIVE_INCLUSION_PARAMETERS,
     SORT_PARAMETER,
+    MAX_ES_WINDOW_SIZE,
 } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
@@ -92,6 +93,16 @@ export class ElasticSearchService implements Search {
             const size = queryParams[SEARCH_PAGINATION_PARAMS.COUNT]
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.COUNT])
                 : DEFAULT_SEARCH_RESULTS_PER_PAGE;
+
+            if (from + size > MAX_ES_WINDOW_SIZE) {
+                logger.info(
+                    `Search request is out of bound. Trying to access ${from} to ${from +
+                        size} which is outside of the max: ${MAX_ES_WINDOW_SIZE}`,
+                );
+                throw new InvalidSearchParameterError(
+                    `Search parameters: ${SEARCH_PAGINATION_PARAMS.PAGES_OFFSET} and ${SEARCH_PAGINATION_PARAMS.COUNT} are accessing items outside the max range (${MAX_ES_WINDOW_SIZE}). Please narrow your search to access the remaining items`,
+                );
+            }
 
             const filter: any[] = ElasticSearchService.buildElasticSearchFilter([
                 ...this.searchFiltersForAllQueries,
@@ -177,14 +188,7 @@ export class ElasticSearchService implements Search {
                     hits: [],
                 };
             }
-            if (
-                error instanceof ResponseError &&
-                error.message === 'search_phase_execution_exception' &&
-                error.body.error.caused_by.type === 'illegal_argument_exception'
-            ) {
-                logger.info(`Invalid arguments; query: ${searchQuery}\n reason: ${error.body.error.caused_by.reason}`);
-                throw new InvalidSearchParameterError('Invalid search parameters');
-            }
+
             throw error;
         }
     }
