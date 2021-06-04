@@ -101,6 +101,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -161,6 +162,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -189,6 +191,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -272,6 +275,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -332,6 +336,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -360,6 +365,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -449,6 +455,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -624,6 +631,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -684,6 +692,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -712,6 +721,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -772,6 +782,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -832,6 +843,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -915,6 +927,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1004,6 +1017,7 @@ Array [
       "from": 0,
       "index": "medicationrequest",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1065,6 +1079,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1102,6 +1117,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1128,6 +1144,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1156,6 +1173,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1184,6 +1202,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1212,6 +1231,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1240,6 +1260,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1272,6 +1293,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1298,6 +1320,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1340,6 +1363,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1398,6 +1422,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1459,6 +1484,7 @@ Array [
       "from": 2,
       "index": "patient",
       "size": 10,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1499,6 +1525,7 @@ Array [
       "from": 2,
       "index": "patient",
       "size": 10,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1525,6 +1552,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1564,6 +1592,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1639,6 +1668,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1706,6 +1736,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1755,6 +1786,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1814,6 +1846,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1840,6 +1873,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1895,6 +1929,7 @@ Array [
       "from": 2,
       "index": "patient",
       "size": 10,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1915,6 +1950,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -1967,6 +2003,7 @@ Array [
       "from": 0,
       "index": "library",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -2022,6 +2059,7 @@ Array [
       "from": 0,
       "index": "patient",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -2074,6 +2112,7 @@ Array [
       "from": 0,
       "index": "person",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]
@@ -2227,6 +2266,7 @@ Array [
       "from": 0,
       "index": "observation",
       "size": 20,
+      "track_total_hits": true,
     },
   ],
 ]

@@ -277,6 +277,18 @@ describe('typeSearch', () => {
         ).rejects.toThrowError(InvalidSearchParameterError);
     });
 
+    test('Invalid search range (> 10k)', () => {
+        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+        expect(
+            es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams: { _count: '20', _getpagesoffset: '10000' },
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            }),
+        ).rejects.toThrowError(InvalidSearchParameterError);
+    });
+
     test('Response format', async () => {
         const patientSearchResult = {
             body: {

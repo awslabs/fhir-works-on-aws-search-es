@@ -22,3 +22,5 @@ export const NON_SEARCHABLE_PARAMETERS = [
     '_revinclude',
     ...ITERATIVE_INCLUSION_PARAMETERS,
 ];
+
+export const MAX_ES_WINDOW_SIZE: number = 10000;

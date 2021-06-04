@@ -17,6 +17,7 @@ import {
     SearchEntry,
     SearchFilter,
     FhirVersion,
+    InvalidSearchParameterError,
 } from 'fhir-works-on-aws-interface';
 import { Client } from '@elastic/elasticsearch';
 import { ElasticSearch } from './elasticSearch';
@@ -25,6 +26,7 @@ import {
     SEARCH_PAGINATION_PARAMS,
     ITERATIVE_INCLUSION_PARAMETERS,
     SORT_PARAMETER,
+    MAX_ES_WINDOW_SIZE,
 } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
@@ -92,6 +94,16 @@ export class ElasticSearchService implements Search {
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.COUNT])
                 : DEFAULT_SEARCH_RESULTS_PER_PAGE;
 
+            if (from + size > MAX_ES_WINDOW_SIZE) {
+                logger.info(
+                    `Search request is out of bound. Trying to access ${from} to ${from +
+                        size} which is outside of the max: ${MAX_ES_WINDOW_SIZE}`,
+                );
+                throw new InvalidSearchParameterError(
+                    `Search parameters: ${SEARCH_PAGINATION_PARAMS.PAGES_OFFSET} and ${SEARCH_PAGINATION_PARAMS.COUNT} are accessing items outside the max range (${MAX_ES_WINDOW_SIZE}). Please narrow your search to access the remaining items`,
+                );
+            }
+
             const filter: any[] = ElasticSearchService.buildElasticSearchFilter([
                 ...this.searchFiltersForAllQueries,
                 ...(searchFilters ?? []),
@@ -102,6 +114,7 @@ export class ElasticSearchService implements Search {
                 index: resourceType.toLowerCase(),
                 from,
                 size,
+                track_total_hits: true,
                 body: {
                     query,
                 },
@@ -175,6 +188,7 @@ export class ElasticSearchService implements Search {
                     hits: [],
                 };
             }
+
             throw error;
         }
     }
