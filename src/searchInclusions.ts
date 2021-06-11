@@ -198,7 +198,7 @@ export const buildRevIncludeQuery = (
 ) => {
     const { sourceResource, path } = revIncludeSearchParameter;
     return {
-        index: sourceResource.toLowerCase(),
+        index: `${sourceResource.toLowerCase()}-alias`,
         body: {
             query: {
                 bool: {

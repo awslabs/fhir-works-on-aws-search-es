@@ -285,7 +285,7 @@ export class ElasticSearchService implements Search {
 
         const lowerCaseAllowedResourceTypes = new Set(allowedResourceTypes.map((r: string) => r.toLowerCase()));
         const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
-            lowerCaseAllowedResourceTypes.has(query.index),
+            lowerCaseAllowedResourceTypes.has(query.index.split('-')[0]),
         );
 
         const { hits } = await this.executeQueries(allowedInclusionQueries);
