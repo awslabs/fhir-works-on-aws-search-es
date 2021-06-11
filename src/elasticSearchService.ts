@@ -111,7 +111,7 @@ export class ElasticSearchService implements Search {
             const query = buildQueryForAllSearchParameters(this.fhirSearchParametersRegistry, request, filter);
 
             const params: any = {
-                index: resourceType.toLowerCase(),
+                index: `${resourceType.toLowerCase()}-alias`,
                 from,
                 size,
                 track_total_hits: true,
