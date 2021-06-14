@@ -174,6 +174,9 @@ export class ElasticSearchService implements Search {
     // eslint-disable-next-line class-methods-use-this
     private async executeQuery(searchQuery: any): Promise<{ hits: any[]; total: number }> {
         try {
+            if (logger.isDebugEnabled()) {
+                logger.debug(`Elastic search query: ${JSON.stringify(searchQuery, null, 2)}`);
+            }
             const apiResponse = await this.esClient.search(searchQuery);
             return {
                 total: apiResponse.body.hits.total.value,
@@ -199,6 +202,9 @@ export class ElasticSearchService implements Search {
             return {
                 hits: [],
             };
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug(`Elastic msearch query: ${JSON.stringify(searchQueries, null, 2)}`);
         }
         const apiResponse = await this.esClient.msearch({
             body: searchQueries.flatMap(query => [{ index: query.index }, { query: query.body.query }]),
