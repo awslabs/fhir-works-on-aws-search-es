@@ -111,7 +111,7 @@ export class ElasticSearchService implements Search {
             const query = buildQueryForAllSearchParameters(this.fhirSearchParametersRegistry, request, filter);
 
             const params: any = {
-                index: resourceType.toLowerCase(),
+                index: `${resourceType.toLowerCase()}-alias`,
                 from,
                 size,
                 track_total_hits: true,
@@ -291,7 +291,7 @@ export class ElasticSearchService implements Search {
 
         const lowerCaseAllowedResourceTypes = new Set(allowedResourceTypes.map((r: string) => r.toLowerCase()));
         const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
-            lowerCaseAllowedResourceTypes.has(query.index),
+            lowerCaseAllowedResourceTypes.has(query.index.split('-')[0]),
         );
 
         const { hits } = await this.executeQueries(allowedInclusionQueries);

@@ -6,7 +6,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "patient",
+          "index": "patient-alias",
         },
         Object {
           "query": Object {
@@ -29,7 +29,7 @@ Array [
           },
         },
         Object {
-          "index": "practitioner",
+          "index": "practitioner-alias",
         },
         Object {
           "query": Object {
@@ -52,7 +52,7 @@ Array [
           },
         },
         Object {
-          "index": "practitionerrole",
+          "index": "practitionerrole-alias",
         },
         Object {
           "query": Object {
@@ -99,7 +99,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -113,7 +113,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "patient",
+          "index": "patient-alias",
         },
         Object {
           "query": Object {
@@ -160,7 +160,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -189,7 +189,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -203,7 +203,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "patient",
+          "index": "patient-alias",
         },
         Object {
           "query": Object {
@@ -226,7 +226,7 @@ Array [
           },
         },
         Object {
-          "index": "practitioner",
+          "index": "practitioner-alias",
         },
         Object {
           "query": Object {
@@ -273,7 +273,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -287,7 +287,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "patient",
+          "index": "patient-alias",
         },
         Object {
           "query": Object {
@@ -334,7 +334,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -363,7 +363,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -377,7 +377,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "patient",
+          "index": "patient-alias",
         },
         Object {
           "query": Object {
@@ -406,7 +406,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "organization",
+          "index": "organization-alias",
         },
         Object {
           "query": Object {
@@ -453,7 +453,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -467,7 +467,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "communication",
+          "index": "communication-alias",
         },
         Object {
           "query": Object {
@@ -490,7 +490,7 @@ Array [
           },
         },
         Object {
-          "index": "communication",
+          "index": "communication-alias",
         },
         Object {
           "query": Object {
@@ -513,7 +513,7 @@ Array [
           },
         },
         Object {
-          "index": "immunizationrecommendation",
+          "index": "immunizationrecommendation-alias",
         },
         Object {
           "query": Object {
@@ -536,7 +536,7 @@ Array [
           },
         },
         Object {
-          "index": "medicationadministration",
+          "index": "medicationadministration-alias",
         },
         Object {
           "query": Object {
@@ -559,7 +559,7 @@ Array [
           },
         },
         Object {
-          "index": "provenance",
+          "index": "provenance-alias",
         },
         Object {
           "query": Object {
@@ -582,7 +582,7 @@ Array [
           },
         },
         Object {
-          "index": "provenance",
+          "index": "provenance-alias",
         },
         Object {
           "query": Object {
@@ -629,7 +629,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -643,7 +643,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "medicationadministration",
+          "index": "medicationadministration-alias",
         },
         Object {
           "query": Object {
@@ -690,7 +690,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -719,7 +719,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -733,7 +733,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "medicationadministration",
+          "index": "medicationadministration-alias",
         },
         Object {
           "query": Object {
@@ -780,7 +780,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -794,7 +794,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "medicationadministration",
+          "index": "medicationadministration-alias",
         },
         Object {
           "query": Object {
@@ -841,7 +841,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -855,7 +855,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "medicationadministration",
+          "index": "medicationadministration-alias",
         },
         Object {
           "query": Object {
@@ -878,7 +878,7 @@ Array [
           },
         },
         Object {
-          "index": "provenance",
+          "index": "provenance-alias",
         },
         Object {
           "query": Object {
@@ -925,7 +925,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -939,7 +939,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "medicationadministration",
+          "index": "medicationadministration-alias",
         },
         Object {
           "query": Object {
@@ -968,7 +968,7 @@ Array [
     Object {
       "body": Array [
         Object {
-          "index": "medicationstatement",
+          "index": "medicationstatement-alias",
         },
         Object {
           "query": Object {
@@ -1015,7 +1015,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "medicationrequest",
+      "index": "medicationrequest-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1077,7 +1077,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1115,7 +1115,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1142,7 +1142,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1171,7 +1171,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1200,7 +1200,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1229,7 +1229,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1258,7 +1258,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1291,7 +1291,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1318,7 +1318,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1361,7 +1361,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1420,7 +1420,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1482,7 +1482,7 @@ Array [
         },
       },
       "from": 2,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 10,
       "track_total_hits": true,
     },
@@ -1523,7 +1523,7 @@ Array [
         ],
       },
       "from": 2,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 10,
       "track_total_hits": true,
     },
@@ -1550,7 +1550,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1590,7 +1590,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1666,7 +1666,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1734,7 +1734,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1784,7 +1784,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1844,7 +1844,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1871,7 +1871,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -1927,7 +1927,7 @@ Array [
         },
       },
       "from": 2,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 10,
       "track_total_hits": true,
     },
@@ -1948,7 +1948,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -2001,7 +2001,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "library",
+      "index": "library-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -2057,7 +2057,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "patient",
+      "index": "patient-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -2110,7 +2110,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "person",
+      "index": "person-alias",
       "size": 20,
       "track_total_hits": true,
     },
@@ -2264,7 +2264,7 @@ Array [
         },
       },
       "from": 0,
-      "index": "observation",
+      "index": "observation-alias",
       "size": 20,
       "track_total_hits": true,
     },

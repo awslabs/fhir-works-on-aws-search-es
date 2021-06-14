@@ -174,7 +174,7 @@ export const buildIncludeQuery = (
     resourceIds: string[],
     filterRulesForActiveResources: any[],
 ) => ({
-    index: resourceType.toLowerCase(),
+    index: `${resourceType.toLowerCase()}-alias`,
     body: {
         query: {
             bool: {
@@ -198,7 +198,7 @@ export const buildRevIncludeQuery = (
 ) => {
     const { sourceResource, path } = revIncludeSearchParameter;
     return {
-        index: sourceResource.toLowerCase(),
+        index: `${sourceResource.toLowerCase()}-alias`,
         body: {
             query: {
                 bool: {

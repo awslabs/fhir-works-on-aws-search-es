@@ -238,7 +238,7 @@ describe('typeSearch', () => {
                         max_score: 1,
                         hits: [
                             {
-                                _index: resourceType.toLowerCase(),
+                                _index: `${resourceType.toLowerCase()}-alias`,
                                 _type: '_doc',
                                 _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
                                 _score: 1,
