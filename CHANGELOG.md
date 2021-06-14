@@ -7,7 +7,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-* alias need to be added to existing index
+* Aliases need to be added to existing index
+* Run the addAlias [script](https://github.com/awslabs/fhir-works-on-aws-deployment/blob/94a3187a6fb7a673946a215869c154048603389b/scripts/elasticsearch-operations.js) created in this [PR](https://github.com/awslabs/fhir-works-on-aws-deployment/pull/346) will create aliases for all existing indices 
+* Update or create resource in a specific type will automatically create alias for the corresponding index  
 
 ### Features
 
