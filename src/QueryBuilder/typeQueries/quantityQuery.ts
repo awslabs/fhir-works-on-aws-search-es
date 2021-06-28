@@ -43,14 +43,19 @@ export const parseQuantitySearchParam = (param: string): QuantitySearchParameter
     };
 };
 
-export const quantityQuery = (compiledSearchParam: CompiledSearchParam, value: string): any => {
+export const quantityQuery = (
+    compiledSearchParam: CompiledSearchParam,
+    value: string,
+    isESStaticallyTyped: boolean,
+): any => {
     const { prefix, implicitRange, number, system, code } = parseQuantitySearchParam(value);
     const queries = [prefixRangeNumber(prefix, number, implicitRange, `${compiledSearchParam.path}.value`)];
+    const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
 
     if (!isEmpty(system) && !isEmpty(code)) {
         queries.push({
             multi_match: {
-                fields: [`${compiledSearchParam.path}.code.keyword`],
+                fields: [`${compiledSearchParam.path}.code${keywordSuffix}`],
                 query: code,
                 lenient: true,
             },
@@ -58,7 +63,7 @@ export const quantityQuery = (compiledSearchParam: CompiledSearchParam, value: s
 
         queries.push({
             multi_match: {
-                fields: [`${compiledSearchParam.path}.system.keyword`],
+                fields: [`${compiledSearchParam.path}.system${keywordSuffix}`],
                 query: system,
                 lenient: true,
             },
@@ -68,7 +73,10 @@ export const quantityQuery = (compiledSearchParam: CompiledSearchParam, value: s
         // https://www.hl7.org/fhir/search.html#quantity
         queries.push({
             multi_match: {
-                fields: [`${compiledSearchParam.path}.code.keyword`, `${compiledSearchParam.path}.unit.keyword`],
+                fields: [
+                    `${compiledSearchParam.path}.code${keywordSuffix}`,
+                    `${compiledSearchParam.path}.unit${keywordSuffix}`,
+                ],
                 query: code,
                 lenient: true,
             },

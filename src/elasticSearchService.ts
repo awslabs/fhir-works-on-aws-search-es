@@ -49,6 +49,8 @@ export class ElasticSearchService implements Search {
 
     private readonly fhirSearchParametersRegistry: FHIRSearchParametersRegistry;
 
+    private readonly isESStaticallyTyped: boolean;
+
     /**
      * @param searchFiltersForAllQueries - If you are storing both History and Search resources
      * in your elastic search you can filter out your History elements by supplying a list of SearchFilters
@@ -59,6 +61,7 @@ export class ElasticSearchService implements Search {
      * @param compiledImplementationGuides - The output of ImplementationGuides.compile.
      * This parameter enables support for search parameters defined in Implementation Guides.
      * @param esClient
+     * @param options.isESStaticallyTyped - whether or not your ES cluster has been statically typed. This effects if a `.keyword` is appended to search fields or not
      */
     constructor(
         searchFiltersForAllQueries: SearchFilter[] = [],
@@ -68,12 +71,14 @@ export class ElasticSearchService implements Search {
         fhirVersion: FhirVersion = '4.0.1',
         compiledImplementationGuides?: any,
         esClient: Client = ElasticSearch,
+        { isESStaticallyTyped = false }: { isESStaticallyTyped?: boolean } = {},
     ) {
         this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
         this.esClient = esClient;
+        this.isESStaticallyTyped = isESStaticallyTyped;
     }
 
     async getCapabilities() {
@@ -108,7 +113,12 @@ export class ElasticSearchService implements Search {
                 ...this.searchFiltersForAllQueries,
                 ...(searchFilters ?? []),
             ]);
-            const query = buildQueryForAllSearchParameters(this.fhirSearchParametersRegistry, request, filter);
+            const query = buildQueryForAllSearchParameters(
+                this.fhirSearchParametersRegistry,
+                request,
+                this.isESStaticallyTyped,
+                filter,
+            );
 
             const params: any = {
                 index: resourceType.toLowerCase(),
@@ -286,6 +296,7 @@ export class ElasticSearchService implements Search {
             searchEntries.map(x => x.resource),
             filter,
             this.fhirSearchParametersRegistry,
+            this.isESStaticallyTyped,
             iterative,
         );
 

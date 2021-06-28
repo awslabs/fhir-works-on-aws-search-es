@@ -6,8 +6,10 @@
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
 
 // eslint-disable-next-line import/prefer-default-export
-export function referenceQuery(compiled: CompiledSearchParam, value: string): any {
-    const fields = [`${compiled.path}.reference.keyword`];
+export function referenceQuery(compiled: CompiledSearchParam, value: string, isESStaticallyTyped: boolean): any {
+    const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
+
+    const fields = [`${compiled.path}.reference${keywordSuffix}`];
     return {
         multi_match: {
             fields,

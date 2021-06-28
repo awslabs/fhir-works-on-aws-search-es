@@ -12,9 +12,11 @@ const fhirSearchParametersRegistry = new FHIRSearchParametersRegistry('4.0.1');
 const quantityParam = fhirSearchParametersRegistry.getSearchParameter('Observation', 'value-quantity')!.compiled[0];
 
 describe('quantityQuery', () => {
-    describe('valid inputs', () => {
+    each([[true], [false]]).describe('valid inputs; isESStaticallyTyped=%j', async (isESStaticallyTyped: boolean) => {
+        const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
         test('5.4|http://unitsofmeasure.org|mg', () => {
-            expect(quantityQuery(quantityParam, '5.4|http://unitsofmeasure.org|mg')).toMatchInlineSnapshot(`
+            expect(quantityQuery(quantityParam, '5.4|http://unitsofmeasure.org|mg', isESStaticallyTyped))
+                .toMatchInlineSnapshot(`
                 Object {
                   "bool": Object {
                     "must": Array [
@@ -29,7 +31,7 @@ describe('quantityQuery', () => {
                       Object {
                         "multi_match": Object {
                           "fields": Array [
-                            "valueQuantity.code.keyword",
+                            "valueQuantity.code${keywordSuffix}",
                           ],
                           "lenient": true,
                           "query": "mg",
@@ -38,7 +40,7 @@ describe('quantityQuery', () => {
                       Object {
                         "multi_match": Object {
                           "fields": Array [
-                            "valueQuantity.system.keyword",
+                            "valueQuantity.system${keywordSuffix}",
                           ],
                           "lenient": true,
                           "query": "http://unitsofmeasure.org",
@@ -50,7 +52,8 @@ describe('quantityQuery', () => {
             `);
         });
         test('5.40e-3|http://unitsofmeasure.org|g', () => {
-            expect(quantityQuery(quantityParam, '5.40e-3|http://unitsofmeasure.org|g')).toMatchInlineSnapshot(`
+            expect(quantityQuery(quantityParam, '5.40e-3|http://unitsofmeasure.org|g', isESStaticallyTyped))
+                .toMatchInlineSnapshot(`
                 Object {
                   "bool": Object {
                     "must": Array [
@@ -65,7 +68,7 @@ describe('quantityQuery', () => {
                       Object {
                         "multi_match": Object {
                           "fields": Array [
-                            "valueQuantity.code.keyword",
+                            "valueQuantity.code${keywordSuffix}",
                           ],
                           "lenient": true,
                           "query": "g",
@@ -74,7 +77,7 @@ describe('quantityQuery', () => {
                       Object {
                         "multi_match": Object {
                           "fields": Array [
-                            "valueQuantity.system.keyword",
+                            "valueQuantity.system${keywordSuffix}",
                           ],
                           "lenient": true,
                           "query": "http://unitsofmeasure.org",
@@ -86,7 +89,7 @@ describe('quantityQuery', () => {
             `);
         });
         test('5.4||mg', () => {
-            expect(quantityQuery(quantityParam, '5.4||mg')).toMatchInlineSnapshot(`
+            expect(quantityQuery(quantityParam, '5.4||mg', isESStaticallyTyped)).toMatchInlineSnapshot(`
                 Object {
                   "bool": Object {
                     "must": Array [
@@ -101,8 +104,8 @@ describe('quantityQuery', () => {
                       Object {
                         "multi_match": Object {
                           "fields": Array [
-                            "valueQuantity.code.keyword",
-                            "valueQuantity.unit.keyword",
+                            "valueQuantity.code${keywordSuffix}",
+                            "valueQuantity.unit${keywordSuffix}",
                           ],
                           "lenient": true,
                           "query": "mg",
@@ -114,7 +117,7 @@ describe('quantityQuery', () => {
             `);
         });
         test('5.4', () => {
-            expect(quantityQuery(quantityParam, '5.4')).toMatchInlineSnapshot(`
+            expect(quantityQuery(quantityParam, '5.4', isESStaticallyTyped)).toMatchInlineSnapshot(`
                 Object {
                   "range": Object {
                     "valueQuantity.value": Object {
@@ -126,7 +129,8 @@ describe('quantityQuery', () => {
             `);
         });
         test('le5.4|http://unitsofmeasure.org|mg', () => {
-            expect(quantityQuery(quantityParam, 'le5.4|http://unitsofmeasure.org|mg')).toMatchInlineSnapshot(`
+            expect(quantityQuery(quantityParam, 'le5.4|http://unitsofmeasure.org|mg', isESStaticallyTyped))
+                .toMatchInlineSnapshot(`
                 Object {
                   "bool": Object {
                     "must": Array [
@@ -140,7 +144,7 @@ describe('quantityQuery', () => {
                       Object {
                         "multi_match": Object {
                           "fields": Array [
-                            "valueQuantity.code.keyword",
+                            "valueQuantity.code${keywordSuffix}",
                           ],
                           "lenient": true,
                           "query": "mg",
@@ -149,7 +153,7 @@ describe('quantityQuery', () => {
                       Object {
                         "multi_match": Object {
                           "fields": Array [
-                            "valueQuantity.system.keyword",
+                            "valueQuantity.system${keywordSuffix}",
                           ],
                           "lenient": true,
                           "query": "http://unitsofmeasure.org",
@@ -171,7 +175,7 @@ describe('quantityQuery', () => {
             ['100xxx|system|code'],
             ['100e-2x|system|code'],
         ]).test('%s', param => {
-            expect(() => quantityQuery(quantityParam, param)).toThrow(InvalidSearchParameterError);
+            expect(() => quantityQuery(quantityParam, param, false)).toThrow(InvalidSearchParameterError);
         });
     });
 });

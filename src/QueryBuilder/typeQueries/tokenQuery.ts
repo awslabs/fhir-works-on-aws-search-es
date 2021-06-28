@@ -39,9 +39,10 @@ export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
     return { system, code, explicitNoSystemProperty };
 };
 
-export function tokenQuery(compiled: CompiledSearchParam, value: string): any {
+export function tokenQuery(compiled: CompiledSearchParam, value: string, isESStaticallyTyped: boolean): any {
     const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
     const queries = [];
+    const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
 
     // Token search params are used for many different field types. Search is not aware of the types of the fields in FHIR resources.
     // The field type is specified in StructureDefinition, but not in SearchParameter.
@@ -50,8 +51,8 @@ export function tokenQuery(compiled: CompiledSearchParam, value: string): any {
     // See: https://www.hl7.org/fhir/search.html#token
     if (system !== undefined) {
         const fields = [
-            `${compiled.path}.system.keyword`, // Coding, Identifier
-            `${compiled.path}.coding.system.keyword`, // CodeableConcept
+            `${compiled.path}.system${keywordSuffix}`, // Coding, Identifier
+            `${compiled.path}.coding.system${keywordSuffix}`, // CodeableConcept
         ];
 
         queries.push({
@@ -65,9 +66,9 @@ export function tokenQuery(compiled: CompiledSearchParam, value: string): any {
 
     if (code !== undefined) {
         const fields = [
-            `${compiled.path}.code.keyword`, // Coding
-            `${compiled.path}.coding.code.keyword`, // CodeableConcept
-            `${compiled.path}.value.keyword`, // Identifier, ContactPoint
+            `${compiled.path}.code${keywordSuffix}`, // Coding
+            `${compiled.path}.coding.code${keywordSuffix}`, // CodeableConcept
+            `${compiled.path}.value${keywordSuffix}`, // Identifier, ContactPoint
             `${compiled.path}`, // code, boolean, uri, string
         ];
 
