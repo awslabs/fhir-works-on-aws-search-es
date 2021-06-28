@@ -41,7 +41,7 @@ function typeQueryWithConditions(
             typeQuery = referenceQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'uri':
-            typeQuery = uriQuery(compiledSearchParam, searchValue);
+            typeQuery = uriQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'composite':
         case 'special':

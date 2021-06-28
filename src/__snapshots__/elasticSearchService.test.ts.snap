@@ -1616,7 +1616,7 @@ Array [
               Object {
                 "multi_match": Object {
                   "fields": Array [
-                    "meta.profile.reference.keyword",
+                    "meta.profile.keyword",
                   ],
                   "lenient": true,
                   "query": "http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Pharmacy",
@@ -1874,6 +1874,43 @@ Array [
                   ],
                   "lenient": true,
                   "query": "Smith",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient",
+      "size": 20,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"general-practitioner":"Practitioner/1234"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "generalPractitioner.reference.keyword",
+                  ],
+                  "lenient": true,
+                  "query": "Practitioner/1234",
                 },
               },
             ],
