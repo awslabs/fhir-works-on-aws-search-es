@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import each from 'jest-each';
+
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { parseTokenSearchParam, tokenQuery } from './tokenQuery';
 import { FHIRSearchParametersRegistry } from '../../FHIRSearchParametersRegistry';
@@ -80,17 +80,16 @@ describe('parseTokenSearchParam', () => {
 });
 
 describe('tokenQuery', () => {
-    each([[true], [false]]).test('system|code; isESStaticallyTyped=%j', async (isESStaticallyTyped: boolean) => {
-        const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
-        expect(tokenQuery(identifierParam, 'http://acme.org/patient|2345', isESStaticallyTyped)).toMatchInlineSnapshot(`
+    test('system|code', () => {
+        expect(tokenQuery(identifierParam, 'http://acme.org/patient|2345', true)).toMatchInlineSnapshot(`
             Object {
               "bool": Object {
                 "must": Array [
                   Object {
                     "multi_match": Object {
                       "fields": Array [
-                        "identifier.system${keywordSuffix}",
-                        "identifier.coding.system${keywordSuffix}",
+                        "identifier.system.keyword",
+                        "identifier.coding.system.keyword",
                       ],
                       "lenient": true,
                       "query": "http://acme.org/patient",
@@ -99,9 +98,9 @@ describe('tokenQuery', () => {
                   Object {
                     "multi_match": Object {
                       "fields": Array [
-                        "identifier.code${keywordSuffix}",
-                        "identifier.coding.code${keywordSuffix}",
-                        "identifier.value${keywordSuffix}",
+                        "identifier.code.keyword",
+                        "identifier.coding.code.keyword",
+                        "identifier.value.keyword",
                         "identifier",
                       ],
                       "lenient": true,
@@ -113,15 +112,14 @@ describe('tokenQuery', () => {
             }
         `);
     });
-    each([[true], [false]]).test('system|; isESStaticallyTyped=%j', async (isESStaticallyTyped: boolean) => {
-        const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
-        expect(tokenQuery(identifierParam, 'http://acme.org/patient', isESStaticallyTyped)).toMatchInlineSnapshot(`
+    test('system|', () => {
+        expect(tokenQuery(identifierParam, 'http://acme.org/patient', true)).toMatchInlineSnapshot(`
             Object {
               "multi_match": Object {
                 "fields": Array [
-                  "identifier.code${keywordSuffix}",
-                  "identifier.coding.code${keywordSuffix}",
-                  "identifier.value${keywordSuffix}",
+                  "identifier.code.keyword",
+                  "identifier.coding.code.keyword",
+                  "identifier.value.keyword",
                   "identifier",
                 ],
                 "lenient": true,
@@ -130,18 +128,17 @@ describe('tokenQuery', () => {
             }
         `);
     });
-    each([[true], [false]]).test('|code; isESStaticallyTyped=%j', async (isESStaticallyTyped: boolean) => {
-        const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
-        expect(tokenQuery(identifierParam, '|2345', isESStaticallyTyped)).toMatchInlineSnapshot(`
+    test('|code', () => {
+        expect(tokenQuery(identifierParam, '|2345', true)).toMatchInlineSnapshot(`
             Object {
               "bool": Object {
                 "must": Array [
                   Object {
                     "multi_match": Object {
                       "fields": Array [
-                        "identifier.code${keywordSuffix}",
-                        "identifier.coding.code${keywordSuffix}",
-                        "identifier.value${keywordSuffix}",
+                        "identifier.code.keyword",
+                        "identifier.coding.code.keyword",
+                        "identifier.value.keyword",
                         "identifier",
                       ],
                       "lenient": true,
@@ -162,17 +159,16 @@ describe('tokenQuery', () => {
             }
         `);
     });
-    each([[true], [false]]).test('code; isESStaticallyTyped=%j', async (isESStaticallyTyped: boolean) => {
-        const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
-        expect(tokenQuery(identifierParam, 'http://acme.org/patient|2345', isESStaticallyTyped)).toMatchInlineSnapshot(`
+    test('code', () => {
+        expect(tokenQuery(identifierParam, 'http://acme.org/patient|2345', true)).toMatchInlineSnapshot(`
             Object {
               "bool": Object {
                 "must": Array [
                   Object {
                     "multi_match": Object {
                       "fields": Array [
-                        "identifier.system${keywordSuffix}",
-                        "identifier.coding.system${keywordSuffix}",
+                        "identifier.system.keyword",
+                        "identifier.coding.system.keyword",
                       ],
                       "lenient": true,
                       "query": "http://acme.org/patient",
@@ -181,9 +177,41 @@ describe('tokenQuery', () => {
                   Object {
                     "multi_match": Object {
                       "fields": Array [
-                        "identifier.code${keywordSuffix}",
-                        "identifier.coding.code${keywordSuffix}",
-                        "identifier.value${keywordSuffix}",
+                        "identifier.code.keyword",
+                        "identifier.coding.code.keyword",
+                        "identifier.value.keyword",
+                        "identifier",
+                      ],
+                      "lenient": true,
+                      "query": "2345",
+                    },
+                  },
+                ],
+              },
+            }
+        `);
+    });
+    test('code; without keyword', () => {
+        expect(tokenQuery(identifierParam, 'http://acme.org/patient|2345', false)).toMatchInlineSnapshot(`
+            Object {
+              "bool": Object {
+                "must": Array [
+                  Object {
+                    "multi_match": Object {
+                      "fields": Array [
+                        "identifier.system",
+                        "identifier.coding.system",
+                      ],
+                      "lenient": true,
+                      "query": "http://acme.org/patient",
+                    },
+                  },
+                  Object {
+                    "multi_match": Object {
+                      "fields": Array [
+                        "identifier.code",
+                        "identifier.coding.code",
+                        "identifier.value",
                         "identifier",
                       ],
                       "lenient": true,

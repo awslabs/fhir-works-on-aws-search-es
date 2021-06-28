@@ -46,11 +46,11 @@ export const parseQuantitySearchParam = (param: string): QuantitySearchParameter
 export const quantityQuery = (
     compiledSearchParam: CompiledSearchParam,
     value: string,
-    isESStaticallyTyped: boolean,
+    useKeywordSubFields: boolean,
 ): any => {
     const { prefix, implicitRange, number, system, code } = parseQuantitySearchParam(value);
     const queries = [prefixRangeNumber(prefix, number, implicitRange, `${compiledSearchParam.path}.value`)];
-    const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
+    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
 
     if (!isEmpty(system) && !isEmpty(code)) {
         queries.push({

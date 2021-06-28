@@ -49,7 +49,7 @@ export class ElasticSearchService implements Search {
 
     private readonly fhirSearchParametersRegistry: FHIRSearchParametersRegistry;
 
-    private readonly isESStaticallyTyped: boolean;
+    private readonly useKeywordSubFields: boolean;
 
     /**
      * @param searchFiltersForAllQueries - If you are storing both History and Search resources
@@ -61,7 +61,7 @@ export class ElasticSearchService implements Search {
      * @param compiledImplementationGuides - The output of ImplementationGuides.compile.
      * This parameter enables support for search parameters defined in Implementation Guides.
      * @param esClient
-     * @param options.isESStaticallyTyped - whether or not your ES cluster has been statically typed. This effects if a `.keyword` is appended to search fields or not
+     * @param options.useKeywordSubFields - whether or not you would want `.keyword` is appended to specifc search fields or not. You should use iff you do dynamic mapping
      */
     constructor(
         searchFiltersForAllQueries: SearchFilter[] = [],
@@ -71,14 +71,14 @@ export class ElasticSearchService implements Search {
         fhirVersion: FhirVersion = '4.0.1',
         compiledImplementationGuides?: any,
         esClient: Client = ElasticSearch,
-        { isESStaticallyTyped = false }: { isESStaticallyTyped?: boolean } = {},
+        { useKeywordSubFields = true }: { useKeywordSubFields?: boolean } = {},
     ) {
         this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
         this.esClient = esClient;
-        this.isESStaticallyTyped = isESStaticallyTyped;
+        this.useKeywordSubFields = useKeywordSubFields;
     }
 
     async getCapabilities() {
@@ -116,7 +116,7 @@ export class ElasticSearchService implements Search {
             const query = buildQueryForAllSearchParameters(
                 this.fhirSearchParametersRegistry,
                 request,
-                this.isESStaticallyTyped,
+                this.useKeywordSubFields,
                 filter,
             );
 
@@ -296,7 +296,7 @@ export class ElasticSearchService implements Search {
             searchEntries.map(x => x.resource),
             filter,
             this.fhirSearchParametersRegistry,
-            this.isESStaticallyTyped,
+            this.useKeywordSubFields,
             iterative,
         );
 

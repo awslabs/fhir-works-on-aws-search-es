@@ -17,7 +17,7 @@ function typeQueryWithConditions(
     searchParam: SearchParam,
     compiledSearchParam: CompiledSearchParam,
     searchValue: string,
-    isESStaticallyTyped: boolean,
+    useKeywordSubFields: boolean,
 ): any {
     let typeQuery: any;
     switch (searchParam.type) {
@@ -28,16 +28,16 @@ function typeQueryWithConditions(
             typeQuery = dateQuery(compiledSearchParam, searchValue);
             break;
         case 'token':
-            typeQuery = tokenQuery(compiledSearchParam, searchValue, isESStaticallyTyped);
+            typeQuery = tokenQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'number':
             typeQuery = numberQuery(compiledSearchParam, searchValue);
             break;
         case 'quantity':
-            typeQuery = quantityQuery(compiledSearchParam, searchValue, isESStaticallyTyped);
+            typeQuery = quantityQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'reference':
-            typeQuery = referenceQuery(compiledSearchParam, searchValue, isESStaticallyTyped);
+            typeQuery = referenceQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'composite':
         case 'special':
@@ -69,9 +69,9 @@ function typeQueryWithConditions(
     return typeQuery;
 }
 
-function searchParamQuery(searchParam: SearchParam, searchValue: string, isESStaticallyTyped: boolean): any {
+function searchParamQuery(searchParam: SearchParam, searchValue: string, useKeywordSubFields: boolean): any {
     const queries = searchParam.compiled.map(compiled => {
-        return typeQueryWithConditions(searchParam, compiled, searchValue, isESStaticallyTyped);
+        return typeQueryWithConditions(searchParam, compiled, searchValue, useKeywordSubFields);
     });
 
     if (queries.length === 1) {
@@ -108,7 +108,7 @@ function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
 function searchRequestQuery(
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     request: TypeSearchRequest,
-    isESStaticallyTyped: boolean,
+    useKeywordSubFields: boolean,
 ): any[] {
     const { queryParams, resourceType } = request;
     return Object.entries(normalizeQueryParams(queryParams))
@@ -120,7 +120,7 @@ function searchRequestQuery(
                     `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,
                 );
             }
-            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue, isESStaticallyTyped));
+            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields));
         });
 }
 
@@ -128,13 +128,13 @@ function searchRequestQuery(
 export const buildQueryForAllSearchParameters = (
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     request: TypeSearchRequest,
-    isESStaticallyTyped: boolean,
+    useKeywordSubFields: boolean,
     additionalFilters: any[] = [],
 ): any => {
     return {
         bool: {
             filter: additionalFilters,
-            must: searchRequestQuery(fhirSearchParametersRegistry, request, isESStaticallyTyped),
+            must: searchRequestQuery(fhirSearchParametersRegistry, request, useKeywordSubFields),
         },
     };
 };

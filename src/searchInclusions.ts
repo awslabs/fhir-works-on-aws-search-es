@@ -195,9 +195,9 @@ export const buildRevIncludeQuery = (
     revIncludeSearchParameter: InclusionSearchParameter,
     references: string[],
     filterRulesForActiveResources: any[],
-    isESStaticallyTyped: boolean,
+    useKeywordSubFields: boolean,
 ) => {
-    const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
+    const keywordSuffix = useKeywordSubFields ? 'keyword' : '';
 
     const { sourceResource, path } = revIncludeSearchParameter;
     return {
@@ -286,7 +286,7 @@ export const buildRevIncludeQueries = (
     resources: any[],
     filterRulesForActiveResources: any[],
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
-    isESStaticallyTyped: boolean,
+    useKeywordSubFields: boolean,
     iterate?: true,
 ) => {
     const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams, iterate);
@@ -306,7 +306,7 @@ export const buildRevIncludeQueries = (
     const revincludeReferences = getRevincludeReferencesFromResources(revIncludeParameters, resources);
 
     const searchQueries = revincludeReferences.map(({ revinclude, references }) =>
-        buildRevIncludeQuery(revinclude, references, filterRulesForActiveResources, isESStaticallyTyped),
+        buildRevIncludeQuery(revinclude, references, filterRulesForActiveResources, useKeywordSubFields),
     );
     return searchQueries;
 };

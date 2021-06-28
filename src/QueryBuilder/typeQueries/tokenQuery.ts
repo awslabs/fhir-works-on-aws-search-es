@@ -39,10 +39,10 @@ export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
     return { system, code, explicitNoSystemProperty };
 };
 
-export function tokenQuery(compiled: CompiledSearchParam, value: string, isESStaticallyTyped: boolean): any {
+export function tokenQuery(compiled: CompiledSearchParam, value: string, useKeywordSubFields: boolean): any {
     const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
     const queries = [];
-    const keywordSuffix = isESStaticallyTyped ? '' : '.keyword';
+    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
 
     // Token search params are used for many different field types. Search is not aware of the types of the fields in FHIR resources.
     // The field type is specified in StructureDefinition, but not in SearchParameter.
