@@ -47,6 +47,8 @@ describe('typeSearch', () => {
             [{ gender: 'female', identifier: 'http://acme.org/patient|2345' }],
             [{ _id: '11111111-1111-1111-1111-111111111111' }],
             [{ _format: 'json' }],
+            [{ _profile: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Pharmacy' }],
+            [{ generalPractitioner: 'Practitioner/1234' }],
             [
                 {
                     _count: '10',
