@@ -61,7 +61,7 @@ export class ElasticSearchService implements Search {
      * @param compiledImplementationGuides - The output of ImplementationGuides.compile.
      * This parameter enables support for search parameters defined in Implementation Guides.
      * @param esClient
-     * @param options.useKeywordSubFields - whether or not you would want `.keyword` is appended to specifc search fields or not. You should use iff you do dynamic mapping
+     * @param options.useKeywordSubFields - whether or not to append `.keyword` to fields in search queries. You should enable this if you do dynamic mapping
      */
     constructor(
         searchFiltersForAllQueries: SearchFilter[] = [],
