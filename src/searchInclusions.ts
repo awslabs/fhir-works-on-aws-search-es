@@ -197,7 +197,7 @@ export const buildRevIncludeQuery = (
     filterRulesForActiveResources: any[],
     useKeywordSubFields: boolean,
 ) => {
-    const keywordSuffix = useKeywordSubFields ? 'keyword' : '';
+    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
 
     const { sourceResource, path } = revIncludeSearchParameter;
     return {
