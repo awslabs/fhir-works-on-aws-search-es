@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - mainline
+      - v2.x.x
 jobs:
   unit-test:
     name: Unit Test and Linting
