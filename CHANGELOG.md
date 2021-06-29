@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.6.1...v3.0.0) (2021-06-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Aliases need to be added to existing index
+* Run the addAlias [script](https://github.com/awslabs/fhir-works-on-aws-deployment/blob/94a3187a6fb7a673946a215869c154048603389b/scripts/elasticsearch-operations.js) created in this [PR](https://github.com/awslabs/fhir-works-on-aws-deployment/pull/346) will create aliases for all existing indices 
+* Update or create resource in a specific type will automatically create alias for the corresponding index  
+
+### Features
+
+* Adding debug logging of JSON elastic queries with formatting. ([#78](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/78)) ([b06b645](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/b06b645bb89152fd633f30a395439b6f40a94d92))
+* Use alias in place of index for search ([#79](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/79)) ([c83827a](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/c83827aff915cf5b7d00eadb2716595499639870))
+
+
+### Bug Fixes
+
+* Show true size for ES results ([#76](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/76)) ([09300b3](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/09300b338e7d51a423f1d4fc70a5329fca4cf84e))
+
 ### [2.6.1](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.6.0...v2.6.1) (2021-05-21)
 
 
