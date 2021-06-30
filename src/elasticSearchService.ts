@@ -117,7 +117,7 @@ export class ElasticSearchService implements Search {
         if (this.enableMultiTenancy) {
             filters.push({
                 match: {
-                    '_tenantId.keyword': tenantId,
+                    _tenantId: tenantId,
                 },
             });
         }
