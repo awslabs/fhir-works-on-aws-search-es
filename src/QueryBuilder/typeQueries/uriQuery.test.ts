@@ -9,7 +9,7 @@ import { FHIRSearchParametersRegistry } from '../../FHIRSearchParametersRegistry
 const fhirSearchParametersRegistry = new FHIRSearchParametersRegistry('4.0.1');
 const profileParam = fhirSearchParametersRegistry.getSearchParameter('Patient', '_profile')!.compiled[0];
 
-describe('referenceQuery', () => {
+describe('uriQuery', () => {
     test('simple value', () => {
         expect(
             uriQuery(
