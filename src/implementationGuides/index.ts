@@ -75,7 +75,7 @@ const isParamSupported = (searchParam: FhirSearchParam) => {
 
     if (!searchParam.expression && !searchParam.xpath) {
         logger.warn(
-            `search parameters without both a FHIRPath and an XPath expression are not supported. Skipping ${searchParam.url}`,
+            `search parameters without a FHIRPath or an XPath expression are not supported. Skipping ${searchParam.url}`,
         );
         return false;
     }

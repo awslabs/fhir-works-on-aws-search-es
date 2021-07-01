@@ -144,7 +144,7 @@ describe('compile', () => {
         await expect(compiled).resolves.toMatchSnapshot();
     });
 
-    test(`another where url value - MedicationKnowledge.extension.where(url='http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension').value`, async () => {
+    test(`expression only - MedicationKnowledge.extension.where(url='http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension').value`, async () => {
         const compiled = compile([
             {
                 resourceType: 'SearchParameter',

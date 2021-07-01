@@ -168,7 +168,28 @@ Array [
 ]
 `;
 
-exports[`compile another where url value - MedicationKnowledge.extension.where(url='http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension').value 1`] = `
+exports[`compile as - (ConceptMap.source as uri) 1`] = `
+Array [
+  Object {
+    "base": "ConceptMap",
+    "compiled": Array [
+      Object {
+        "path": "sourceUri",
+        "resourceType": "ConceptMap",
+      },
+    ],
+    "description": "The source value set that contains the concepts that are being mapped",
+    "name": "source-uri",
+    "target": Array [
+      "ValueSet",
+    ],
+    "type": "reference",
+    "url": "http://hl7.org/fhir/SearchParameter/ConceptMap-source-uri",
+  },
+]
+`;
+
+exports[`compile expression only - MedicationKnowledge.extension.where(url='http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension').value 1`] = `
 Array [
   Object {
     "base": "MedicationKnowledge",
@@ -188,27 +209,6 @@ Array [
     "target": undefined,
     "type": "string",
     "url": "http://hl7.org/fhir/us/davinci-drug-formulary/SearchParameter/DrugPlan",
-  },
-]
-`;
-
-exports[`compile as - (ConceptMap.source as uri) 1`] = `
-Array [
-  Object {
-    "base": "ConceptMap",
-    "compiled": Array [
-      Object {
-        "path": "sourceUri",
-        "resourceType": "ConceptMap",
-      },
-    ],
-    "description": "The source value set that contains the concepts that are being mapped",
-    "name": "source-uri",
-    "target": Array [
-      "ValueSet",
-    ],
-    "type": "reference",
-    "url": "http://hl7.org/fhir/SearchParameter/ConceptMap-source-uri",
   },
 ]
 `;
