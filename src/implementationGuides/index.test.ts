@@ -144,6 +144,24 @@ describe('compile', () => {
         await expect(compiled).resolves.toMatchSnapshot();
     });
 
+    test(`another where url value - MedicationKnowledge.extension.where(url='http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension').value`, async () => {
+        const compiled = compile([
+            {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/us/davinci-drug-formulary/SearchParameter/DrugPlan',
+                name: 'DrugPlan',
+                description: 'Accesses the DrugPlan ID of a FormularyDrug',
+                code: 'DrugPlan',
+                base: ['MedicationKnowledge'],
+                type: 'string',
+                expression:
+                    "MedicationKnowledge.extension.where(url='http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension').value",
+                comparator: ['eq'],
+            },
+        ]);
+        await expect(compiled).resolves.toMatchSnapshot();
+    });
+
     test(`xpath explicitly expands choice of data types and fhirPath does not`, async () => {
         const compiled = compile([
             {

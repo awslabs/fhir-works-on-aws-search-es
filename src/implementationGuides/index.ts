@@ -73,7 +73,7 @@ const isParamSupported = (searchParam: FhirSearchParam) => {
         return false;
     }
 
-    if (!searchParam.expression || !searchParam.xpath) {
+    if (!searchParam.expression && !searchParam.xpath) {
         logger.warn(
             `search parameters without both a FHIRPath and an XPath expression are not supported. Skipping ${searchParam.url}`,
         );
@@ -82,15 +82,21 @@ const isParamSupported = (searchParam: FhirSearchParam) => {
     return true;
 };
 
-function mergeParserResults(primaryParser: Parser, secondaryParser: Parser) {
+function mergeParserResults(searchParam: any, primaryParser: Parser, secondaryParser: Parser) {
     // this takes advantage of the fact that _.uniq traverses the array in order, giving primaryParser an higher priority
-    return uniqBy(
-        [
-            ...primaryParser.results[0], // nearley returns an array of results. The array always has exactly one element for non ambiguous grammars
-            ...secondaryParser.results[0],
-        ],
-        x => `${x.resourceType}.${x.path}`,
-    );
+    if (searchParam.xpath && searchParam.expression) {
+        return uniqBy(
+            [
+                ...primaryParser.results[0], // nearley returns an array of results. The array always has exactly one element for non ambiguous grammars
+                ...secondaryParser.results[0],
+            ],
+            x => `${x.resourceType}.${x.path}`,
+        );
+    }
+    if (searchParam.expression) {
+        return primaryParser.results[0];
+    }
+    return secondaryParser.results[0];
 }
 
 /**
@@ -114,8 +120,12 @@ const compile = async (searchParams: any[]): Promise<any> => {
             const fhirPathparser = new Parser(Grammar.fromCompiled(fhirPathGrammar));
             const xPathParser = new Parser(Grammar.fromCompiled(xPathGrammar));
             try {
-                fhirPathparser.feed(searchParam.expression!);
-                xPathParser.feed(searchParam.xpath!);
+                if (searchParam.expression) {
+                    fhirPathparser.feed(searchParam.expression!);
+                }
+                if (searchParam.xpath) {
+                    xPathParser.feed(searchParam.xpath!);
+                }
             } catch (e) {
                 throw new Error(
                     `The expressions for the following search parameter could not be parsed:
@@ -133,7 +143,7 @@ Original error message was: ${e.message}`,
             // i.e. for http://hl7.org/fhir/SearchParameter/Invoice-patient the expressions are:
             // Invoice.subject.where(resolve() is Patient)
             // f:Invoice/f:subject
-            const compiled = mergeParserResults(fhirPathparser, xPathParser);
+            const compiled = mergeParserResults(searchParam, fhirPathparser, xPathParser);
 
             return {
                 ...searchParam,

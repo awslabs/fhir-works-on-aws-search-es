@@ -168,6 +168,30 @@ Array [
 ]
 `;
 
+exports[`compile another where url value - MedicationKnowledge.extension.where(url='http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension').value 1`] = `
+Array [
+  Object {
+    "base": "MedicationKnowledge",
+    "compiled": Array [
+      Object {
+        "condition": Array [
+          "extension.url",
+          "=",
+          "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-PlanID-extension",
+        ],
+        "path": "extension.value",
+        "resourceType": "MedicationKnowledge",
+      },
+    ],
+    "description": "Accesses the DrugPlan ID of a FormularyDrug",
+    "name": "DrugPlan",
+    "target": undefined,
+    "type": "string",
+    "url": "http://hl7.org/fhir/us/davinci-drug-formulary/SearchParameter/DrugPlan",
+  },
+]
+`;
+
 exports[`compile as - (ConceptMap.source as uri) 1`] = `
 Array [
   Object {
