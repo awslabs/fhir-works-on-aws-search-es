@@ -12,6 +12,7 @@ import { tokenQuery } from './typeQueries/tokenQuery';
 import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
+import { uriQuery } from './typeQueries/uriQuery';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -39,9 +40,11 @@ function typeQueryWithConditions(
         case 'reference':
             typeQuery = referenceQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
+        case 'uri':
+            typeQuery = uriQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            break;
         case 'composite':
         case 'special':
-        case 'uri':
         default:
             typeQuery = stringQuery(compiledSearchParam, searchValue);
     }
