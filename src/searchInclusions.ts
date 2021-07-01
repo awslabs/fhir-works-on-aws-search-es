@@ -195,7 +195,10 @@ export const buildRevIncludeQuery = (
     revIncludeSearchParameter: InclusionSearchParameter,
     references: string[],
     filterRulesForActiveResources: any[],
+    useKeywordSubFields: boolean,
 ) => {
+    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
+
     const { sourceResource, path } = revIncludeSearchParameter;
     return {
         index: `${sourceResource.toLowerCase()}-alias`,
@@ -205,7 +208,7 @@ export const buildRevIncludeQuery = (
                     filter: [
                         {
                             terms: {
-                                [`${path}.reference.keyword`]: references,
+                                [`${path}.reference${keywordSuffix}`]: references,
                             },
                         },
                         ...filterRulesForActiveResources,
@@ -283,6 +286,7 @@ export const buildRevIncludeQueries = (
     resources: any[],
     filterRulesForActiveResources: any[],
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
+    useKeywordSubFields: boolean,
     iterate?: true,
 ) => {
     const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams, iterate);
@@ -302,7 +306,7 @@ export const buildRevIncludeQueries = (
     const revincludeReferences = getRevincludeReferencesFromResources(revIncludeParameters, resources);
 
     const searchQueries = revincludeReferences.map(({ revinclude, references }) =>
-        buildRevIncludeQuery(revinclude, references, filterRulesForActiveResources),
+        buildRevIncludeQuery(revinclude, references, filterRulesForActiveResources, useKeywordSubFields),
     );
     return searchQueries;
 };

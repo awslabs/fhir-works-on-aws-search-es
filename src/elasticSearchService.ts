@@ -49,6 +49,8 @@ export class ElasticSearchService implements Search {
 
     private readonly fhirSearchParametersRegistry: FHIRSearchParametersRegistry;
 
+    private readonly useKeywordSubFields: boolean;
+
     /**
      * @param searchFiltersForAllQueries - If you are storing both History and Search resources
      * in your elastic search you can filter out your History elements by supplying a list of SearchFilters
@@ -59,6 +61,7 @@ export class ElasticSearchService implements Search {
      * @param compiledImplementationGuides - The output of ImplementationGuides.compile.
      * This parameter enables support for search parameters defined in Implementation Guides.
      * @param esClient
+     * @param options.useKeywordSubFields - whether or not to append `.keyword` to fields in search queries. You should enable this if you do dynamic mapping
      */
     constructor(
         searchFiltersForAllQueries: SearchFilter[] = [],
@@ -68,12 +71,14 @@ export class ElasticSearchService implements Search {
         fhirVersion: FhirVersion = '4.0.1',
         compiledImplementationGuides?: any,
         esClient: Client = ElasticSearch,
+        { useKeywordSubFields = true }: { useKeywordSubFields?: boolean } = {},
     ) {
         this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
         this.fhirVersion = fhirVersion;
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
         this.esClient = esClient;
+        this.useKeywordSubFields = useKeywordSubFields;
     }
 
     async getCapabilities() {
@@ -108,7 +113,12 @@ export class ElasticSearchService implements Search {
                 ...this.searchFiltersForAllQueries,
                 ...(searchFilters ?? []),
             ]);
-            const query = buildQueryForAllSearchParameters(this.fhirSearchParametersRegistry, request, filter);
+            const query = buildQueryForAllSearchParameters(
+                this.fhirSearchParametersRegistry,
+                request,
+                this.useKeywordSubFields,
+                filter,
+            );
 
             const params: any = {
                 index: `${resourceType.toLowerCase()}-alias`,
@@ -286,6 +296,7 @@ export class ElasticSearchService implements Search {
             searchEntries.map(x => x.resource),
             filter,
             this.fhirSearchParametersRegistry,
+            this.useKeywordSubFields,
             iterative,
         );
 
