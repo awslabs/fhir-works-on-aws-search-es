@@ -29,6 +29,21 @@ All notable changes to this project will be documented in this file. See [standa
 
 * Show true size for ES results ([#76](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/76)) ([09300b3](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/09300b338e7d51a423f1d4fc70a5329fca4cf84e))
 
+
+## [2.7.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.6.1...v2.7.0) (2021-06-28)
+
+
+### Features
+
+* Add flexibility to searches against static ES mapping ([#85](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/85)) ([f70045b](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/f70045b6b23945f0459549cb0dda33fac14f27bf))
+* Adding debug logging of JSON elastic queries with formatting. ([#78](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/78)) ([b06b645](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/b06b645bb89152fd633f30a395439b6f40a94d92))
+* handle uris; not escaping the value ([#86](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/86)) ([006b3c1](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/006b3c1c200d8bda00d2e49b5aa48857a531c3ac))
+
+
+### Bug Fixes
+
+* Show true size for ES results ([#76](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/76)) ([09300b3](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/09300b338e7d51a423f1d4fc70a5329fca4cf84e))
+
 ### [2.6.1](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.6.0...v2.6.1) (2021-05-21)
 
 
