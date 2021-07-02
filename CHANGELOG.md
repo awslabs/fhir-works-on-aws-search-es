@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.0.0...v3.1.0) (2021-07-02)
+
+
+### Features
+
+* Add flexibility to searches against static ES mapping ([#85](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/85)) ([#89](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/89)) ([a1e7683](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/a1e7683525c814020a476373167469ebf68189d2))
+* handle uris; not escaping the value ([#90](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/90)) ([8de76c1](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/8de76c1056370e4964e0bef33ec161ef954ba2dd)), closes [#85](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/85) [#86](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/86)
+
 ## [3.0.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v2.6.1...v3.0.0) (2021-06-14)
 
 
