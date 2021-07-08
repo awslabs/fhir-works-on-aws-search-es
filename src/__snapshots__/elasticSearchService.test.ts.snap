@@ -1325,7 +1325,7 @@ Array [
                 },
                 Object {
                   "match": Object {
-                    "_tenantId.keyword": "tenant1",
+                    "_tenantId": "tenant1",
                   },
                 },
               ],
@@ -1359,7 +1359,7 @@ Array [
                 },
                 Object {
                   "match": Object {
-                    "_tenantId.keyword": "tenant1",
+                    "_tenantId": "tenant1",
                   },
                 },
               ],
@@ -1387,7 +1387,7 @@ Array [
               },
               Object {
                 "match": Object {
-                  "_tenantId.keyword": "tenant1",
+                  "_tenantId": "tenant1",
                 },
               },
             ],
@@ -1430,7 +1430,7 @@ Array [
                 },
                 Object {
                   "match": Object {
-                    "_tenantId.keyword": "tenant1",
+                    "_tenantId": "tenant1",
                   },
                 },
               ],
@@ -1464,7 +1464,7 @@ Array [
                 },
                 Object {
                   "match": Object {
-                    "_tenantId.keyword": "tenant1",
+                    "_tenantId": "tenant1",
                   },
                 },
               ],
@@ -1492,7 +1492,7 @@ Array [
               },
               Object {
                 "match": Object {
-                  "_tenantId.keyword": "tenant1",
+                  "_tenantId": "tenant1",
                 },
               },
             ],
@@ -1524,7 +1524,7 @@ Array [
               },
               Object {
                 "match": Object {
-                  "_tenantId.keyword": "tenant1",
+                  "_tenantId": "tenant1",
                 },
               },
             ],
@@ -1569,7 +1569,7 @@ Array [
               },
               Object {
                 "match": Object {
-                  "_tenantId.keyword": "tenant1",
+                  "_tenantId": "tenant1",
                 },
               },
             ],
