@@ -12,6 +12,7 @@ import { tokenQuery } from './typeQueries/tokenQuery';
 import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
+import { getSearchQueries} from './searchOR'
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -69,30 +70,7 @@ function typeQueryWithConditions(
 }
 
 function searchParamQuery(searchParam: SearchParam, searchValue: string): any {
-    // split search value string based on commas for OR functionality unless escaped by \
-    let splitSearchValue : string[] = [];
-    let lastIndex = 0;
-    for (let c = 0; c < searchValue.length; c++) {
-        if (searchValue[c] === '\\') {
-            if (c + 1 < searchValue.length && searchValue[c+1] === ',') {
-                // replace the escape character to allow the string to be handled by ES
-                searchValue = searchValue.substring(0, c) + searchValue.substring(c+1);
-            }
-        } else if (searchValue[c] === ',') {
-            splitSearchValue.push(searchValue.substring(lastIndex, c));
-            lastIndex = c + 1;
-        }
-    }
-    splitSearchValue.push(searchValue.substring(lastIndex));
-    // construct queries for each split search value
-    let queryList = [];
-    for (let i = 0; i < splitSearchValue.length; i++) {
-        queryList.push(searchParam.compiled.map(compiled => {
-            return typeQueryWithConditions(searchParam, compiled, splitSearchValue[i]);
-        }));
-    }
-    // join queries
-    queryList.join();
+    let queryList = getSearchQueries(searchValue, searchParam, typeQueryWithConditions);
 
     if (queryList.length === 1) {
         return queryList[0];
