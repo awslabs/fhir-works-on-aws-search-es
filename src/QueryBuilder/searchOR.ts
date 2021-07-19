@@ -6,7 +6,7 @@
 import { SearchParam } from '../FHIRSearchParametersRegistry';
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 
-export const getSearchQueries = (searchValue: string, searchParam: SearchParam, typeQueryWithConditions: any) => {
+export const getSearchQueries = (searchValue: string, searchParam: SearchParam, useKeywordSubFields: boolean,  typeQueryWithConditions: any) => {
     // split search value string based on commas for OR functionality unless escaped by \
     let splitSearchValue : string[] = [];
     let lastIndex = 0;
@@ -26,7 +26,7 @@ export const getSearchQueries = (searchValue: string, searchParam: SearchParam, 
     let queryList = [];
     for (let i = 0; i < splitSearchValue.length; i++) {
         queryList.push(searchParam.compiled.map(compiled => {
-            return typeQueryWithConditions(searchParam, compiled, splitSearchValue[i]);
+            return typeQueryWithConditions(searchParam, compiled, splitSearchValue[i], useKeywordSubFields);
         }));
     }
     // join queries

@@ -13,11 +13,13 @@ import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
 import { getSearchQueries} from './searchOR'
+import { uriQuery } from './typeQueries/uriQuery';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
     compiledSearchParam: CompiledSearchParam,
     searchValue: string,
+    useKeywordSubFields: boolean,
 ): any {
     let typeQuery: any;
     switch (searchParam.type) {
@@ -28,20 +30,22 @@ function typeQueryWithConditions(
             typeQuery = dateQuery(compiledSearchParam, searchValue);
             break;
         case 'token':
-            typeQuery = tokenQuery(compiledSearchParam, searchValue);
+            typeQuery = tokenQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'number':
             typeQuery = numberQuery(compiledSearchParam, searchValue);
             break;
         case 'quantity':
-            typeQuery = quantityQuery(compiledSearchParam, searchValue);
+            typeQuery = quantityQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'reference':
-            typeQuery = referenceQuery(compiledSearchParam, searchValue);
+            typeQuery = referenceQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            break;
+        case 'uri':
+            typeQuery = uriQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'composite':
         case 'special':
-        case 'uri':
         default:
             typeQuery = stringQuery(compiledSearchParam, searchValue);
     }
@@ -69,8 +73,8 @@ function typeQueryWithConditions(
     return typeQuery;
 }
 
-function searchParamQuery(searchParam: SearchParam, searchValue: string): any {
-    let queryList = getSearchQueries(searchValue, searchParam, typeQueryWithConditions);
+function searchParamQuery(searchParam: SearchParam, searchValue: string, useKeywordSubFields: boolean): any {
+    let queryList = getSearchQueries(searchValue, searchParam, useKeywordSubFields, typeQueryWithConditions);
 
     if (queryList.length === 1) {
         return queryList[0];
@@ -106,6 +110,7 @@ function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
 function searchRequestQuery(
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     request: TypeSearchRequest,
+    useKeywordSubFields: boolean,
 ): any[] {
     const { queryParams, resourceType } = request;
     return Object.entries(normalizeQueryParams(queryParams))
@@ -117,7 +122,7 @@ function searchRequestQuery(
                     `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,
                 );
             }
-            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue));
+            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields));
         });
 }
 
@@ -125,12 +130,13 @@ function searchRequestQuery(
 export const buildQueryForAllSearchParameters = (
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     request: TypeSearchRequest,
+    useKeywordSubFields: boolean,
     additionalFilters: any[] = [],
 ): any => {
     return {
         bool: {
             filter: additionalFilters,
-            must: searchRequestQuery(fhirSearchParametersRegistry, request),
+            must: searchRequestQuery(fhirSearchParametersRegistry, request, useKeywordSubFields),
         },
     };
 };
