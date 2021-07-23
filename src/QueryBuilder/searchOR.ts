@@ -3,33 +3,25 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  */
-import { SearchParam } from '../FHIRSearchParametersRegistry';
-import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 
-export const getSearchQueries = (searchValue: string, searchParam: SearchParam, useKeywordSubFields: boolean,  typeQueryWithConditions: any) => {
+const getOrSearchValues = (searchValue: string): string[] => {
     // split search value string based on commas for OR functionality unless escaped by \
-    let splitSearchValue : string[] = [];
+    let unescapedSearchValue = searchValue;
+    const splitSearchValue: string[] = [];
     let lastIndex = 0;
-    for (let c = 0; c < searchValue.length; c++) {
-        if (searchValue[c] === '\\') {
-            if (c + 1 < searchValue.length && searchValue[c+1] === ',') {
+    for (let c = 0; c < unescapedSearchValue.length; c += 1) {
+        if (unescapedSearchValue[c] === '\\') {
+            if (c + 1 < unescapedSearchValue.length && unescapedSearchValue[c + 1] === ',') {
                 // replace the escape character to allow the string to be handled by ES
-                searchValue = searchValue.substring(0, c) + searchValue.substring(c+1);
+                unescapedSearchValue = unescapedSearchValue.substring(0, c) + unescapedSearchValue.substring(c + 1);
             }
-        } else if (searchValue[c] === ',') {
-            splitSearchValue.push(searchValue.substring(lastIndex, c));
+        } else if (unescapedSearchValue[c] === ',') {
+            splitSearchValue.push(unescapedSearchValue.substring(lastIndex, c));
             lastIndex = c + 1;
         }
     }
-    splitSearchValue.push(searchValue.substring(lastIndex));
-    // construct queries for each split search value
-    let queryList = [];
-    for (let i = 0; i < splitSearchValue.length; i++) {
-        queryList.push(searchParam.compiled.map(compiled => {
-            return typeQueryWithConditions(searchParam, compiled, splitSearchValue[i], useKeywordSubFields);
-        }));
-    }
-    // join queries
-    queryList.join();
-    return queryList;
-}
+    splitSearchValue.push(unescapedSearchValue.substring(lastIndex));
+    return splitSearchValue;
+};
+
+export default getOrSearchValues;

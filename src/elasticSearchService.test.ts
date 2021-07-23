@@ -44,7 +44,6 @@ describe('typeSearch', () => {
             [{ gender: 'female', name: 'Emily' }],
             [{ gender: 'female,male', name: 'Emily' }],
             [{ gender: 'female', name: 'Emily,Smith' }],
-            [{ gender: 'female', name: 'Emily\,Smith' }],
             [{ gender: 'female', name: 'Emily\\,Smith' }],
             [{ gender: 'female', name: ['Emily', 'Smith'] }],
             [{ gender: 'female', birthdate: 'gt1990' }],
