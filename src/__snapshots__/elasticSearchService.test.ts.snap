@@ -1829,6 +1829,122 @@ Array [
 ]
 `;
 
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"gender":"female","name":"Emily,Smith"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "gender.code.keyword",
+                    "gender.coding.code.keyword",
+                    "gender.value.keyword",
+                    "gender",
+                  ],
+                  "lenient": true,
+                  "query": "female",
+                },
+              },
+              Object {
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "name",
+                          "name.*",
+                        ],
+                        "lenient": true,
+                        "query": "Emily",
+                      },
+                    },
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "name",
+                          "name.*",
+                        ],
+                        "lenient": true,
+                        "query": "Smith",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient-alias",
+      "size": 20,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"gender":"female","name":"Emily\\\\,Smith"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "gender.code.keyword",
+                    "gender.coding.code.keyword",
+                    "gender.value.keyword",
+                    "gender",
+                  ],
+                  "lenient": true,
+                  "query": "female",
+                },
+              },
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "name",
+                    "name.*",
+                  ],
+                  "lenient": true,
+                  "query": "Emily,Smith",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient-alias",
+      "size": 20,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"gender":"female","name":["Emily","Smith"]} 1`] = `
 Array [
   Array [
@@ -1874,6 +1990,74 @@ Array [
                   ],
                   "lenient": true,
                   "query": "Smith",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient-alias",
+      "size": 20,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"gender":"female,male","name":"Emily"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "gender.code.keyword",
+                          "gender.coding.code.keyword",
+                          "gender.value.keyword",
+                          "gender",
+                        ],
+                        "lenient": true,
+                        "query": "female",
+                      },
+                    },
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "gender.code.keyword",
+                          "gender.coding.code.keyword",
+                          "gender.value.keyword",
+                          "gender",
+                        ],
+                        "lenient": true,
+                        "query": "male",
+                      },
+                    },
+                  ],
+                },
+              },
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "name",
+                    "name.*",
+                  ],
+                  "lenient": true,
+                  "query": "Emily",
                 },
               },
             ],
