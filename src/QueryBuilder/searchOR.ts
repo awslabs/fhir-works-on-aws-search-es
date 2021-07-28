@@ -16,11 +16,19 @@ const getOrSearchValues = (searchValue: string): string[] => {
                 unescapedSearchValue = unescapedSearchValue.substring(0, c) + unescapedSearchValue.substring(c + 1);
             }
         } else if (unescapedSearchValue[c] === ',') {
-            splitSearchValue.push(unescapedSearchValue.substring(lastIndex, c));
+            const subValue: string = unescapedSearchValue.substring(lastIndex, c);
+            // avoid pushing empty strings to array of results
+            if (subValue.length > 0) {
+                splitSearchValue.push(subValue);
+            }
             lastIndex = c + 1;
         }
     }
-    splitSearchValue.push(unescapedSearchValue.substring(lastIndex));
+    const subValue: string = unescapedSearchValue.substring(lastIndex);
+    // avoid pushing empty strings to array of results
+    if (subValue.length > 0) {
+        splitSearchValue.push(subValue);
+    }
     return splitSearchValue;
 };
 
