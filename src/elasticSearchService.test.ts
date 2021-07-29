@@ -390,6 +390,52 @@ describe('typeSearch', () => {
         },
     };
 
+    const fakeEncounterSearchResult = {
+        body: {
+            took: 5,
+            timed_out: false,
+            _shards: {
+                total: 5,
+                successful: 5,
+                skipped: 0,
+                failed: 0,
+            },
+            hits: {
+                total: {
+                    value: 1,
+                    relation: 'eq',
+                },
+                max_score: 1.0,
+                hits: [
+                    {
+                        _index: 'encounter',
+                        _type: '_doc',
+                        _id: 'encounter-id-111_1',
+                        _score: 1.0,
+                        _source: {
+                            vid: '1',
+                            location: [
+                                {
+                                    location: {
+                                        reference: 'Location/location-id-111',
+                                    },
+                                },
+                                {
+                                    location: {
+                                        reference: 'Location/location-id-222',
+                                    },
+                                },
+                            ],
+                            documentStatus: 'AVAILABLE',
+                            id: 'encounter-id-111',
+                            resourceType: 'Encounter',
+                        },
+                    },
+                ],
+            },
+        },
+    };
+
     const emptyMsearchResult = {
         body: {
             responses: [],
@@ -429,6 +475,22 @@ describe('typeSearch', () => {
                 baseUrl: 'https://base-url.com',
                 queryParams: { _include: '*' },
                 allowedResourceTypes: ['MedicationRequest'],
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+            expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+        });
+
+        test('search param with array fields', async () => {
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeEncounterSearchResult);
+            (ElasticSearch.msearch as jest.Mock).mockResolvedValue(emptyMsearchResult);
+
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'Encounter',
+                baseUrl: 'https://base-url.com',
+                queryParams: { _include: 'Encounter:location' },
+                allowedResourceTypes: ['Encounter', 'Location'],
             });
 
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');

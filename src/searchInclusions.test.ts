@@ -261,6 +261,47 @@ describe('getIncludeReferencesFromResources', () => {
         expect(refs).toEqual(expected);
     });
 
+    test('path with intermediate arrays', () => {
+        const includeSearchParams: InclusionSearchParameter[] = [
+            {
+                isWildcard: false,
+                type: '_include',
+                searchParameter: 'someField',
+                path: 'someField.multiple.single',
+                sourceResource: 'Patient',
+                targetResourceType: '',
+            },
+        ];
+
+        const resources: any[] = [
+            {
+                resourceType: 'Patient',
+                someField: {
+                    multiple: [
+                        {
+                            single: {
+                                reference: 'Practitioner/111',
+                            },
+                        },
+                        {
+                            single: {
+                                reference: 'Organization/222',
+                            },
+                        },
+                    ],
+                },
+            },
+        ];
+
+        const refs = getIncludeReferencesFromResources(includeSearchParams, resources);
+
+        const expected = [
+            { resourceType: 'Practitioner', id: '111' },
+            { resourceType: 'Organization', id: '222' },
+        ];
+        expect(refs).toEqual(expected);
+    });
+
     test('searchParameter with dot', () => {
         const includeSearchParams: InclusionSearchParameter[] = [
             {
