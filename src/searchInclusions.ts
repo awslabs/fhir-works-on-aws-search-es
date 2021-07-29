@@ -7,7 +7,6 @@ import { groupBy, mapValues, uniq, get, uniqBy } from 'lodash';
 import { isPresent } from './tsUtils';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import getComponentLogger from './loggerBuilder';
-import { Query } from './elasticSearchService';
 import { getAllValuesForFHIRPath } from './getAllValuesForFHIRPath';
 
 const logger = getComponentLogger();
