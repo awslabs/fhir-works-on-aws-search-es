@@ -8,6 +8,7 @@ import { isPresent } from './tsUtils';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import getComponentLogger from './loggerBuilder';
 import { Query } from './elasticSearchService';
+import { getAllValuesForFHIRPath } from './getAllValuesForFHIRPath';
 
 const logger = getComponentLogger();
 
@@ -133,7 +134,7 @@ export const getIncludeReferencesFromResources = (
     const references = includes.flatMap(include => {
         return resources
             .filter(resource => resource.resourceType === include.sourceResource)
-            .map(resource => get(resource, `${include.path}`) as any)
+            .flatMap(resource => getAllValuesForFHIRPath(resource, `${include.path}`))
             .flatMap(valueAtPath => {
                 if (Array.isArray(valueAtPath)) {
                     return valueAtPath.map(v => get(v, 'reference'));

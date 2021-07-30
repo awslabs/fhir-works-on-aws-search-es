@@ -12,6 +12,7 @@ import { tokenQuery } from './typeQueries/tokenQuery';
 import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
+import getOrSearchValues from './searchOR';
 import { uriQuery } from './typeQueries/uriQuery';
 
 function typeQueryWithConditions(
@@ -73,16 +74,23 @@ function typeQueryWithConditions(
 }
 
 function searchParamQuery(searchParam: SearchParam, searchValue: string, useKeywordSubFields: boolean): any {
-    const queries = searchParam.compiled.map(compiled => {
-        return typeQueryWithConditions(searchParam, compiled, searchValue, useKeywordSubFields);
-    });
-
-    if (queries.length === 1) {
-        return queries[0];
+    const splitSearchValue = getOrSearchValues(searchValue);
+    let queryList = [];
+    for (let i = 0; i < splitSearchValue.length; i += 1) {
+        queryList.push(
+            searchParam.compiled.map(compiled => {
+                return typeQueryWithConditions(searchParam, compiled, splitSearchValue[i], useKeywordSubFields);
+            }),
+        );
+    }
+    // flatten array of arrays of results into one array with results
+    queryList = queryList.flat(1);
+    if (queryList.length === 1) {
+        return queryList[0];
     }
     return {
         bool: {
-            should: queries,
+            should: queryList,
         },
     };
 }
