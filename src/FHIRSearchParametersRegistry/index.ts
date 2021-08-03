@@ -148,8 +148,14 @@ export class FHIRSearchParametersRegistry {
 
         const resourceSearchParams = Object.values(this.typeNameMap.Resource).map(toCapabilityStatement);
 
-        Object.values(this.capabilityStatement).forEach(searchCapabilities => {
-            searchCapabilities.searchParam.push(...resourceSearchParams);
+        // For each resource type, add all search params that have "Resource" as base, except when there is already
+        // a more specific search parameter with the same name.
+        Object.entries(this.capabilityStatement).forEach(([resourceType, searchCapabilities]) => {
+            searchCapabilities.searchParam.push(
+                ...resourceSearchParams.filter(
+                    resourceSearchParam => !this.typeNameMap?.[resourceType]?.[resourceSearchParam.name],
+                ),
+            );
         });
     }
 
