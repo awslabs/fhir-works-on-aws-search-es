@@ -19,7 +19,7 @@ import {
     FhirVersion,
     InvalidSearchParameterError,
 } from 'fhir-works-on-aws-interface';
-import { Client } from '@elastic/elasticsearch';
+import { Client, RequestParams } from '@elastic/elasticsearch';
 import { ElasticSearch } from './elasticSearch';
 import {
     DEFAULT_SEARCH_RESULTS_PER_PAGE,
@@ -33,9 +33,22 @@ import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
 import getComponentLogger from './loggerBuilder';
 
+export type Query = {
+    resourceType: string;
+    queryRequest: RequestParams.Search<Record<string, any>>;
+};
+
 const logger = getComponentLogger();
 
 const MAX_INCLUDE_ITERATIVE_DEPTH = 5;
+
+const getAliasName = (resourceType: string, tenantId?: string) => {
+    const lowercaseResourceType = resourceType.toLowerCase();
+    if (tenantId) {
+        return `${lowercaseResourceType}-alias-tenant-${tenantId}`;
+    }
+    return `${lowercaseResourceType}-alias`;
+};
 
 // eslint-disable-next-line import/prefer-default-export
 export class ElasticSearchService implements Search {
@@ -49,6 +62,8 @@ export class ElasticSearchService implements Search {
 
     private readonly fhirSearchParametersRegistry: FHIRSearchParametersRegistry;
 
+    private readonly enableMultiTenancy: boolean;
+
     private readonly useKeywordSubFields: boolean;
 
     /**
@@ -61,6 +76,7 @@ export class ElasticSearchService implements Search {
      * @param compiledImplementationGuides - The output of ImplementationGuides.compile.
      * This parameter enables support for search parameters defined in Implementation Guides.
      * @param esClient
+     * @param options.enableMultiTenancy - whether or not to enable multi-tenancy. When enabled a tenantId is required for all requests.
      * @param options.useKeywordSubFields - whether or not to append `.keyword` to fields in search queries. You should enable this if you do dynamic mapping
      */
     constructor(
@@ -71,7 +87,10 @@ export class ElasticSearchService implements Search {
         fhirVersion: FhirVersion = '4.0.1',
         compiledImplementationGuides?: any,
         esClient: Client = ElasticSearch,
-        { useKeywordSubFields = true }: { useKeywordSubFields?: boolean } = {},
+        {
+            enableMultiTenancy = false,
+            useKeywordSubFields = true,
+        }: { enableMultiTenancy?: boolean; useKeywordSubFields?: boolean } = {},
     ) {
         this.searchFiltersForAllQueries = searchFiltersForAllQueries;
         this.cleanUpFunction = cleanUpFunction;
@@ -79,17 +98,46 @@ export class ElasticSearchService implements Search {
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
         this.esClient = esClient;
         this.useKeywordSubFields = useKeywordSubFields;
+        this.enableMultiTenancy = enableMultiTenancy;
+    }
+
+    private assertValidTenancyMode(tenantId?: string) {
+        if (this.enableMultiTenancy && tenantId === undefined) {
+            throw new Error('This instance has multi-tenancy enabled, but the incoming request is missing tenantId');
+        }
+        if (!this.enableMultiTenancy && tenantId !== undefined) {
+            throw new Error('This instance has multi-tenancy disabled, but the incoming request has a tenantId');
+        }
     }
 
     async getCapabilities() {
         return this.fhirSearchParametersRegistry.getCapabilities();
     }
 
+    private getFilters(request: TypeSearchRequest) {
+        const { searchFilters, tenantId } = request;
+        const filters: any[] = ElasticSearchService.buildElasticSearchFilter([
+            ...this.searchFiltersForAllQueries,
+            ...(searchFilters ?? []),
+        ]);
+
+        if (this.enableMultiTenancy) {
+            filters.push({
+                match: {
+                    _tenantId: tenantId,
+                },
+            });
+        }
+
+        return filters;
+    }
+
     /*
     searchParams => {field: value}
      */
     async typeSearch(request: TypeSearchRequest): Promise<SearchResponse> {
-        const { queryParams, searchFilters, resourceType } = request;
+        this.assertValidTenancyMode(request.tenantId);
+        const { queryParams, resourceType } = request;
         try {
             const from = queryParams[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET]
                 ? Number(queryParams[SEARCH_PAGINATION_PARAMS.PAGES_OFFSET])
@@ -109,10 +157,8 @@ export class ElasticSearchService implements Search {
                 );
             }
 
-            const filter: any[] = ElasticSearchService.buildElasticSearchFilter([
-                ...this.searchFiltersForAllQueries,
-                ...(searchFilters ?? []),
-            ]);
+            const filter = this.getFilters(request);
+
             const query = buildQueryForAllSearchParameters(
                 this.fhirSearchParametersRegistry,
                 request,
@@ -120,25 +166,27 @@ export class ElasticSearchService implements Search {
                 filter,
             );
 
-            const params: any = {
-                index: `${resourceType.toLowerCase()}-alias`,
-                from,
-                size,
-                track_total_hits: true,
-                body: {
-                    query,
+            const params: Query = {
+                resourceType,
+                queryRequest: {
+                    from,
+                    size,
+                    track_total_hits: true,
+                    body: {
+                        query,
+                    },
                 },
             };
 
             if (request.queryParams[SORT_PARAMETER]) {
-                params.body.sort = buildSortClause(
+                params.queryRequest.body!.sort = buildSortClause(
                     this.fhirSearchParametersRegistry,
                     resourceType,
                     request.queryParams[SORT_PARAMETER],
                 );
             }
 
-            const { total, hits } = await this.executeQuery(params);
+            const { total, hits } = await this.executeQuery(params, request);
             const result: SearchResult = {
                 numberOfResults: total,
                 entries: this.hitsToSearchEntries({ hits, baseUrl: request.baseUrl, mode: 'match' }),
@@ -182,12 +230,20 @@ export class ElasticSearchService implements Search {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    private async executeQuery(searchQuery: any): Promise<{ hits: any[]; total: number }> {
+    private async executeQuery(
+        searchQuery: Query,
+        request: TypeSearchRequest,
+    ): Promise<{ hits: any[]; total: number }> {
         try {
+            const searchQueryWithAlias = {
+                ...searchQuery.queryRequest,
+                index: getAliasName(searchQuery.resourceType, request.tenantId),
+            };
+
             if (logger.isDebugEnabled()) {
-                logger.debug(`Elastic search query: ${JSON.stringify(searchQuery, null, 2)}`);
+                logger.debug(`Elastic search query: ${JSON.stringify(searchQueryWithAlias, null, 2)}`);
             }
-            const apiResponse = await this.esClient.search(searchQuery);
+            const apiResponse = await this.esClient.search(searchQueryWithAlias);
             return {
                 total: apiResponse.body.hits.total.value,
                 hits: apiResponse.body.hits.hits,
@@ -195,7 +251,9 @@ export class ElasticSearchService implements Search {
         } catch (error) {
             // Indexes are created the first time a resource of a given type is written to DDB.
             if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
-                logger.info(`Search index for ${searchQuery.index} does not exist. Returning an empty search result`);
+                logger.info(
+                    `Search index for ${searchQuery.queryRequest.index} does not exist. Returning an empty search result`,
+                );
                 return {
                     total: 0,
                     hits: [],
@@ -207,17 +265,23 @@ export class ElasticSearchService implements Search {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    private async executeQueries(searchQueries: any[]): Promise<{ hits: any[] }> {
+    private async executeQueries(searchQueries: Query[], request: TypeSearchRequest): Promise<{ hits: any[] }> {
         if (searchQueries.length === 0) {
             return {
                 hits: [],
             };
         }
+
+        const searchQueriesWithAlias = searchQueries.map(searchQuery => ({
+            ...searchQuery.queryRequest,
+            index: getAliasName(searchQuery.resourceType, request.tenantId),
+        }));
+
         if (logger.isDebugEnabled()) {
-            logger.debug(`Elastic msearch query: ${JSON.stringify(searchQueries, null, 2)}`);
+            logger.debug(`Elastic msearch query: ${JSON.stringify(searchQueriesWithAlias, null, 2)}`);
         }
         const apiResponse = await this.esClient.msearch({
-            body: searchQueries.flatMap(query => [{ index: query.index }, { query: query.body.query }]),
+            body: searchQueriesWithAlias.flatMap(query => [{ index: query.index }, { query: query.body!.query }]),
         });
 
         return (apiResponse.body.responses as any[])
@@ -277,13 +341,10 @@ export class ElasticSearchService implements Search {
         request: TypeSearchRequest,
         iterative?: true,
     ): Promise<SearchEntry[]> {
-        const { queryParams, searchFilters, allowedResourceTypes, baseUrl } = request;
-        const filter: any[] = ElasticSearchService.buildElasticSearchFilter([
-            ...this.searchFiltersForAllQueries,
-            ...(searchFilters ?? []),
-        ]);
+        const { queryParams, allowedResourceTypes, baseUrl } = request;
+        const filter: any[] = this.getFilters(request);
 
-        const includeSearchQueries = buildIncludeQueries(
+        const includeSearchQueries: Query[] = buildIncludeQueries(
             queryParams,
             searchEntries.map(x => x.resource),
             filter,
@@ -291,7 +352,7 @@ export class ElasticSearchService implements Search {
             iterative,
         );
 
-        const revIncludeSearchQueries = buildRevIncludeQueries(
+        const revIncludeSearchQueries: Query[] = buildRevIncludeQueries(
             queryParams,
             searchEntries.map(x => x.resource),
             filter,
@@ -302,10 +363,10 @@ export class ElasticSearchService implements Search {
 
         const lowerCaseAllowedResourceTypes = new Set(allowedResourceTypes.map((r: string) => r.toLowerCase()));
         const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
-            lowerCaseAllowedResourceTypes.has(query.index.split('-')[0]),
+            lowerCaseAllowedResourceTypes.has(query.resourceType.toLowerCase()),
         );
 
-        const { hits } = await this.executeQueries(allowedInclusionQueries);
+        const { hits } = await this.executeQueries(allowedInclusionQueries, request);
         return this.hitsToSearchEntries({ hits, baseUrl, mode: 'include' });
     }
 
@@ -371,6 +432,7 @@ export class ElasticSearchService implements Search {
     // eslint-disable-next-line class-methods-use-this
     async globalSearch(request: GlobalSearchRequest): Promise<SearchResponse> {
         logger.info(request);
+        this.assertValidTenancyMode(request.tenantId);
         throw new Error('Method not implemented.');
     }
 
