@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.2.1...v3.3.0) (2021-08-17)
+
+
+### Features
+
+* implement multi-tenancy ([#102](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/102)) ([f138bdb](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/f138bdba188b7c8df0e2058362252d0fca4358d0))
+
 ### [3.2.1](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.2.0...v3.2.1) (2021-08-05)
 
 
