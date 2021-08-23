@@ -7,6 +7,7 @@ import { groupBy, mapValues, uniq, get, uniqBy } from 'lodash';
 import { isPresent } from './tsUtils';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import getComponentLogger from './loggerBuilder';
+import { Query } from './elasticSearchService';
 import { getAllValuesForFHIRPath } from './getAllValuesForFHIRPath';
 
 const logger = getComponentLogger();
@@ -174,19 +175,21 @@ export const buildIncludeQuery = (
     resourceType: string,
     resourceIds: string[],
     filterRulesForActiveResources: any[],
-) => ({
-    index: `${resourceType.toLowerCase()}-alias`,
-    body: {
-        query: {
-            bool: {
-                filter: [
-                    {
-                        terms: {
-                            id: resourceIds,
+): Query => ({
+    resourceType,
+    queryRequest: {
+        body: {
+            query: {
+                bool: {
+                    filter: [
+                        {
+                            terms: {
+                                id: resourceIds,
+                            },
                         },
-                    },
-                    ...filterRulesForActiveResources,
-                ],
+                        ...filterRulesForActiveResources,
+                    ],
+                },
             },
         },
     },
@@ -197,23 +200,24 @@ export const buildRevIncludeQuery = (
     references: string[],
     filterRulesForActiveResources: any[],
     useKeywordSubFields: boolean,
-) => {
+): Query => {
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
-
     const { sourceResource, path } = revIncludeSearchParameter;
     return {
-        index: `${sourceResource.toLowerCase()}-alias`,
-        body: {
-            query: {
-                bool: {
-                    filter: [
-                        {
-                            terms: {
-                                [`${path}.reference${keywordSuffix}`]: references,
+        resourceType: sourceResource,
+        queryRequest: {
+            body: {
+                query: {
+                    bool: {
+                        filter: [
+                            {
+                                terms: {
+                                    [`${path}.reference${keywordSuffix}`]: references,
+                                },
                             },
-                        },
-                        ...filterRulesForActiveResources,
-                    ],
+                            ...filterRulesForActiveResources,
+                        ],
+                    },
                 },
             },
         },
@@ -247,7 +251,7 @@ export const buildIncludeQueries = (
     filterRulesForActiveResources: any[],
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     iterate?: true,
-): any[] => {
+): Query[] => {
     const allIncludeParameters = getInclusionParametersFromQueryParams(
         '_include',
         queryParams,
@@ -289,7 +293,7 @@ export const buildRevIncludeQueries = (
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     useKeywordSubFields: boolean,
     iterate?: true,
-) => {
+): Query[] => {
     const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams, iterate);
 
     const revIncludeParameters = allRevincludeParameters.some(x => x.isWildcard)

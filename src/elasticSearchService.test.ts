@@ -591,6 +591,84 @@ describe('typeSearch', () => {
         expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
     });
 
+    test('multi-tenancy enabled: _include:iterate', async () => {
+        (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [
+                                {
+                                    _source: {
+                                        id: 'patient-id-333',
+                                        resourceType: 'Patient',
+                                        managingOrganization: {
+                                            reference: 'Organization/org-id-111',
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [
+                                {
+                                    _source: {
+                                        id: 'org-id-111',
+                                        resourceType: 'Organization',
+                                    },
+                                },
+                            ],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        const queryParams = { '_include:iterate': ['MedicationRequest:subject', 'Patient:organization'] };
+        const es = new ElasticSearchService(
+            FILTER_RULES_FOR_ACTIVE_RESOURCES,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            {
+                enableMultiTenancy: true,
+            },
+        );
+        await es.typeSearch({
+            resourceType: 'MedicationRequest',
+            baseUrl: 'https://base-url.com',
+            queryParams: { ...queryParams },
+            allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            tenantId: 'tenant1',
+        });
+
+        expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+        expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+    });
+
     test('_revinclude:iterate', async () => {
         (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
         (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
@@ -648,6 +726,79 @@ describe('typeSearch', () => {
             baseUrl: 'https://base-url.com',
             queryParams: { ...queryParams },
             allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+        });
+
+        expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
+        expect((ElasticSearch.msearch as jest.Mock).mock.calls).toMatchSnapshot('msearch queries');
+    });
+
+    test('multi-tenancy enabled: _revinclude:iterate', async () => {
+        (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeMedicationRequestSearchResult);
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [
+                                {
+                                    _source: {
+                                        id: 'medication-administration-111',
+                                        resourceType: 'MedicationAdministration',
+                                    },
+                                },
+                            ],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        (ElasticSearch.msearch as jest.Mock).mockResolvedValueOnce({
+            body: {
+                took: 0,
+                responses: [
+                    {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 0,
+                            hits: [],
+                        },
+                        status: 200,
+                    },
+                ],
+            },
+        });
+        const queryParams = {
+            '_revinclude:iterate': [
+                'MedicationAdministration:request:MedicationRequest',
+                'MedicationStatement:part-of:MedicationAdministration',
+            ],
+        };
+        const es = new ElasticSearchService(
+            FILTER_RULES_FOR_ACTIVE_RESOURCES,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            {
+                enableMultiTenancy: true,
+            },
+        );
+        await es.typeSearch({
+            resourceType: 'MedicationRequest',
+            baseUrl: 'https://base-url.com',
+            queryParams: { ...queryParams },
+            allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            tenantId: 'tenant1',
         });
 
         expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
@@ -780,5 +931,57 @@ describe('typeSearch', () => {
 
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
         });
+    });
+
+    describe('multi-tenancy enabled: simple queries', () => {
+        each([[{ gender: 'female', name: 'Emily' }], [{ _id: '11111111-1111-1111-1111-111111111111' }]]).test(
+            'queryParams=%j',
+            async (queryParams: any) => {
+                const fakeSearchResult = {
+                    body: {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 1,
+                            hits: [
+                                {
+                                    _index: 'patient',
+                                    _type: '_doc',
+                                    _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                    _score: 1,
+                                    _source: {
+                                        vid: '1',
+                                        id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                        resourceType: 'Patient',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                };
+                (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+                const es = new ElasticSearchService(
+                    FILTER_RULES_FOR_ACTIVE_RESOURCES,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    {
+                        enableMultiTenancy: true,
+                    },
+                );
+                await es.typeSearch({
+                    resourceType: 'Patient',
+                    baseUrl: 'https://base-url.com',
+                    queryParams,
+                    allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+                    tenantId: 'tenant1',
+                });
+
+                expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+            },
+        );
     });
 });
