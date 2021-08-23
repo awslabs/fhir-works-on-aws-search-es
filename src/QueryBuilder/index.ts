@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { InvalidSearchParameterError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
+import { InvalidSearchParameterError, ResourceConflictError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
 import { NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { stringQuery } from './typeQueries/stringQuery';
@@ -13,6 +13,7 @@ import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
 import getOrSearchValues from './searchOR';
+import getSearchModifiers, { SearchModifier } from './searchModifiers';
 import { uriQuery } from './typeQueries/uriQuery';
 
 function typeQueryWithConditions(
@@ -24,7 +25,7 @@ function typeQueryWithConditions(
     let typeQuery: any;
     switch (searchParam.type) {
         case 'string':
-            typeQuery = stringQuery(compiledSearchParam, searchValue);
+            typeQuery = stringQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'date':
             typeQuery = dateQuery(compiledSearchParam, searchValue);
@@ -47,7 +48,7 @@ function typeQueryWithConditions(
         case 'composite':
         case 'special':
         default:
-            typeQuery = stringQuery(compiledSearchParam, searchValue);
+            typeQuery = stringQuery(compiledSearchParam, searchValue, useKeywordSubFields);
     }
     // In most cases conditions are used for fields that are an array of objects
     // Ideally we should be using a nested query, but that'd require to update the index mappings.
@@ -125,13 +126,20 @@ function searchRequestQuery(
     return Object.entries(normalizeQueryParams(queryParams))
         .filter(([searchParameter]) => !NON_SEARCHABLE_PARAMETERS.includes(searchParameter))
         .flatMap(([searchParameter, searchValues]) => {
-            const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(resourceType, searchParameter);
+            const unmodifiedParam = searchParameter.split(":")[0];
+            const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(resourceType, unmodifiedParam);
             if (fhirSearchParam === undefined) {
                 throw new InvalidSearchParameterError(
-                    `Invalid search parameter '${searchParameter}' for resource type ${resourceType}`,
+                    `Invalid search parameter '${unmodifiedParam}' for resource type ${resourceType}`,
                 );
             }
-            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields));
+            const searchModifier = getSearchModifiers(searchParameter);
+            let forceUseKeywordSubFields = false;
+            if (searchModifier === SearchModifier.Exact) {
+                forceUseKeywordSubFields = true;
+            }
+            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue,
+                forceUseKeywordSubFields? true: useKeywordSubFields));
         });
 }
 
