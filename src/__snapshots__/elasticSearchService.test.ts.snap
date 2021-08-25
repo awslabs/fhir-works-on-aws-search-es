@@ -2586,7 +2586,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch search parameters with complex expressions queryParams={"depends-on":"something"} 1`] = `
+exports[`typeSearch search parameters with complex expressions queryParams={"depends-on":"Patient/something"} 1`] = `
 Array [
   Array [
     Object {
@@ -2610,7 +2610,7 @@ Array [
                           "relatedArtifact.resource.reference.keyword",
                         ],
                         "lenient": true,
-                        "query": "something",
+                        "query": "Patient/something",
                       },
                     },
                     Object {

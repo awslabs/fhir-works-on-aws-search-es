@@ -230,7 +230,7 @@ describe('typeSearch', () => {
         each([
             [{ phone: '1234567' }, 'Patient'],
             [{ 'value-string': 'some value' }, 'Observation'],
-            [{ 'depends-on': 'something' }, 'Library'],
+            [{ 'depends-on': 'Patient/something' }, 'Library'],
             [{ relatedperson: 'RelatedPerson/111' }, 'Person'],
         ]).test('queryParams=%j', async (queryParams: any, resourceType: string) => {
             const fakeSearchResult = {
@@ -277,6 +277,18 @@ describe('typeSearch', () => {
                 resourceType: 'Patient',
                 baseUrl: 'https://base-url.com',
                 queryParams: { someFieldThatDoesNotExist: 'someValue' },
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            }),
+        ).rejects.toThrowError(InvalidSearchParameterError);
+    });
+
+    test('Invalid Parameter; reference search with an id', () => {
+        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+        expect(
+            es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams: { generalPractitioner: 'idWithoutType' },
                 allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
             }),
         ).rejects.toThrowError(InvalidSearchParameterError);
