@@ -27,7 +27,7 @@ export function referenceQuery(
             reference = `${target[0]}/${value}`;
         } else {
             throw new InvalidSearchParameterError(
-                `'${searchParamName}' is invalid please specify the resource type with the id`,
+                `'${searchParamName}' is invalid please specify the reference value with the format [resourcetType]/[id] or as an absolute URL`,
             );
         }
     }

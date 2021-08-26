@@ -39,7 +39,7 @@ describe('referenceQuery', () => {
         `);
     });
     test('just id search, one type found', () => {
-        expect(referenceQuery(organizationParam, 'orgnaizationId', false, 'organization', ['Organization']))
+        expect(referenceQuery(organizationParam, 'organizationId', false, 'organization', ['Organization']))
             .toMatchInlineSnapshot(`
             Object {
               "multi_match": Object {
@@ -47,18 +47,18 @@ describe('referenceQuery', () => {
                   "managingOrganization.reference",
                 ],
                 "lenient": true,
-                "query": "Organization/orgnaizationId",
+                "query": "Organization/organizationId",
               },
             }
         `);
     });
     test('just id search, many types found', () => {
         expect(() =>
-            referenceQuery(organizationParam, 'orgnaizationId', false, 'organization', ['Organization', 'Group']),
+            referenceQuery(organizationParam, 'organizationId', false, 'organization', ['Organization', 'Group']),
         ).toThrow(InvalidSearchParameterError);
     });
     test('just id search, no types found', () => {
-        expect(() => referenceQuery(organizationParam, 'orgnaizationId', false, 'organization')).toThrow(
+        expect(() => referenceQuery(organizationParam, 'organizationId', false, 'organization')).toThrow(
             InvalidSearchParameterError,
         );
     });
