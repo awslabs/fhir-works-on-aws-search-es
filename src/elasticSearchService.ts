@@ -185,7 +185,6 @@ export class ElasticSearchService implements Search {
                     request.queryParams[SORT_PARAMETER],
                 );
             }
-
             const { total, hits } = await this.executeQuery(params, request);
             const result: SearchResult = {
                 numberOfResults: total,

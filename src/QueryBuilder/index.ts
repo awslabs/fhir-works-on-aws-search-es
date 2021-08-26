@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { InvalidSearchParameterError, ResourceConflictError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
+import { InvalidSearchParameterError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
 import { NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { stringQuery } from './typeQueries/stringQuery';
@@ -126,7 +126,7 @@ function searchRequestQuery(
     return Object.entries(normalizeQueryParams(queryParams))
         .filter(([searchParameter]) => !NON_SEARCHABLE_PARAMETERS.includes(searchParameter))
         .flatMap(([searchParameter, searchValues]) => {
-            const unmodifiedParam = searchParameter.split(":")[0];
+            const unmodifiedParam = searchParameter.split(':')[0];
             const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(resourceType, unmodifiedParam);
             if (fhirSearchParam === undefined) {
                 throw new InvalidSearchParameterError(
@@ -138,8 +138,9 @@ function searchRequestQuery(
             if (searchModifier === SearchModifier.Exact) {
                 forceUseKeywordSubFields = true;
             }
-            return searchValues.map(searchValue => searchParamQuery(fhirSearchParam, searchValue,
-                forceUseKeywordSubFields? true: useKeywordSubFields));
+            return searchValues.map(searchValue =>
+                searchParamQuery(fhirSearchParam, searchValue, forceUseKeywordSubFields ? true : useKeywordSubFields),
+            );
         });
 }
 

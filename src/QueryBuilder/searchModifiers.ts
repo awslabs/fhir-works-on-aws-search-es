@@ -5,17 +5,18 @@
  */
 
 export enum SearchModifier {
-    None = "none",
-    Error = "error",
-    Exact = "exact",
+    None = 'none',
+    Error = 'error',
+    Exact = 'exact',
 }
 
 const getSearchModifiers = (searchParameter: string): SearchModifier => {
-    const modifier = searchParameter.split(":");
-    if (modifier.length === 1) { // split was unsuccessful, there is no modifier
+    const modifier = searchParameter.split(':');
+    // split was unsuccessful, there is no modifier
+    if (modifier.length === 1) {
         return SearchModifier.None;
     }
-    switch(modifier[1]) {
+    switch (modifier[1]) {
         case SearchModifier.Exact:
             return SearchModifier.Exact;
         default:
