@@ -52,6 +52,8 @@ describe('typeSearch', () => {
             [{ _format: 'json' }],
             [{ _profile: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Pharmacy' }],
             [{ 'general-practitioner': 'Practitioner/1234' }],
+            [{ 'general-practitioner': '1234' }],
+            [{ organization: '1234' }],
             [
                 {
                     _count: '10',
@@ -277,18 +279,6 @@ describe('typeSearch', () => {
                 resourceType: 'Patient',
                 baseUrl: 'https://base-url.com',
                 queryParams: { someFieldThatDoesNotExist: 'someValue' },
-                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
-            }),
-        ).rejects.toThrowError(InvalidSearchParameterError);
-    });
-
-    test('Invalid Parameter; reference search with an id', () => {
-        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
-        expect(
-            es.typeSearch({
-                resourceType: 'Patient',
-                baseUrl: 'https://base-url.com',
-                queryParams: { generalPractitioner: 'idWithoutType' },
                 allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
             }),
         ).rejects.toThrowError(InvalidSearchParameterError);

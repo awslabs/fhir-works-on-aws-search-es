@@ -18,25 +18,20 @@ export function referenceQuery(
 ): any {
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
 
-    const fields = [`${compiled.path}.reference${keywordSuffix}`];
-    let reference = value;
     // http://hl7.org/fhir/R4/search.html#reference
-    // to cover the use-case of someone searching as just an 'id' and this reference just has 1 target i.e. Observation.patient = 123
+    // reference fields should be of `keyword` ES type: https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html
+    let references: string[] = [value];
     if (value.match(idOnlyRegExp)) {
-        if (target.length === 1) {
-            reference = `${target[0]}/${value}`;
-        } else {
+        if (target.length === 0) {
             throw new InvalidSearchParameterError(
                 `'${searchParamName}' is invalid please specify the reference value with the format [resourcetType]/[id] or as an absolute URL`,
             );
         }
+
+        references = target.map((resourceType: string) => {
+            return `${resourceType}/${value}`;
+        });
     }
 
-    return {
-        multi_match: {
-            fields,
-            query: reference,
-            lenient: true,
-        },
-    };
+    return { terms: { [`${compiled.path}.reference${keywordSuffix}`]: references } };
 }

@@ -14,12 +14,10 @@ describe('referenceQuery', () => {
     test('simple value; with keyword', () => {
         expect(referenceQuery(organizationParam, 'Organization/111', true, 'organization', [])).toMatchInlineSnapshot(`
             Object {
-              "multi_match": Object {
-                "fields": Array [
-                  "managingOrganization.reference.keyword",
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
+                  "Organization/111",
                 ],
-                "lenient": true,
-                "query": "Organization/111",
               },
             }
         `);
@@ -28,34 +26,38 @@ describe('referenceQuery', () => {
         expect(referenceQuery(organizationParam, 'http://fhir.com/baseR4/Organization/111', false, 'organization'))
             .toMatchInlineSnapshot(`
             Object {
-              "multi_match": Object {
-                "fields": Array [
-                  "managingOrganization.reference",
+              "terms": Object {
+                "managingOrganization.reference": Array [
+                  "http://fhir.com/baseR4/Organization/111",
                 ],
-                "lenient": true,
-                "query": "http://fhir.com/baseR4/Organization/111",
               },
             }
         `);
     });
     test('just id search, one type found', () => {
-        expect(referenceQuery(organizationParam, 'organizationId', false, 'organization', ['Organization']))
+        expect(referenceQuery(organizationParam, 'organizationId', true, 'organization', ['Organization']))
             .toMatchInlineSnapshot(`
             Object {
-              "multi_match": Object {
-                "fields": Array [
-                  "managingOrganization.reference",
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
+                  "Organization/organizationId",
                 ],
-                "lenient": true,
-                "query": "Organization/organizationId",
               },
             }
         `);
     });
     test('just id search, many types found', () => {
-        expect(() =>
-            referenceQuery(organizationParam, 'organizationId', false, 'organization', ['Organization', 'Group']),
-        ).toThrow(InvalidSearchParameterError);
+        expect(referenceQuery(organizationParam, 'organizationId', true, 'organization', ['Organization', 'Group']))
+            .toMatchInlineSnapshot(`
+            Object {
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
+                  "Organization/organizationId",
+                  "Group/organizationId",
+                ],
+              },
+            }
+    `);
     });
     test('just id search, no types found', () => {
         expect(() => referenceQuery(organizationParam, 'organizationId', false, 'organization')).toThrow(
