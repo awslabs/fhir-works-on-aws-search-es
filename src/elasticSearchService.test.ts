@@ -52,6 +52,8 @@ describe('typeSearch', () => {
             [{ _format: 'json' }],
             [{ _profile: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Pharmacy' }],
             [{ 'general-practitioner': 'Practitioner/1234' }],
+            [{ 'general-practitioner': '1234' }],
+            [{ organization: '1234' }],
             [
                 {
                     _count: '10',
@@ -230,7 +232,7 @@ describe('typeSearch', () => {
         each([
             [{ phone: '1234567' }, 'Patient'],
             [{ 'value-string': 'some value' }, 'Observation'],
-            [{ 'depends-on': 'something' }, 'Library'],
+            [{ 'depends-on': 'Patient/something' }, 'Library'],
             [{ relatedperson: 'RelatedPerson/111' }, 'Person'],
         ]).test('queryParams=%j', async (queryParams: any, resourceType: string) => {
             const fakeSearchResult = {

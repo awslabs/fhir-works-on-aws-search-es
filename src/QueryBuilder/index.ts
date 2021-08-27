@@ -39,7 +39,13 @@ function typeQueryWithConditions(
             typeQuery = quantityQuery(compiledSearchParam, searchValue, useKeywordSubFields);
             break;
         case 'reference':
-            typeQuery = referenceQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            typeQuery = referenceQuery(
+                compiledSearchParam,
+                searchValue,
+                useKeywordSubFields,
+                searchParam.name,
+                searchParam.target,
+            );
             break;
         case 'uri':
             typeQuery = uriQuery(compiledSearchParam, searchValue, useKeywordSubFields);
