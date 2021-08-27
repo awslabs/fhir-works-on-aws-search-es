@@ -23,11 +23,22 @@ describe('referenceQuery', () => {
         `);
     });
     test('simple value; without keyword', () => {
-        expect(referenceQuery(organizationParam, 'http://fhir.com/baseR4/Organization/111', false, 'organization'))
-            .toMatchInlineSnapshot(`
+        expect(referenceQuery(organizationParam, 'Organization/111', false, 'organization')).toMatchInlineSnapshot(`
             Object {
               "terms": Object {
                 "managingOrganization.reference": Array [
+                  "Organization/111",
+                ],
+              },
+            }
+        `);
+    });
+    test('reference search with full URL', () => {
+        expect(referenceQuery(organizationParam, 'http://fhir.com/baseR4/Organization/111', true, 'organization'))
+            .toMatchInlineSnapshot(`
+            Object {
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
                   "http://fhir.com/baseR4/Organization/111",
                 ],
               },

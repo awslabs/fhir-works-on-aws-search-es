@@ -5,6 +5,9 @@
 
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
+import getComponentLogger from '../../loggerBuilder';
+
+const logger = getComponentLogger();
 
 const idOnlyRegExp = /^[A-Za-z0-9\-.]{1,64}$/;
 
@@ -23,8 +26,11 @@ export function referenceQuery(
     let references: string[] = [value];
     if (value.match(idOnlyRegExp)) {
         if (target.length === 0) {
+            logger.error(
+                `ID only reference search failed. The requested search parameter: '${searchParamName}',  does not have any targets. Please ensure the compiled IG is valid`,
+            );
             throw new InvalidSearchParameterError(
-                `'${searchParamName}' is invalid please specify the reference value with the format [resourcetType]/[id] or as an absolute URL`,
+                `ID only search for '${searchParamName}' parameter is not supported, please specify the value with the format [resourcetType]/[id] or as an absolute URL`,
             );
         }
 
