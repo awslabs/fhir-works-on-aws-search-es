@@ -28,6 +28,81 @@ This package is dependent on:
 - [deployment component](https://github.com/awslabs/fhir-works-on-aws-deployment)
   - This package deploys this and all the default components
 
+
+## FHIR search features supported
+
+#### Search Parameter Types
+| Feature       | Supported? | Notes |
+|---------------|:----------:|-------|
+| Number        | ✔          |       |
+| Date/DateTime | ✔          |       |
+| String        | ✔          |       |
+| Token         | ✔          |       |
+| Reference     | ✔          |       |
+| Composite     | -          |       |
+| Quantity      | ✔          |       |
+| URI           | ✔          |       |
+| Special       | -          |       |
+
+#### Search modifiers
+
+| Feature             | Supported? | Notes |
+|---------------------|:----------:|-------|
+| `:missing`            |      -     |       |
+| `:exact`              |      -     |       |
+| `:contains`           |      -     |       |
+| `:text`               |      -     |       |
+| `:in` (token)         |      -     |       |
+| `:below` (token)      |      -     |       |
+| `:above` (token)      |      -     |       |
+| `:not-in` (token)     |      -     |       |
+| `:[type]` (reference) |      -     |       |
+| `:below` (uri)        |      -     |       |
+| `:not`                |      -     |       |
+| `:above` (uri)        |      -     |       |
+
+#### Parameters for all resources
+
+| Feature      | Supported? | Notes |
+|--------------|:----------:|---    |
+| `_id`          | ✔          |       |
+| `_lastUpdated` | ✔          |       |
+| `_tag`         | ✔          |       |
+| `_profile`     | ✔          |       |
+| `_security`    | ✔          |       |
+| `_text`        |            |       |
+| `_content`     | -          |       |
+| `_list`        | -          |       |
+| `_has`         | -          |       |
+| `_type`        | -          |       |
+| `_query`       | -          |       |
+| `_filter`      | -          |       |
+
+#### Search result parameters
+
+| Feature        | Supported? | Notes                                         |
+|----------------|:----------:|-----------------------------------------------|
+| `_sort`          | ✔*         |  * Only supports sorting by date parameters                                             |
+| `_count`         | ✔          |                                               |
+| `_include`       | ✔          | `_include:iterate` is limited to a search depth of 5                   |
+| `_revinclude`    | ✔          | `_revinclude:iterate` is limited to a search depth of 5                   |
+| `_summary`       | -          |                                               |
+| `_total`         | -          |                                               |
+| `_elements`      | -          |                                               |
+| `_contained`     | -          |                                               |
+| `_containedType` | -          |                                               |
+| `_score`         | -          |                                               |
+
+#### Other
+
+| Feature             | Supported? | Notes                                                                             |
+|--------------       |:----------:|---                                                                                |
+| OR search parameter | ✔          | This refers to the use of a comma. e.g. `/Patient?language=FR,NL`                 |
+| AND search parameter| ✔          | This refers to repeating search parameters e.g. `/Patient?language=FR&language=NL` |
+| Chained parameters  | -          |       |
+| Reverse Chaining  | -          |       |
+
+
 ## Known issues
 
 For known issues please track the issues on the GitHub repository

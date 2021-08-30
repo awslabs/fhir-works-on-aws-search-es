@@ -2445,6 +2445,43 @@ Array [
 ]
 `;
 
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"general-practitioner":"1234"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "terms": Object {
+                  "generalPractitioner.reference.keyword": Array [
+                    "Practitioner/1234",
+                    "Organization/1234",
+                    "PractitionerRole/1234",
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient-alias",
+      "size": 20,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"general-practitioner":"Practitioner/1234"} 1`] = `
 Array [
   Array [
@@ -2461,12 +2498,45 @@ Array [
             ],
             "must": Array [
               Object {
-                "multi_match": Object {
-                  "fields": Array [
-                    "generalPractitioner.reference.keyword",
+                "terms": Object {
+                  "generalPractitioner.reference.keyword": Array [
+                    "Practitioner/1234",
                   ],
-                  "lenient": true,
-                  "query": "Practitioner/1234",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "from": 0,
+      "index": "patient-alias",
+      "size": 20,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for simple queryParams; with ACTIVE filter queryParams={"organization":"1234"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "terms": Object {
+                  "managingOrganization.reference.keyword": Array [
+                    "Organization/1234",
+                  ],
                 },
               },
             ],
@@ -2586,7 +2656,7 @@ Array [
 ]
 `;
 
-exports[`typeSearch search parameters with complex expressions queryParams={"depends-on":"something"} 1`] = `
+exports[`typeSearch search parameters with complex expressions queryParams={"depends-on":"Patient/something"} 1`] = `
 Array [
   Array [
     Object {
@@ -2605,12 +2675,10 @@ Array [
                 "bool": Object {
                   "must": Array [
                     Object {
-                      "multi_match": Object {
-                        "fields": Array [
-                          "relatedArtifact.resource.reference.keyword",
+                      "terms": Object {
+                        "relatedArtifact.resource.reference.keyword": Array [
+                          "Patient/something",
                         ],
-                        "lenient": true,
-                        "query": "something",
                       },
                     },
                     Object {
@@ -2714,12 +2782,10 @@ Array [
                 "bool": Object {
                   "must": Array [
                     Object {
-                      "multi_match": Object {
-                        "fields": Array [
-                          "link.target.reference.keyword",
+                      "terms": Object {
+                        "link.target.reference.keyword": Array [
+                          "RelatedPerson/111",
                         ],
-                        "lenient": true,
-                        "query": "RelatedPerson/111",
                       },
                     },
                     Object {

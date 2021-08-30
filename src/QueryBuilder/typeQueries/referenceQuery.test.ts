@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { referenceQuery } from './referenceQuery';
 import { FHIRSearchParametersRegistry } from '../../FHIRSearchParametersRegistry';
 
@@ -11,29 +12,67 @@ const organizationParam = fhirSearchParametersRegistry.getSearchParameter('Patie
 
 describe('referenceQuery', () => {
     test('simple value; with keyword', () => {
-        expect(referenceQuery(organizationParam, 'Organization/111', true)).toMatchInlineSnapshot(`
+        expect(referenceQuery(organizationParam, 'Organization/111', true, 'organization', [])).toMatchInlineSnapshot(`
             Object {
-              "multi_match": Object {
-                "fields": Array [
-                  "managingOrganization.reference.keyword",
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
+                  "Organization/111",
                 ],
-                "lenient": true,
-                "query": "Organization/111",
               },
             }
         `);
     });
     test('simple value; without keyword', () => {
-        expect(referenceQuery(organizationParam, 'Organization/111', false)).toMatchInlineSnapshot(`
+        expect(referenceQuery(organizationParam, 'Organization/111', false, 'organization')).toMatchInlineSnapshot(`
             Object {
-              "multi_match": Object {
-                "fields": Array [
-                  "managingOrganization.reference",
+              "terms": Object {
+                "managingOrganization.reference": Array [
+                  "Organization/111",
                 ],
-                "lenient": true,
-                "query": "Organization/111",
               },
             }
         `);
+    });
+    test('reference search with full URL', () => {
+        expect(referenceQuery(organizationParam, 'http://fhir.com/baseR4/Organization/111', true, 'organization'))
+            .toMatchInlineSnapshot(`
+            Object {
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
+                  "http://fhir.com/baseR4/Organization/111",
+                ],
+              },
+            }
+        `);
+    });
+    test('just id search, one type found', () => {
+        expect(referenceQuery(organizationParam, 'organizationId', true, 'organization', ['Organization']))
+            .toMatchInlineSnapshot(`
+            Object {
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
+                  "Organization/organizationId",
+                ],
+              },
+            }
+        `);
+    });
+    test('just id search, many types found', () => {
+        expect(referenceQuery(organizationParam, 'organizationId', true, 'organization', ['Organization', 'Group']))
+            .toMatchInlineSnapshot(`
+            Object {
+              "terms": Object {
+                "managingOrganization.reference.keyword": Array [
+                  "Organization/organizationId",
+                  "Group/organizationId",
+                ],
+              },
+            }
+    `);
+    });
+    test('just id search, no types found', () => {
+        expect(() => referenceQuery(organizationParam, 'organizationId', false, 'organization')).toThrow(
+            InvalidSearchParameterError,
+        );
     });
 });
