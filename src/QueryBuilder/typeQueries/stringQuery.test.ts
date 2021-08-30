@@ -11,7 +11,7 @@ const nameParam = fhirSearchParametersRegistry.getSearchParameter('Patient', 'na
 
 describe('stringQuery', () => {
     test('simple value', () => {
-        expect(stringQuery(nameParam, 'Robert Bell', false)).toMatchInlineSnapshot(`
+        expect(stringQuery(nameParam, 'Robert Bell')).toMatchInlineSnapshot(`
             Object {
               "multi_match": Object {
                 "fields": Array [
@@ -25,7 +25,7 @@ describe('stringQuery', () => {
         `);
     });
     test('simple value; with forward slash', () => {
-        expect(stringQuery(nameParam, 'Robert/Bobby Bell', false)).toMatchInlineSnapshot(`
+        expect(stringQuery(nameParam, 'Robert/Bobby Bell')).toMatchInlineSnapshot(`
             Object {
               "multi_match": Object {
                 "fields": Array [
@@ -39,7 +39,7 @@ describe('stringQuery', () => {
         `);
     });
     test('simple value; with backwards slash', () => {
-        expect(stringQuery(nameParam, 'Robert\\Bobby Bell', false)).toMatchInlineSnapshot(`
+        expect(stringQuery(nameParam, 'Robert\\Bobby Bell')).toMatchInlineSnapshot(`
             Object {
               "multi_match": Object {
                 "fields": Array [
@@ -53,7 +53,7 @@ describe('stringQuery', () => {
         `);
     });
     test('simple value; with characters', () => {
-        expect(stringQuery(nameParam, '平仮名', false)).toMatchInlineSnapshot(`
+        expect(stringQuery(nameParam, '平仮名')).toMatchInlineSnapshot(`
             Object {
               "multi_match": Object {
                 "fields": Array [
@@ -65,5 +65,33 @@ describe('stringQuery', () => {
               },
             }
         `);
+    });
+    test('simple value with exact modifier', () => {
+        expect(stringQuery(nameParam, 'Robert Bell', 'exact')).toMatchInlineSnapshot(`
+          Object {
+            "multi_match": Object {
+              "fields": Array [
+                "name.keyword",
+                "name.*",
+              ],
+              "lenient": true,
+              "query": "Robert Bell",
+            },
+          }
+      `);
+    });
+    test('simple value with exact modifier and case differences', () => {
+        expect(stringQuery(nameParam, 'RoBeRt BeLL', 'exact')).toMatchInlineSnapshot(`
+          Object {
+            "multi_match": Object {
+              "fields": Array [
+                "name.keyword",
+                "name.*",
+              ],
+              "lenient": true,
+              "query": "RoBeRt BeLL",
+            },
+          }
+      `);
     });
 });

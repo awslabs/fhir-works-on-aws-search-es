@@ -10,9 +10,9 @@ const escapeQueryString = (string: string) => {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export function stringQuery(compiled: CompiledSearchParam, value: string, useKeywordSubFields: boolean): any {
-    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
-    const fields = [compiled.path, `${compiled.path}.*${keywordSuffix}`];
+export function stringQuery(compiled: CompiledSearchParam, value: string, modifier?: string): any {
+    const keywordSuffix = modifier === 'exact' ? '.keyword' : '';
+    const fields = [compiled.path + keywordSuffix, `${compiled.path}.*`];
 
     return {
         multi_match: {

@@ -39,7 +39,15 @@ export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
     return { system, code, explicitNoSystemProperty };
 };
 
-export function tokenQuery(compiled: CompiledSearchParam, value: string, useKeywordSubFields: boolean): any {
+export function tokenQuery(
+    compiled: CompiledSearchParam,
+    value: string,
+    useKeywordSubFields: boolean,
+    modifier?: string,
+): any {
+    if (modifier === 'exact') {
+        throw new InvalidSearchParameterError(`Invalid token search modifier: ${modifier}`);
+    }
     const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
     const queries = [];
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';

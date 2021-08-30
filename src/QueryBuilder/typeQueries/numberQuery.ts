@@ -38,7 +38,10 @@ export const parseNumberSearchParam = (param: string): NumberSearchParameter => 
     };
 };
 
-export const numberQuery = (compiledSearchParam: CompiledSearchParam, value: string): any => {
+export const numberQuery = (compiledSearchParam: CompiledSearchParam, value: string, modifier?: string): any => {
+    if (modifier === 'exact') {
+        throw new InvalidSearchParameterError(`Invalid number search modifier: ${modifier}`);
+    }
     const { prefix, implicitRange, number } = parseNumberSearchParam(value);
     return prefixRangeNumber(prefix, number, implicitRange, compiledSearchParam.path);
 };

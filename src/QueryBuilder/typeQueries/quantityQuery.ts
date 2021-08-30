@@ -47,7 +47,11 @@ export const quantityQuery = (
     compiledSearchParam: CompiledSearchParam,
     value: string,
     useKeywordSubFields: boolean,
+    modifier?: string,
 ): any => {
+    if (modifier === 'exact') {
+        throw new InvalidSearchParameterError(`Invalid quantity search modifier: ${modifier}`);
+    }
     const { prefix, implicitRange, number, system, code } = parseQuantitySearchParam(value);
     const queries = [prefixRangeNumber(prefix, number, implicitRange, `${compiledSearchParam.path}.value`)];
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';

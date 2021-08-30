@@ -13,7 +13,7 @@ import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
 import getOrSearchValues from './searchOR';
-import getSearchModifiers, { SearchModifier } from './searchModifiers';
+import parseSearchModifiers from './searchModifiers';
 import { uriQuery } from './typeQueries/uriQuery';
 
 function typeQueryWithConditions(
@@ -21,34 +21,35 @@ function typeQueryWithConditions(
     compiledSearchParam: CompiledSearchParam,
     searchValue: string,
     useKeywordSubFields: boolean,
+    modifier?: string,
 ): any {
     let typeQuery: any;
     switch (searchParam.type) {
         case 'string':
-            typeQuery = stringQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            typeQuery = stringQuery(compiledSearchParam, searchValue, modifier);
             break;
         case 'date':
-            typeQuery = dateQuery(compiledSearchParam, searchValue);
+            typeQuery = dateQuery(compiledSearchParam, searchValue, modifier);
             break;
         case 'token':
-            typeQuery = tokenQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            typeQuery = tokenQuery(compiledSearchParam, searchValue, useKeywordSubFields, modifier);
             break;
         case 'number':
-            typeQuery = numberQuery(compiledSearchParam, searchValue);
+            typeQuery = numberQuery(compiledSearchParam, searchValue, modifier);
             break;
         case 'quantity':
-            typeQuery = quantityQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            typeQuery = quantityQuery(compiledSearchParam, searchValue, useKeywordSubFields, modifier);
             break;
         case 'reference':
-            typeQuery = referenceQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            typeQuery = referenceQuery(compiledSearchParam, searchValue, useKeywordSubFields, modifier);
             break;
         case 'uri':
-            typeQuery = uriQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            typeQuery = uriQuery(compiledSearchParam, searchValue, useKeywordSubFields, modifier);
             break;
         case 'composite':
         case 'special':
         default:
-            typeQuery = stringQuery(compiledSearchParam, searchValue, useKeywordSubFields);
+            typeQuery = stringQuery(compiledSearchParam, searchValue, modifier);
     }
     // In most cases conditions are used for fields that are an array of objects
     // Ideally we should be using a nested query, but that'd require to update the index mappings.
@@ -74,13 +75,24 @@ function typeQueryWithConditions(
     return typeQuery;
 }
 
-function searchParamQuery(searchParam: SearchParam, searchValue: string, useKeywordSubFields: boolean): any {
+function searchParamQuery(
+    searchParam: SearchParam,
+    searchValue: string,
+    useKeywordSubFields: boolean,
+    modifier?: string,
+): any {
     const splitSearchValue = getOrSearchValues(searchValue);
     let queryList = [];
     for (let i = 0; i < splitSearchValue.length; i += 1) {
         queryList.push(
             searchParam.compiled.map(compiled => {
-                return typeQueryWithConditions(searchParam, compiled, splitSearchValue[i], useKeywordSubFields);
+                return typeQueryWithConditions(
+                    searchParam,
+                    compiled,
+                    splitSearchValue[i],
+                    useKeywordSubFields,
+                    modifier,
+                );
             }),
         );
     }
@@ -126,20 +138,18 @@ function searchRequestQuery(
     return Object.entries(normalizeQueryParams(queryParams))
         .filter(([searchParameter]) => !NON_SEARCHABLE_PARAMETERS.includes(searchParameter))
         .flatMap(([searchParameter, searchValues]) => {
-            const unmodifiedParam = searchParameter.split(':')[0];
-            const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(resourceType, unmodifiedParam);
+            const searchModifier = parseSearchModifiers(searchParameter);
+            const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
+                resourceType,
+                searchModifier.parameterName,
+            );
             if (fhirSearchParam === undefined) {
                 throw new InvalidSearchParameterError(
-                    `Invalid search parameter '${unmodifiedParam}' for resource type ${resourceType}`,
+                    `Invalid search parameter '${searchModifier.parameterName}' for resource type ${resourceType}`,
                 );
             }
-            const searchModifier = getSearchModifiers(searchParameter);
-            let forceUseKeywordSubFields = false;
-            if (searchModifier === SearchModifier.Exact) {
-                forceUseKeywordSubFields = true;
-            }
             return searchValues.map(searchValue =>
-                searchParamQuery(fhirSearchParam, searchValue, forceUseKeywordSubFields ? true : useKeywordSubFields),
+                searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields, searchModifier.modifier),
             );
         });
 }

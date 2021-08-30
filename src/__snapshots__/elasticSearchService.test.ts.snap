@@ -1652,7 +1652,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily",
@@ -1843,7 +1843,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily",
@@ -2182,7 +2182,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily",
@@ -2235,7 +2235,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "name",
-                          "name.*.keyword",
+                          "name.*",
                         ],
                         "lenient": true,
                         "query": "Emily",
@@ -2245,7 +2245,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "name",
-                          "name.*.keyword",
+                          "name.*",
                         ],
                         "lenient": true,
                         "query": "Smith",
@@ -2298,7 +2298,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily,Smith",
@@ -2348,7 +2348,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily",
@@ -2358,7 +2358,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Smith",
@@ -2426,7 +2426,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily",
@@ -2546,7 +2546,7 @@ Array [
                 "multi_match": Object {
                   "fields": Array [
                     "name",
-                    "name.*.keyword",
+                    "name.*",
                   ],
                   "lenient": true,
                   "query": "Emily",
@@ -2770,7 +2770,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueString",
-                          "valueString.*.keyword",
+                          "valueString.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2780,7 +2780,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueCodeableConcept.text",
-                          "valueCodeableConcept.text.*.keyword",
+                          "valueCodeableConcept.text.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2790,7 +2790,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueQuantity",
-                          "valueQuantity.*.keyword",
+                          "valueQuantity.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2800,7 +2800,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueCodeableConcept",
-                          "valueCodeableConcept.*.keyword",
+                          "valueCodeableConcept.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2810,7 +2810,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueBoolean",
-                          "valueBoolean.*.keyword",
+                          "valueBoolean.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2820,7 +2820,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueInteger",
-                          "valueInteger.*.keyword",
+                          "valueInteger.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2830,7 +2830,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueRange",
-                          "valueRange.*.keyword",
+                          "valueRange.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2840,7 +2840,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueRatio",
-                          "valueRatio.*.keyword",
+                          "valueRatio.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2850,7 +2850,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueSampledData",
-                          "valueSampledData.*.keyword",
+                          "valueSampledData.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2860,7 +2860,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueTime",
-                          "valueTime.*.keyword",
+                          "valueTime.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2870,7 +2870,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valueDateTime",
-                          "valueDateTime.*.keyword",
+                          "valueDateTime.*",
                         ],
                         "lenient": true,
                         "query": "some value",
@@ -2880,7 +2880,7 @@ Array [
                       "multi_match": Object {
                         "fields": Array [
                           "valuePeriod",
-                          "valuePeriod.*.keyword",
+                          "valuePeriod.*",
                         ],
                         "lenient": true,
                         "query": "some value",

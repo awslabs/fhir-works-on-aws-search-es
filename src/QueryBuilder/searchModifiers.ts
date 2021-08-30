@@ -4,24 +4,26 @@
  *
  */
 
-export enum SearchModifier {
-    None = 'none',
-    Error = 'error',
-    Exact = 'exact',
-}
+import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 
-const getSearchModifiers = (searchParameter: string): SearchModifier => {
+const parseSearchModifiers = (
+    searchParameter: string,
+): {
+    parameterName: string;
+    modifier?: string;
+} => {
     const modifier = searchParameter.split(':');
     // split was unsuccessful, there is no modifier
     if (modifier.length === 1) {
-        return SearchModifier.None;
+        return { parameterName: modifier[0], modifier: undefined };
     }
+    modifier[1] = modifier[1].toLowerCase();
     switch (modifier[1]) {
-        case SearchModifier.Exact:
-            return SearchModifier.Exact;
+        case 'exact':
+            return { parameterName: modifier[0], modifier: modifier[1] };
         default:
-            return SearchModifier.Error;
+            throw new InvalidSearchParameterError(`Unsupported search modifier: ${modifier[1]}`);
     }
 };
 
-export default getSearchModifiers;
+export default parseSearchModifiers;

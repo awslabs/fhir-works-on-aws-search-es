@@ -68,7 +68,10 @@ export const parseDateSearchParam = (param: string): DateSearchParameter => {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export const dateQuery = (compiledSearchParam: CompiledSearchParam, value: string): any => {
+export const dateQuery = (compiledSearchParam: CompiledSearchParam, value: string, modifier?: string): any => {
+    if (modifier === 'exact') {
+        throw new InvalidSearchParameterError(`Invalid date search modifier: ${modifier}`);
+    }
     const { prefix, range } = parseDateSearchParam(value);
     return prefixRangeDate(prefix, range, compiledSearchParam.path);
 };
