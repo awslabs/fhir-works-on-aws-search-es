@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import parseSearchModifiers from './searchModifiers';
 
 describe('getSearchModifiers', () => {
@@ -26,10 +25,20 @@ describe('getSearchModifiers', () => {
     });
 
     test('name:contains', () => {
-        expect(() => parseSearchModifiers('name:contains')).toThrow(InvalidSearchParameterError);
+        expect(parseSearchModifiers('name:contains')).toMatchInlineSnapshot(`
+        Object {
+          "modifier": "contains",
+          "parameterName": "name",
+        }
+        `);
     });
 
     test('name:', () => {
-        expect(() => parseSearchModifiers('name:')).toThrow(InvalidSearchParameterError);
+        expect(parseSearchModifiers('name:')).toMatchInlineSnapshot(`
+        Object {
+          "modifier": "",
+          "parameterName": "name",
+        }
+        `);
     });
 });

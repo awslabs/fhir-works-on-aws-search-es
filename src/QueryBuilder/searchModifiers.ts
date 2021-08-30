@@ -4,8 +4,6 @@
  *
  */
 
-import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
-
 const parseSearchModifiers = (
     searchParameter: string,
 ): {
@@ -18,12 +16,7 @@ const parseSearchModifiers = (
         return { parameterName: modifier[0], modifier: undefined };
     }
     modifier[1] = modifier[1].toLowerCase();
-    switch (modifier[1]) {
-        case 'exact':
-            return { parameterName: modifier[0], modifier: modifier[1] };
-        default:
-            throw new InvalidSearchParameterError(`Unsupported search modifier: ${modifier[1]}`);
-    }
+    return { parameterName: modifier[0], modifier: modifier[1] };
 };
 
 export default parseSearchModifiers;

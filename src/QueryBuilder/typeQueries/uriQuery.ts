@@ -6,6 +6,8 @@
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
 
+const SUPPORTED_MODIFIERS: string[] = [];
+
 // eslint-disable-next-line import/prefer-default-export
 export function uriQuery(
     compiled: CompiledSearchParam,
@@ -13,8 +15,8 @@ export function uriQuery(
     useKeywordSubFields: boolean,
     modifier?: string,
 ): any {
-    if (modifier === 'exact') {
-        throw new InvalidSearchParameterError(`Invalid uri search modifier: ${modifier}`);
+    if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
+        throw new InvalidSearchParameterError(`Unsupported URI search modifier: ${modifier}`);
     }
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
 
