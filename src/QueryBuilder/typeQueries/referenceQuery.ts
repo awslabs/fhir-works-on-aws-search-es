@@ -11,6 +11,8 @@ const logger = getComponentLogger();
 
 const idOnlyRegExp = /^[A-Za-z0-9\-.]{1,64}$/;
 
+const SUPPORTED_MODIFIERS: string[] = [];
+
 // eslint-disable-next-line import/prefer-default-export
 export function referenceQuery(
     compiled: CompiledSearchParam,
@@ -18,7 +20,11 @@ export function referenceQuery(
     useKeywordSubFields: boolean,
     searchParamName: string,
     target: string[] = [],
+    modifier?: string,
 ): any {
+    if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
+        throw new InvalidSearchParameterError(`Unsupported reference search modifier: ${modifier}`);
+    }
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
 
     // http://hl7.org/fhir/R4/search.html#reference

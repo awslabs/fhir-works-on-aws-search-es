@@ -19,6 +19,8 @@ interface NumberSearchParameter {
 
 const NUMBER_SEARCH_PARAM_REGEX = /^(?<prefix>eq|ne|lt|gt|ge|le|sa|eb|ap)?(?<numberString>[\d.+-eE]+)$/;
 
+const SUPPORTED_MODIFIERS: string[] = [];
+
 export const parseNumberSearchParam = (param: string): NumberSearchParameter => {
     const match = param.match(NUMBER_SEARCH_PARAM_REGEX);
     if (match === null) {
@@ -38,7 +40,10 @@ export const parseNumberSearchParam = (param: string): NumberSearchParameter => 
     };
 };
 
-export const numberQuery = (compiledSearchParam: CompiledSearchParam, value: string): any => {
+export const numberQuery = (compiledSearchParam: CompiledSearchParam, value: string, modifier?: string): any => {
+    if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
+        throw new InvalidSearchParameterError(`Unsupported number search modifier: ${modifier}`);
+    }
     const { prefix, implicitRange, number } = parseNumberSearchParam(value);
     return prefixRangeNumber(prefix, number, implicitRange, compiledSearchParam.path);
 };

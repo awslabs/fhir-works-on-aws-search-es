@@ -22,6 +22,8 @@ interface QuantitySearchParameter {
 
 const QUANTITY_SEARCH_PARAM_REGEX = /^(?<prefix>eq|ne|lt|gt|ge|le|sa|eb|ap)?(?<numberString>[\d.+-eE]+)(\|(?<system>[^|\s]*)\|(?<code>[^|\s]*))?$/;
 
+const SUPPORTED_MODIFIERS: string[] = [];
+
 export const parseQuantitySearchParam = (param: string): QuantitySearchParameter => {
     const match = param.match(QUANTITY_SEARCH_PARAM_REGEX);
     if (match === null) {
@@ -47,7 +49,11 @@ export const quantityQuery = (
     compiledSearchParam: CompiledSearchParam,
     value: string,
     useKeywordSubFields: boolean,
+    modifier?: string,
 ): any => {
+    if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
+        throw new InvalidSearchParameterError(`Unsupported quantity search modifier: ${modifier}`);
+    }
     const { prefix, implicitRange, number, system, code } = parseQuantitySearchParam(value);
     const queries = [prefixRangeNumber(prefix, number, implicitRange, `${compiledSearchParam.path}.value`)];
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';

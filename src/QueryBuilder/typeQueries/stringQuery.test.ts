@@ -66,4 +66,32 @@ describe('stringQuery', () => {
             }
         `);
     });
+    test('simple value with exact modifier', () => {
+        expect(stringQuery(nameParam, 'Robert Bell', 'exact')).toMatchInlineSnapshot(`
+          Object {
+            "multi_match": Object {
+              "fields": Array [
+                "name.keyword",
+                "name.*.keyword",
+              ],
+              "lenient": true,
+              "query": "Robert Bell",
+            },
+          }
+      `);
+    });
+    test('simple value with exact modifier and case differences', () => {
+        expect(stringQuery(nameParam, 'RoBeRt BeLL', 'exact')).toMatchInlineSnapshot(`
+          Object {
+            "multi_match": Object {
+              "fields": Array [
+                "name.keyword",
+                "name.*.keyword",
+              ],
+              "lenient": true,
+              "query": "RoBeRt BeLL",
+            },
+          }
+      `);
+    });
 });

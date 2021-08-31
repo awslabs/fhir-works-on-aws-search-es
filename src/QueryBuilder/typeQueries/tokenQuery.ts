@@ -12,6 +12,8 @@ interface TokenSearchParameter {
     explicitNoSystemProperty: boolean;
 }
 
+const SUPPORTED_MODIFIERS: string[] = [];
+
 // eslint-disable-next-line import/prefer-default-export
 export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
     if (param === '|') {
@@ -39,7 +41,15 @@ export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
     return { system, code, explicitNoSystemProperty };
 };
 
-export function tokenQuery(compiled: CompiledSearchParam, value: string, useKeywordSubFields: boolean): any {
+export function tokenQuery(
+    compiled: CompiledSearchParam,
+    value: string,
+    useKeywordSubFields: boolean,
+    modifier?: string,
+): any {
+    if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
+        throw new InvalidSearchParameterError(`Unsupported token search modifier: ${modifier}`);
+    }
     const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
     const queries = [];
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
