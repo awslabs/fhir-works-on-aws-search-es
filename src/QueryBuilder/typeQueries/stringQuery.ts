@@ -18,7 +18,7 @@ export function stringQuery(compiled: CompiledSearchParam, value: string, modifi
         throw new InvalidSearchParameterError(`Unsupported string search modifier: ${modifier}`);
     }
     const keywordSuffix = modifier === 'exact' ? '.keyword' : '';
-    const fields = [compiled.path + keywordSuffix, `${compiled.path}.*`];
+    const fields = [compiled.path, `${compiled.path}.*${keywordSuffix}`];
 
     return {
         multi_match: {
