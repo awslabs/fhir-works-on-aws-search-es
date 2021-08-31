@@ -71,7 +71,7 @@ describe('stringQuery', () => {
           Object {
             "multi_match": Object {
               "fields": Array [
-                "name",
+                "name.keyword",
                 "name.*.keyword",
               ],
               "lenient": true,
@@ -85,7 +85,7 @@ describe('stringQuery', () => {
           Object {
             "multi_match": Object {
               "fields": Array [
-                "name",
+                "name.keyword",
                 "name.*.keyword",
               ],
               "lenient": true,
