@@ -50,7 +50,7 @@ This package is dependent on:
 |---------------------|:----------:|-------|
 | `:missing`            |      -     |       |
 | `:exact`              |      -     |       |
-| `:contains`           |      -     |       |
+| `:contains`           |      ✔*    | *only works for alphanumeric search values. search values with whitespaces or punctuation characters won't work|
 | `:text`               |      -     |       |
 | `:in` (token)         |      -     |       |
 | `:below` (token)      |      -     |       |
