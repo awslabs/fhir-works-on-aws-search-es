@@ -21,6 +21,7 @@ function typeQueryWithConditions(
     compiledSearchParam: CompiledSearchParam,
     searchValue: string,
     useKeywordSubFields: boolean,
+    baseUrl: string,
     modifier?: string,
 ): any {
     let typeQuery: any;
@@ -45,6 +46,7 @@ function typeQueryWithConditions(
                 compiledSearchParam,
                 searchValue,
                 useKeywordSubFields,
+                baseUrl,
                 searchParam.name,
                 searchParam.target,
                 modifier,
@@ -86,6 +88,7 @@ function searchParamQuery(
     searchParam: SearchParam,
     searchValue: string,
     useKeywordSubFields: boolean,
+    baseUrl: string,
     modifier?: string,
 ): any {
     const splitSearchValue = getOrSearchValues(searchValue);
@@ -98,6 +101,7 @@ function searchParamQuery(
                     compiled,
                     splitSearchValue[i],
                     useKeywordSubFields,
+                    baseUrl,
                     modifier,
                 );
             }),
@@ -141,7 +145,7 @@ function searchRequestQuery(
     request: TypeSearchRequest,
     useKeywordSubFields: boolean,
 ): any[] {
-    const { queryParams, resourceType } = request;
+    const { baseUrl, queryParams, resourceType } = request;
     return Object.entries(normalizeQueryParams(queryParams))
         .filter(([searchParameter]) => !NON_SEARCHABLE_PARAMETERS.includes(searchParameter))
         .flatMap(([searchParameter, searchValues]) => {
@@ -156,7 +160,7 @@ function searchRequestQuery(
                 );
             }
             return searchValues.map(searchValue =>
-                searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields, searchModifier.modifier),
+                searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields, baseUrl, searchModifier.modifier),
             );
         });
 }
