@@ -16,28 +16,28 @@ describe('referenceQuery', () => {
             expect(
                 referenceQuery(organizationParam, 'Organization/111', true, 'https://base-url.com', 'organization', []),
             ).toMatchInlineSnapshot(`
-            Object {
-              "terms": Object {
-                "managingOrganization.reference.keyword": Array [
-                  "Organization/111",
-                  "https://base-url.com/Organization/111",
-                ],
-              },
-            }
-        `);
+              Object {
+                "terms": Object {
+                  "managingOrganization.reference.keyword": Array [
+                    "Organization/111",
+                    "https://base-url.com/Organization/111",
+                  ],
+                },
+              }
+            `);
         });
-        test('without keyword not included', () => {
+        test('keyword not included', () => {
             expect(referenceQuery(organizationParam, 'Organization/111', false, 'https://base-url.com', 'organization'))
                 .toMatchInlineSnapshot(`
-            Object {
-              "terms": Object {
-                "managingOrganization.reference": Array [
-                  "Organization/111",
-                  "https://base-url.com/Organization/111",
-                ],
-              },
-            }
-        `);
+              Object {
+                "terms": Object {
+                  "managingOrganization.reference": Array [
+                    "Organization/111",
+                    "https://base-url.com/Organization/111",
+                  ],
+                },
+              }
+            `);
         });
     });
     describe('searching with {hostname}/{type}/{id}', () => {
@@ -51,15 +51,15 @@ describe('referenceQuery', () => {
                     'organization',
                 ),
             ).toMatchInlineSnapshot(`
-            Object {
-              "terms": Object {
-                "managingOrganization.reference.keyword": Array [
-                  "https://base-url.com/Organization/111",
-                  "Organization/111",
-                ],
-              },
-            }
-        `);
+              Object {
+                "terms": Object {
+                  "managingOrganization.reference.keyword": Array [
+                    "https://base-url.com/Organization/111",
+                    "Organization/111",
+                  ],
+                },
+              }
+            `);
         });
         test('hostname does not match baseUrl', () => {
             expect(
@@ -71,14 +71,14 @@ describe('referenceQuery', () => {
                     'organization',
                 ),
             ).toMatchInlineSnapshot(`
-            Object {
-              "terms": Object {
-                "managingOrganization.reference.keyword": Array [
-                  "http://notMatching.com/baseR4/Organization/111",
-                ],
-              },
-            }
-        `);
+              Object {
+                "terms": Object {
+                  "managingOrganization.reference.keyword": Array [
+                    "http://notMatching.com/baseR4/Organization/111",
+                  ],
+                },
+              }
+            `);
         });
     });
     describe('searching with just {id}', () => {
@@ -88,15 +88,15 @@ describe('referenceQuery', () => {
                     'Organization',
                 ]),
             ).toMatchInlineSnapshot(`
-            Object {
-              "terms": Object {
-                "managingOrganization.reference.keyword": Array [
-                  "https://base-url.com/Organization/organizationId",
-                  "Organization/organizationId",
-                ],
-              },
-            }
-        `);
+              Object {
+                "terms": Object {
+                  "managingOrganization.reference.keyword": Array [
+                    "https://base-url.com/Organization/organizationId",
+                    "Organization/organizationId",
+                  ],
+                },
+              }
+            `);
         });
         test('many target types found', () => {
             expect(
@@ -105,17 +105,17 @@ describe('referenceQuery', () => {
                     'Group',
                 ]),
             ).toMatchInlineSnapshot(`
-            Object {
-              "terms": Object {
-                "managingOrganization.reference.keyword": Array [
-                  "https://base-url.com/Organization/organizationId",
-                  "Organization/organizationId",
-                  "https://base-url.com/Group/organizationId",
-                  "Group/organizationId",
-                ],
-              },
-            }
-    `);
+              Object {
+                "terms": Object {
+                  "managingOrganization.reference.keyword": Array [
+                    "https://base-url.com/Organization/organizationId",
+                    "Organization/organizationId",
+                    "https://base-url.com/Group/organizationId",
+                    "Group/organizationId",
+                  ],
+                },
+              }
+            `);
         });
         test('no target types found', () => {
             expect(() =>
@@ -135,5 +135,21 @@ describe('referenceQuery', () => {
                 'exact',
             ),
         ).toThrow(InvalidSearchParameterError);
+    });
+    test('search does not match expect id or url', () => {
+        expect(
+            referenceQuery(organizationParam, 'this:does# not match', true, 'https://base-url.com', 'organization', [
+                'Organization',
+                'Group',
+            ]),
+        ).toMatchInlineSnapshot(`
+          Object {
+            "terms": Object {
+              "managingOrganization.reference.keyword": Array [
+                "this:does# not match",
+              ],
+            },
+          }
+        `);
     });
 });
