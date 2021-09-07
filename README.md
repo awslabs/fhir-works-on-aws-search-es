@@ -49,7 +49,7 @@ This package is dependent on:
 | Feature             | Supported? | Notes |
 |---------------------|:----------:|-------|
 | `:missing`            |      -     |       |
-| `:exact`              |      -     |       |
+| `:exact`              |      ✔     |       |
 | `:contains`           |      ✔*    | *only works for alphanumeric search values. search values with whitespaces or punctuation characters won't work|
 | `:text`               |      -     |       |
 | `:in` (token)         |      -     |       |
