@@ -10,7 +10,7 @@ import getComponentLogger from '../../loggerBuilder';
 const logger = getComponentLogger();
 
 const ID_ONLY_REGEX = /^[A-Za-z0-9\-.]{1,64}$/;
-const FHIR_RESOURCE_REGEX = /^((?<hostname>https?:\/\/[A-Za-z0-9\-\\.:%$_/]+)\/)?(?<resourceType>[A-Z][a-zA-Z]+)\/(?<id>[A-Za-z0-9\-.]{1,64})$/;
+const FHIR_REFERENCE_REGEX = /^((?<fhirServiceBaseUrl>https?:\/\/[A-Za-z0-9\-\\.:%$_/]+)\/)?(?<resourceType>[A-Z][a-zA-Z]+)\/(?<id>[A-Za-z0-9\-.]{1,64})$/;
 
 const SUPPORTED_MODIFIERS: string[] = [];
 
@@ -32,13 +32,13 @@ export function referenceQuery(
     // http://hl7.org/fhir/R4/search.html#reference
     // reference fields should be of `keyword` ES type: https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html
     let references: string[] = [value];
-    const match = value.match(FHIR_RESOURCE_REGEX);
+    const match = value.match(FHIR_REFERENCE_REGEX);
     if (match) {
-        const { hostname, resourceType, id } = match.groups!;
-        if (hostname && hostname === baseUrl) {
+        const { fhirServiceBaseUrl, resourceType, id } = match.groups!;
+        if (fhirServiceBaseUrl && fhirServiceBaseUrl === baseUrl) {
             references.push(`${resourceType}/${id}`);
-        } else if (!hostname) {
-            // Search doesn't have a hostname
+        } else if (!fhirServiceBaseUrl) {
+            // Search doesn't have a baseUrl
             references.push(`${baseUrl}/${resourceType}/${id}`);
         }
     } else if (ID_ONLY_REGEX.test(value)) {

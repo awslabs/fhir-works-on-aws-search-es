@@ -40,8 +40,8 @@ describe('referenceQuery', () => {
             `);
         });
     });
-    describe('searching with {hostname}/{type}/{id}', () => {
-        test('hostname matches baseUrl', () => {
+    describe('searching with {fhirServiceBaseUrl}/{type}/{id}', () => {
+        test('fhirServiceBaseUrl matches baseUrl', () => {
             expect(
                 referenceQuery(
                     organizationParam,
@@ -61,7 +61,7 @@ describe('referenceQuery', () => {
               }
             `);
         });
-        test('hostname does not match baseUrl', () => {
+        test('fhirServiceBaseUrl does not match baseUrl', () => {
             expect(
                 referenceQuery(
                     organizationParam,
@@ -131,12 +131,12 @@ describe('referenceQuery', () => {
                 false,
                 'https://base-url.com',
                 'organization',
-                [],
+                ['Organization'],
                 'exact',
             ),
         ).toThrow(InvalidSearchParameterError);
     });
-    test('search does not match expect id or url', () => {
+    test('search value is not an URL nor has the format <resourceType>/<id>', () => {
         expect(
             referenceQuery(organizationParam, 'this:does# not match', true, 'https://base-url.com', 'organization', [
                 'Organization',
