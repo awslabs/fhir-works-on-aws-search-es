@@ -2463,8 +2463,11 @@ Array [
               Object {
                 "terms": Object {
                   "generalPractitioner.reference.keyword": Array [
+                    "https://base-url.com/Practitioner/1234",
                     "Practitioner/1234",
+                    "https://base-url.com/Organization/1234",
                     "Organization/1234",
+                    "https://base-url.com/PractitionerRole/1234",
                     "PractitionerRole/1234",
                   ],
                 },
@@ -2501,6 +2504,7 @@ Array [
                 "terms": Object {
                   "generalPractitioner.reference.keyword": Array [
                     "Practitioner/1234",
+                    "https://base-url.com/Practitioner/1234",
                   ],
                 },
               },
@@ -2535,6 +2539,7 @@ Array [
               Object {
                 "terms": Object {
                   "managingOrganization.reference.keyword": Array [
+                    "https://base-url.com/Organization/1234",
                     "Organization/1234",
                   ],
                 },
@@ -2678,6 +2683,7 @@ Array [
                       "terms": Object {
                         "relatedArtifact.resource.reference.keyword": Array [
                           "Patient/something",
+                          "https://base-url.com/Patient/something",
                         ],
                       },
                     },
@@ -2785,6 +2791,7 @@ Array [
                       "terms": Object {
                         "link.target.reference.keyword": Array [
                           "RelatedPerson/111",
+                          "https://base-url.com/RelatedPerson/111",
                         ],
                       },
                     },

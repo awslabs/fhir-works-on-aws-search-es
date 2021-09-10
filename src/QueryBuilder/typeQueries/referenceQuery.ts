@@ -9,7 +9,8 @@ import getComponentLogger from '../../loggerBuilder';
 
 const logger = getComponentLogger();
 
-const idOnlyRegExp = /^[A-Za-z0-9\-.]{1,64}$/;
+const ID_ONLY_REGEX = /^[A-Za-z0-9\-.]{1,64}$/;
+const FHIR_REFERENCE_REGEX = /^((?<fhirServiceBaseUrl>https?:\/\/[A-Za-z0-9\-\\.:%$_/]+)\/)?(?<resourceType>[A-Z][a-zA-Z]+)\/(?<id>[A-Za-z0-9\-.]{1,64})$/;
 
 const SUPPORTED_MODIFIERS: string[] = [];
 
@@ -18,6 +19,7 @@ export function referenceQuery(
     compiled: CompiledSearchParam,
     value: string,
     useKeywordSubFields: boolean,
+    baseUrl: string,
     searchParamName: string,
     target: string[] = [],
     modifier?: string,
@@ -30,7 +32,16 @@ export function referenceQuery(
     // http://hl7.org/fhir/R4/search.html#reference
     // reference fields should be of `keyword` ES type: https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html
     let references: string[] = [value];
-    if (value.match(idOnlyRegExp)) {
+    const match = value.match(FHIR_REFERENCE_REGEX);
+    if (match) {
+        const { fhirServiceBaseUrl, resourceType, id } = match.groups!;
+        if (fhirServiceBaseUrl && fhirServiceBaseUrl === baseUrl) {
+            references.push(`${resourceType}/${id}`);
+        } else if (!fhirServiceBaseUrl) {
+            // Search doesn't have a baseUrl
+            references.push(`${baseUrl}/${resourceType}/${id}`);
+        }
+    } else if (ID_ONLY_REGEX.test(value)) {
         if (target.length === 0) {
             logger.error(
                 `ID only reference search failed. The requested search parameter: '${searchParamName}',  does not have any targets. Please ensure the compiled IG is valid`,
@@ -40,8 +51,8 @@ export function referenceQuery(
             );
         }
 
-        references = target.map((resourceType: string) => {
-            return `${resourceType}/${value}`;
+        references = target.flatMap((targetType: string) => {
+            return [`${baseUrl}/${targetType}/${value}`, `${targetType}/${value}`];
         });
     }
 
