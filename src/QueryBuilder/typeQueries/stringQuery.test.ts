@@ -8,6 +8,8 @@ import { FHIRSearchParametersRegistry } from '../../FHIRSearchParametersRegistry
 
 const fhirSearchParametersRegistry = new FHIRSearchParametersRegistry('4.0.1');
 const nameParam = fhirSearchParametersRegistry.getSearchParameter('Patient', 'name')!.compiled[0];
+const addressParam = fhirSearchParametersRegistry.getSearchParameter('Patient', 'address')!.compiled[0];
+const givenParam = fhirSearchParametersRegistry.getSearchParameter('Patient', 'given')!.compiled[0];
 
 describe('stringQuery', () => {
     test('simple value', () => {
@@ -66,32 +68,171 @@ describe('stringQuery', () => {
             }
         `);
     });
-    test('simple value with exact modifier', () => {
-        expect(stringQuery(nameParam, 'Robert Bell', 'exact')).toMatchInlineSnapshot(`
-          Object {
-            "multi_match": Object {
-              "fields": Array [
-                "name.keyword",
-                "name.*.keyword",
-              ],
-              "lenient": true,
-              "query": "Robert Bell",
-            },
-          }
-      `);
-    });
-    test('simple value with exact modifier and case differences', () => {
-        expect(stringQuery(nameParam, 'RoBeRt BeLL', 'exact')).toMatchInlineSnapshot(`
-          Object {
-            "multi_match": Object {
-              "fields": Array [
-                "name.keyword",
-                "name.*.keyword",
-              ],
-              "lenient": true,
-              "query": "RoBeRt BeLL",
-            },
-          }
-      `);
+
+    describe('modifiers', () => {
+        describe(':exact', () => {
+            test('simple value', () => {
+                expect(stringQuery(nameParam, 'Robert Bell', 'exact')).toMatchInlineSnapshot(`
+                      Object {
+                        "multi_match": Object {
+                          "fields": Array [
+                            "name.keyword",
+                            "name.*.keyword",
+                          ],
+                          "lenient": true,
+                          "query": "Robert Bell",
+                        },
+                      }
+              `);
+            });
+            test('simple value withcase differences', () => {
+                expect(stringQuery(nameParam, 'RoBeRt BeLL', 'exact')).toMatchInlineSnapshot(`
+                      Object {
+                        "multi_match": Object {
+                          "fields": Array [
+                            "name.keyword",
+                            "name.*.keyword",
+                          ],
+                          "lenient": true,
+                          "query": "RoBeRt BeLL",
+                        },
+                      }
+              `);
+            });
+        });
+
+        describe(':contains', () => {
+            test('simple parameter', () => {
+                expect(stringQuery(givenParam, 'anne', 'contains')).toMatchInlineSnapshot(`
+                                Object {
+                                  "wildcard": Object {
+                                    "name.given": Object {
+                                      "value": "*anne*",
+                                    },
+                                  },
+                                }
+                        `);
+            });
+
+            test('name parameter', () => {
+                expect(stringQuery(nameParam, 'anne', 'contains')).toMatchInlineSnapshot(`
+                    Object {
+                      "bool": Object {
+                        "should": Array [
+                          Object {
+                            "wildcard": Object {
+                              "name": Object {
+                                "value": "*anne*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "name.family": Object {
+                                "value": "*anne*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "name.given": Object {
+                                "value": "*anne*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "name.text": Object {
+                                "value": "*anne*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "name.prefix": Object {
+                                "value": "*anne*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "name.suffix": Object {
+                                "value": "*anne*",
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    }
+                `);
+            });
+
+            test('address parameter', () => {
+                expect(stringQuery(addressParam, 'new', 'contains')).toMatchInlineSnapshot(`
+                    Object {
+                      "bool": Object {
+                        "should": Array [
+                          Object {
+                            "wildcard": Object {
+                              "address": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "address.city": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "address.country": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "address.district": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "address.line": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "address.postalCode": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "address.state": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                          Object {
+                            "wildcard": Object {
+                              "address.text": Object {
+                                "value": "*new*",
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    }
+                `);
+            });
+        });
     });
 });
