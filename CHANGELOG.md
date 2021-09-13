@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.4.0...v3.5.0) (2021-09-13)
+
+
+### Features
+
+* add support for exact search modifier ([#108](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/108)) ([9bc2e32](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/9bc2e32a7718f4e1a8c24851779a22d76dcaa98f))
+* implement ":contains" modifier ([#113](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/113)) ([c513d59](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/c513d59675aaabb0b1b48023995127fa3ad3936f))
+
 ## [3.4.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.3.0...v3.4.0) (2021-08-27)
 
 
