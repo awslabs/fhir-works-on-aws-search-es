@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.5.1](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.5.0...v3.5.1) (2021-09-14)
+
+
+### Bug Fixes
+
+* token search should be exact matches ([#117](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/117)) ([d106500](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/d1065003d7d04d98645f5e668423ac99ecc6120c))
+
 ## [3.5.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.4.0...v3.5.0) (2021-09-13)
 
 
