@@ -14,7 +14,7 @@ interface TokenSearchParameter {
 
 const SUPPORTED_MODIFIERS: string[] = [];
 
-// Fields that do not have `.keyword` suffix; currently it is just `id`. This is only important if `useKeywordSubFields` is true
+// Fields that do not have `.keyword` suffix. This is only important if `useKeywordSubFields` is true
 const FIELDS_WITHOUT_KEYWORD = ['id'];
 
 // eslint-disable-next-line import/prefer-default-export
