@@ -1594,10 +1594,10 @@ Array [
               Object {
                 "multi_match": Object {
                   "fields": Array [
-                    "id.code.keyword",
-                    "id.coding.code.keyword",
-                    "id.value.keyword",
-                    "id.keyword",
+                    "id.code",
+                    "id.coding.code",
+                    "id.value",
+                    "id",
                   ],
                   "lenient": true,
                   "query": "11111111-1111-1111-1111-111111111111",
@@ -1818,10 +1818,10 @@ Array [
               Object {
                 "multi_match": Object {
                   "fields": Array [
-                    "id.code.keyword",
-                    "id.coding.code.keyword",
-                    "id.value.keyword",
-                    "id.keyword",
+                    "id.code",
+                    "id.coding.code",
+                    "id.value",
+                    "id",
                   ],
                   "lenient": true,
                   "query": "11111111-1111-1111-1111-111111111111",
@@ -1948,10 +1948,10 @@ Array [
               Object {
                 "multi_match": Object {
                   "fields": Array [
-                    "id.code.keyword",
-                    "id.coding.code.keyword",
-                    "id.value.keyword",
-                    "id.keyword",
+                    "id.code",
+                    "id.coding.code",
+                    "id.value",
+                    "id",
                   ],
                   "lenient": true,
                   "query": "11111111-1111-1111-1111-111111111111",
@@ -2596,10 +2596,10 @@ Array [
               Object {
                 "multi_match": Object {
                   "fields": Array [
-                    "id.code.keyword",
-                    "id.coding.code.keyword",
-                    "id.value.keyword",
-                    "id.keyword",
+                    "id.code",
+                    "id.coding.code",
+                    "id.value",
+                    "id",
                   ],
                   "lenient": true,
                   "query": "11111111-1111-1111-1111-111111111111",

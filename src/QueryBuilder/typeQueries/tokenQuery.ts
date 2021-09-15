@@ -14,6 +14,9 @@ interface TokenSearchParameter {
 
 const SUPPORTED_MODIFIERS: string[] = [];
 
+// Fields that do not have `.keyword` suffix. This is only important if `useKeywordSubFields` is true
+const FIELDS_WITHOUT_KEYWORD = ['id'];
+
 // eslint-disable-next-line import/prefer-default-export
 export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
     if (param === '|') {
@@ -52,7 +55,7 @@ export function tokenQuery(
     }
     const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
     const queries = [];
-    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
+    const keywordSuffix = useKeywordSubFields && !FIELDS_WITHOUT_KEYWORD.includes(compiled.path) ? '.keyword' : '';
 
     // Token search params are used for many different field types. Search is not aware of the types of the fields in FHIR resources.
     // The field type is specified in StructureDefinition, but not in SearchParameter.
