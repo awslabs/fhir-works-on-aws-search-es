@@ -77,7 +77,7 @@ export class ElasticSearchService implements Search {
      * This parameter enables support for search parameters defined in Implementation Guides.
      * @param esClient
      * @param options.enableMultiTenancy - whether or not to enable multi-tenancy. When enabled a tenantId is required for all requests.
-     * @param options.useKeywordSubFields - whether or not to append `.keyword` to fields in search queries. You should enable this if you do dynamic mapping
+     * @param options.useKeywordSubFields - whether or not to append `.keyword` to fields in search queries. You should enable this if you do dynamic mapping. NOTE: Parameter`id` will not be affected by this due to it being of `keyword` type
      */
     constructor(
         searchFiltersForAllQueries: SearchFilter[] = [],
