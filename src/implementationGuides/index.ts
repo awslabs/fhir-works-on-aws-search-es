@@ -43,7 +43,8 @@ const isFhirSearchParam = (x: any): x is FhirSearchParam => {
         typeof x.type === 'string' &&
         (x.expression === undefined || typeof x.expression === 'string') &&
         (x.xpath === undefined || typeof x.xpath === 'string') &&
-        (x.target === undefined || (Array.isArray(x.target) && x.target.every((y: any) => typeof y === 'string')))
+        (x.target === undefined || (Array.isArray(x.target) && x.target.every((y: any) => typeof y === 'string'))) &&
+        (x.target === undefined ? x.type !== 'reference' : true)
     );
 };
 
