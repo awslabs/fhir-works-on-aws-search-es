@@ -43,9 +43,23 @@ const isFhirSearchParam = (x: any): x is FhirSearchParam => {
         typeof x.type === 'string' &&
         (x.expression === undefined || typeof x.expression === 'string') &&
         (x.xpath === undefined || typeof x.xpath === 'string') &&
-        (x.target === undefined || (Array.isArray(x.target) && x.target.every((y: any) => typeof y === 'string'))) &&
-        (x.target === undefined ? x.type !== 'reference' : true)
+        (x.target === undefined || (Array.isArray(x.target) && x.target.every((y: any) => typeof y === 'string')))
     );
+};
+
+// validates any semantic necessities of FHIR Search Parameters
+const validateSearchParam = (param: FhirSearchParam) => {
+    if (param.type === 'reference') {
+        if (!param.target || param.target?.length === 0) {
+            throw new Error(
+                `Search Parameter of type reference must have a specified target. Error in ${JSON.stringify(
+                    param,
+                    null,
+                    2,
+                )}`,
+            );
+        }
+    }
 };
 
 const UNSUPPORTED_SEARCH_PARAMS = [
@@ -103,6 +117,7 @@ const compile = async (searchParams: any[]): Promise<any> => {
     const validFhirSearchParams: FhirSearchParam[] = [];
     searchParams.forEach(s => {
         if (isFhirSearchParam(s)) {
+            validateSearchParam(s);
             validFhirSearchParams.push(s);
         } else {
             throw new Error(`The following input is not a search parameter: ${JSON.stringify(s, null, 2)}`);

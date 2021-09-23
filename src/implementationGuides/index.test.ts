@@ -237,4 +237,22 @@ describe('compile', () => {
         ]);
         await expect(compiled).rejects.toThrowError();
     });
+
+    test(`search param of type reference with empty target`, async () => {
+        const compiled = compile([
+            {
+                resourceType: 'SearchParameter',
+                url: 'http://hl7.org/fhir/SearchParameter/ConceptMap-source-uri',
+                name: 'source-uri',
+                code: 'source-uri',
+                type: 'reference',
+                description: 'The source value set that contains the concepts that are being mapped',
+                base: ['ConceptMap'],
+                expression: '(ConceptMap.source as uri)',
+                xpath: 'f:ConceptMap/f:sourceUri',
+                target: [],
+            },
+        ]);
+        await expect(compiled).rejects.toThrowError();
+    });
 });
