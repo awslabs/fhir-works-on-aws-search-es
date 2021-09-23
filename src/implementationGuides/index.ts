@@ -47,6 +47,21 @@ const isFhirSearchParam = (x: any): x is FhirSearchParam => {
     );
 };
 
+// validates any semantic necessities of FHIR Search Parameters
+const validateSearchParam = (param: FhirSearchParam) => {
+    if (param.type === 'reference') {
+        if (!param.target || param.target?.length === 0) {
+            throw new Error(
+                `Search Parameter of type reference must have a specified target. Error in ${JSON.stringify(
+                    param,
+                    null,
+                    2,
+                )}`,
+            );
+        }
+    }
+};
+
 const UNSUPPORTED_SEARCH_PARAMS = [
     'http://hl7.org/fhir/SearchParameter/Bundle-composition', // Uses "Bundle.entry[0]". We have no way of searching the nth element of an array
     'http://hl7.org/fhir/SearchParameter/Bundle-message', // Uses "Bundle.entry[0]". We have no way of searching the nth element of an array
@@ -102,6 +117,7 @@ const compile = async (searchParams: any[]): Promise<any> => {
     const validFhirSearchParams: FhirSearchParam[] = [];
     searchParams.forEach(s => {
         if (isFhirSearchParam(s)) {
+            validateSearchParam(s);
             validFhirSearchParams.push(s);
         } else {
             throw new Error(`The following input is not a search parameter: ${JSON.stringify(s, null, 2)}`);

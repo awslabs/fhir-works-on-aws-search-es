@@ -369,7 +369,9 @@ Array [
     ],
     "description": "test",
     "name": "source-reference",
-    "target": undefined,
+    "target": Array [
+      "ValueSet",
+    ],
     "type": "reference",
     "url": "http://hl7.org/fhir/SearchParameter/Consent-source-reference",
   },
