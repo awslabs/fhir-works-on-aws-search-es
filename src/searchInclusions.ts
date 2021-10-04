@@ -51,7 +51,8 @@ export const inclusionParameterFromString = (
     if (s === '*') {
         return { isWildcard: true };
     }
-    const INCLUSION_PARAM_REGEX = /^(?<sourceResource>[A-Za-z]+):(?<searchParameter>[A-Za-z-]+)(?::(?<targetResourceType>[A-Za-z]+))?$/;
+    const INCLUSION_PARAM_REGEX =
+        /^(?<sourceResource>[A-Za-z]+):(?<searchParameter>[A-Za-z-]+)(?::(?<targetResourceType>[A-Za-z]+))?$/;
     const match = s.match(INCLUSION_PARAM_REGEX);
     if (match === null) {
         // Malformed inclusion search parameters are ignored. No exception is thrown.
@@ -72,9 +73,9 @@ const expandRevIncludeWildcard = (
     resourceTypes: string[],
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
 ): InclusionSearchParameter[] => {
-    return resourceTypes.flatMap(resourceType => {
-        return fhirSearchParametersRegistry.getRevIncludeSearchParameters(resourceType).flatMap(searchParam => {
-            return searchParam.target!.map(target => ({
+    return resourceTypes.flatMap((resourceType) => {
+        return fhirSearchParametersRegistry.getRevIncludeSearchParameters(resourceType).flatMap((searchParam) => {
+            return searchParam.target!.map((target) => ({
                 type: '_revinclude',
                 isWildcard: false,
                 sourceResource: searchParam.base,
@@ -90,9 +91,9 @@ const expandIncludeWildcard = (
     resourceTypes: string[],
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
 ): InclusionSearchParameter[] => {
-    return resourceTypes.flatMap(resourceType => {
-        return fhirSearchParametersRegistry.getIncludeSearchParameters(resourceType).flatMap(searchParam => {
-            return searchParam.target!.map(target => ({
+    return resourceTypes.flatMap((resourceType) => {
+        return fhirSearchParametersRegistry.getIncludeSearchParameters(resourceType).flatMap((searchParam) => {
+            return searchParam.target!.map((target) => ({
                 type: '_include',
                 isWildcard: false,
                 sourceResource: searchParam.base,
@@ -116,9 +117,9 @@ export const getInclusionParametersFromQueryParams = (
     }
     if (Array.isArray(queryParam)) {
         return uniq(queryParam)
-            .map(param => inclusionParameterFromString(param))
+            .map((param) => inclusionParameterFromString(param))
             .filter(isPresent)
-            .map(inclusionParam => ({ type: includeType, ...inclusionParam }));
+            .map((inclusionParam) => ({ type: includeType, ...inclusionParam }));
     }
     const inclusionParameter = inclusionParameterFromString(queryParam);
     if (inclusionParameter === null) {
@@ -131,26 +132,26 @@ export const getIncludeReferencesFromResources = (
     includes: InclusionSearchParameter[],
     resources: any[],
 ): { resourceType: string; id: string }[] => {
-    const references = includes.flatMap(include => {
+    const references = includes.flatMap((include) => {
         return resources
-            .filter(resource => resource.resourceType === include.sourceResource)
-            .flatMap(resource => getAllValuesForFHIRPath(resource, `${include.path}`))
-            .flatMap(valueAtPath => {
+            .filter((resource) => resource.resourceType === include.sourceResource)
+            .flatMap((resource) => getAllValuesForFHIRPath(resource, `${include.path}`))
+            .flatMap((valueAtPath) => {
                 if (Array.isArray(valueAtPath)) {
-                    return valueAtPath.map(v => get(v, 'reference'));
+                    return valueAtPath.map((v) => get(v, 'reference'));
                 }
                 return [get(valueAtPath, 'reference')];
             })
             .filter((reference): reference is string => typeof reference === 'string')
-            .filter(reference => RELATIVE_URL_REGEX.test(reference))
-            .map(relativeUrl => {
+            .filter((reference) => RELATIVE_URL_REGEX.test(reference))
+            .map((relativeUrl) => {
                 const [resourceType, id] = relativeUrl.split('/');
                 return { resourceType, id };
             })
             .filter(({ resourceType }) => !include.targetResourceType || include.targetResourceType === resourceType);
     });
 
-    return uniqBy(references, x => `${x.resourceType}/${x.id}`);
+    return uniqBy(references, (x) => `${x.resourceType}/${x.id}`);
 };
 
 export const getRevincludeReferencesFromResources = (
@@ -158,14 +159,14 @@ export const getRevincludeReferencesFromResources = (
     resources: any[],
 ): { references: string[]; revinclude: InclusionSearchParameter }[] => {
     return revIncludeParameters
-        .map(revinclude => {
+        .map((revinclude) => {
             const references = resources
                 .filter(
-                    resource =>
+                    (resource) =>
                         revinclude.targetResourceType === undefined ||
                         resource.resourceType === revinclude.targetResourceType,
                 )
-                .map(resource => `${resource.resourceType}/${resource.id}`);
+                .map((resource) => `${resource.resourceType}/${resource.id}`);
             return { revinclude, references };
         })
         .filter(({ references }) => references.length > 0);
@@ -230,7 +231,7 @@ const validateAndAddPath = (
 ): InclusionSearchParameter[] => {
     const validInclusionSearchParams: InclusionSearchParameter[] = [];
 
-    inclusionSearchParameters.forEach(includeParam => {
+    inclusionSearchParameters.forEach((includeParam) => {
         const searchParam = fhirSearchParametersRegistry.getReferenceSearchParameter(
             includeParam.sourceResource,
             includeParam.searchParameter,
@@ -258,7 +259,7 @@ export const buildIncludeQueries = (
         iterate,
     ) as InclusionSearchParameter[];
 
-    const includeParameters = allIncludeParameters.some(x => x.isWildcard)
+    const includeParameters = allIncludeParameters.some((x) => x.isWildcard)
         ? expandIncludeWildcard(
               [
                   ...resources.reduce(
@@ -276,8 +277,8 @@ export const buildIncludeQueries = (
     );
 
     const resourceTypeToIds: { [resourceType: string]: string[] } = mapValues(
-        groupBy(resourceReferences, resourcReference => resourcReference.resourceType),
-        arr => arr.map(x => x.id),
+        groupBy(resourceReferences, (resourcReference) => resourcReference.resourceType),
+        (arr) => arr.map((x) => x.id),
     );
 
     const searchQueries = Object.entries(resourceTypeToIds).map(([resourceType, ids]) => {
@@ -296,7 +297,7 @@ export const buildRevIncludeQueries = (
 ): Query[] => {
     const allRevincludeParameters = getInclusionParametersFromQueryParams('_revinclude', queryParams, iterate);
 
-    const revIncludeParameters = allRevincludeParameters.some(x => x.isWildcard)
+    const revIncludeParameters = allRevincludeParameters.some((x) => x.isWildcard)
         ? expandRevIncludeWildcard(
               [
                   ...resources.reduce(

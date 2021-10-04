@@ -71,7 +71,7 @@ describe('buildSortClause', () => {
             '#$%/., symbols and stuff',
             'valid params must match a param name from fhirSearchParametersRegistry, so most strings are invalid...',
             'name', // This is actually a valid param but right now we only allow sorting by date params
-        ].forEach(p =>
+        ].forEach((p) =>
             expect(() => buildSortClause(fhirSearchParametersRegistry, 'Patient', p)).toThrow(
                 InvalidSearchParameterError,
             ),

@@ -14,7 +14,7 @@ interface SortParameter {
 
 export const parseSortParameter = (param: string): SortParameter[] => {
     const parts = param.split(',');
-    return parts.map(s => {
+    return parts.map((s) => {
         const order = s.startsWith('-') ? 'desc' : 'asc';
         return {
             order,
@@ -43,7 +43,7 @@ export const buildSortClause = (
     }
     const sortParams = parseSortParameter(sortQueryParam);
 
-    return sortParams.flatMap(sortParam => {
+    return sortParams.flatMap((sortParam) => {
         const searchParameter = fhirSearchParametersRegistry.getSearchParameter(resourceType, sortParam.searchParam);
         if (searchParameter === undefined) {
             throw new InvalidSearchParameterError(
@@ -55,7 +55,7 @@ export const buildSortClause = (
                 `Invalid _sort parameter: ${sortParam.searchParam}. Only date type parameters can currently be used for sorting`,
             );
         }
-        return searchParameter.compiled.flatMap(compiledParam => {
+        return searchParameter.compiled.flatMap((compiledParam) => {
             return [
                 elasticsearchSort(compiledParam.path, sortParam.order),
 

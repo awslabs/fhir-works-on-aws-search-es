@@ -104,7 +104,7 @@ function mergeParserResults(primaryParser: Parser, secondaryParser: Parser) {
             ...primaryParser.results[0], // nearley returns an array of results. The array always has exactly one element for non ambiguous grammars
             ...secondaryParser.results[0],
         ],
-        x => `${x.resourceType}.${x.path}`,
+        (x) => `${x.resourceType}.${x.path}`,
     );
 }
 
@@ -115,7 +115,7 @@ function mergeParserResults(primaryParser: Parser, secondaryParser: Parser) {
  */
 const compile = async (searchParams: any[]): Promise<any> => {
     const validFhirSearchParams: FhirSearchParam[] = [];
-    searchParams.forEach(s => {
+    searchParams.forEach((s) => {
         if (isFhirSearchParam(s)) {
             validateSearchParam(s);
             validFhirSearchParams.push(s);
@@ -126,7 +126,7 @@ const compile = async (searchParams: any[]): Promise<any> => {
 
     const compiledSearchParams = validFhirSearchParams
         .filter(isParamSupported)
-        .map(searchParam => {
+        .map((searchParam) => {
             const fhirPathparser = new Parser(Grammar.fromCompiled(fhirPathGrammar));
             const xPathParser = new Parser(Grammar.fromCompiled(xPathGrammar));
             try {
@@ -141,7 +141,7 @@ ${JSON.stringify(
     2,
 )}
 Either it is an invalid FHIRPath expression or it is using FHIRPath features not supported by this compiler.
-Original error message was: ${e.message}`,
+Original error message was: ${(e as any).message}`,
                 );
             }
 
@@ -156,7 +156,7 @@ Original error message was: ${e.message}`,
                 compiled,
             };
         })
-        .flatMap(searchParam => {
+        .flatMap((searchParam) => {
             return searchParam.base.map((base: any) => ({
                 // Explicitly returning 'code' as 'name'. For the base FHIR resources code and name happen to be the same.
                 // This is not true for search parameters from Implementation Guides. However, all the FHIR documentation and

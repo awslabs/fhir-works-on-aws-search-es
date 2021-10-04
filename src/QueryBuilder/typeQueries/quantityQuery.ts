@@ -20,7 +20,8 @@ interface QuantitySearchParameter {
     };
 }
 
-const QUANTITY_SEARCH_PARAM_REGEX = /^(?<prefix>eq|ne|lt|gt|ge|le|sa|eb|ap)?(?<numberString>[\d.+-eE]+)(\|(?<system>[^|\s]*)\|(?<code>[^|\s]*))?$/;
+const QUANTITY_SEARCH_PARAM_REGEX =
+    /^(?<prefix>eq|ne|lt|gt|ge|le|sa|eb|ap)?(?<numberString>[\d.+-eE]+)(\|(?<system>[^|\s]*)\|(?<code>[^|\s]*))?$/;
 
 const SUPPORTED_MODIFIERS: string[] = [];
 

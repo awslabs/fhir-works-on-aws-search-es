@@ -149,8 +149,9 @@ export class ElasticSearchService implements Search {
 
             if (from + size > MAX_ES_WINDOW_SIZE) {
                 logger.info(
-                    `Search request is out of bound. Trying to access ${from} to ${from +
-                        size} which is outside of the max: ${MAX_ES_WINDOW_SIZE}`,
+                    `Search request is out of bound. Trying to access ${from} to ${
+                        from + size
+                    } which is outside of the max: ${MAX_ES_WINDOW_SIZE}`,
                 );
                 throw new InvalidSearchParameterError(
                     `Search parameters: ${SEARCH_PAGINATION_PARAMS.PAGES_OFFSET} and ${SEARCH_PAGINATION_PARAMS.COUNT} are accessing items outside the max range (${MAX_ES_WINDOW_SIZE}). Please narrow your search to access the remaining items`,
@@ -271,7 +272,7 @@ export class ElasticSearchService implements Search {
             };
         }
 
-        const searchQueriesWithAlias = searchQueries.map(searchQuery => ({
+        const searchQueriesWithAlias = searchQueries.map((searchQuery) => ({
             ...searchQuery.queryRequest,
             index: getAliasName(searchQuery.resourceType, request.tenantId),
         }));
@@ -280,11 +281,11 @@ export class ElasticSearchService implements Search {
             logger.debug(`Elastic msearch query: ${JSON.stringify(searchQueriesWithAlias, null, 2)}`);
         }
         const apiResponse = await this.esClient.msearch({
-            body: searchQueriesWithAlias.flatMap(query => [{ index: query.index }, { query: query.body!.query }]),
+            body: searchQueriesWithAlias.flatMap((query) => [{ index: query.index }, { query: query.body!.query }]),
         });
 
         return (apiResponse.body.responses as any[])
-            .filter(response => {
+            .filter((response) => {
                 if (response.error) {
                     if (response.error.type === 'index_not_found_exception') {
                         // Indexes are created the first time a resource of a given type is written to DDB.
@@ -317,22 +318,20 @@ export class ElasticSearchService implements Search {
         baseUrl: string;
         mode: 'match' | 'include';
     }): SearchEntry[] {
-        return hits.map(
-            (hit: any): SearchEntry => {
-                // Modify to return resource with FHIR id not Dynamo ID
-                const resource = this.cleanUpFunction(hit._source);
-                return {
-                    search: {
-                        mode,
-                    },
-                    fullUrl: URL.format({
-                        host: baseUrl,
-                        pathname: `/${resource.resourceType}/${resource.id}`,
-                    }),
-                    resource,
-                };
-            },
-        );
+        return hits.map((hit: any): SearchEntry => {
+            // Modify to return resource with FHIR id not Dynamo ID
+            const resource = this.cleanUpFunction(hit._source);
+            return {
+                search: {
+                    mode,
+                },
+                fullUrl: URL.format({
+                    host: baseUrl,
+                    pathname: `/${resource.resourceType}/${resource.id}`,
+                }),
+                resource,
+            };
+        });
     }
 
     private async processSearchInclusions(
@@ -345,7 +344,7 @@ export class ElasticSearchService implements Search {
 
         const includeSearchQueries: Query[] = buildIncludeQueries(
             queryParams,
-            searchEntries.map(x => x.resource),
+            searchEntries.map((x) => x.resource),
             filter,
             this.fhirSearchParametersRegistry,
             iterative,
@@ -353,7 +352,7 @@ export class ElasticSearchService implements Search {
 
         const revIncludeSearchQueries: Query[] = buildRevIncludeQueries(
             queryParams,
-            searchEntries.map(x => x.resource),
+            searchEntries.map((x) => x.resource),
             filter,
             this.fhirSearchParametersRegistry,
             this.useKeywordSubFields,
@@ -361,7 +360,7 @@ export class ElasticSearchService implements Search {
         );
 
         const lowerCaseAllowedResourceTypes = new Set(allowedResourceTypes.map((r: string) => r.toLowerCase()));
-        const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter(query =>
+        const allowedInclusionQueries = [...includeSearchQueries, ...revIncludeSearchQueries].filter((query) =>
             lowerCaseAllowedResourceTypes.has(query.resourceType.toLowerCase()),
         );
 
@@ -374,7 +373,7 @@ export class ElasticSearchService implements Search {
         request: TypeSearchRequest,
     ): Promise<SearchEntry[]> {
         if (
-            !ITERATIVE_INCLUSION_PARAMETERS.some(param => {
+            !ITERATIVE_INCLUSION_PARAMETERS.some((param) => {
                 return request.queryParams[param];
             })
         ) {
@@ -382,7 +381,7 @@ export class ElasticSearchService implements Search {
         }
         const result: SearchEntry[] = [];
         const resourceIdsAlreadyInResult: Set<string> = new Set(
-            searchEntries.map(searchEntry => searchEntry.resource.id),
+            searchEntries.map((searchEntry) => searchEntry.resource.id),
         );
         const resourceIdsWithInclusionsAlreadyResolved: Set<string> = new Set();
 
@@ -393,13 +392,15 @@ export class ElasticSearchService implements Search {
             // eslint-disable-next-line no-await-in-loop
             const resourcesFound = await this.processSearchInclusions(resourcesToIterate, request, true);
 
-            resourcesToIterate.forEach(resource => resourceIdsWithInclusionsAlreadyResolved.add(resource.resource.id));
+            resourcesToIterate.forEach((resource) =>
+                resourceIdsWithInclusionsAlreadyResolved.add(resource.resource.id),
+            );
             if (resourcesFound.length === 0) {
                 logger.info(`Iteration ${i} found zero results. Stopping`);
                 break;
             }
 
-            resourcesFound.forEach(resourceFound => {
+            resourcesFound.forEach((resourceFound) => {
                 // Avoid duplicates in result. In some cases different include/revinclude clauses can end up finding the same resource.
                 if (!resourceIdsAlreadyInResult.has(resourceFound.resource.id)) {
                     resourceIdsAlreadyInResult.add(resourceFound.resource.id);
@@ -412,7 +413,7 @@ export class ElasticSearchService implements Search {
                 break;
             }
             resourcesToIterate = resourcesFound.filter(
-                r => !resourceIdsWithInclusionsAlreadyResolved.has(r.resource.id),
+                (r) => !resourceIdsWithInclusionsAlreadyResolved.has(r.resource.id),
             );
             logger.info(`Iteration ${i} found ${resourcesFound.length} resources`);
         }
@@ -529,7 +530,7 @@ export class ElasticSearchService implements Search {
      * @returns the `filter` part of the ES query
      */
     private static buildElasticSearchFilter(searchFilters: SearchFilter[]): any[] {
-        const partitions: SearchFilter[][] = partition(searchFilters, filter => {
+        const partitions: SearchFilter[][] = partition(searchFilters, (filter) => {
             return filter.logicalOperator === 'OR';
         });
         const orSearchFilterParts: any[] = partitions[0].map(ElasticSearchService.buildElasticSearchFilterPart).flat();

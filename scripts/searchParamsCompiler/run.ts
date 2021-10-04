@@ -47,6 +47,4 @@ const run = async () => {
     );
 };
 
-run()
-    .then(logger.info)
-    .catch(logger.error);
+run().then(logger.info).catch(logger.error);

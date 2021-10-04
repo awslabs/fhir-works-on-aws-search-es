@@ -106,10 +106,10 @@ const searchableFields: {
     [resourceType: string]: SearchField[];
 } = {};
 
-compiledSearchParameters.forEach(compiledSearchParameter => {
+compiledSearchParameters.forEach((compiledSearchParameter) => {
     searchableFields[compiledSearchParameter.base] = searchableFields[compiledSearchParameter.base] ?? [];
 
-    const fields: { field: string; type?: string }[] = compiledSearchParameter.compiled.flatMap(s => {
+    const fields: { field: string; type?: string }[] = compiledSearchParameter.compiled.flatMap((s) => {
         const output = [{ field: s.path }];
         if (s.condition) {
             output.push({ field: s.condition[0] });
@@ -120,14 +120,14 @@ compiledSearchParameters.forEach(compiledSearchParameter => {
     searchableFields[compiledSearchParameter.base].push(...fields);
 });
 
-searchableFields.Resource.push(...EXTENSION_FIELDS.map(field => ({ field })));
+searchableFields.Resource.push(...EXTENSION_FIELDS.map((field) => ({ field })));
 
-const uniqSearchableFields = mapValues(searchableFields, x => uniqBy(x, s => s.field));
+const uniqSearchableFields = mapValues(searchableFields, (x) => uniqBy(x, (s) => s.field));
 
 const searchableFieldsWithResolvedTypes = mapValues(uniqSearchableFields, (fieldsArr, resourceType) =>
     fieldsArr
-        .map(s => resolveFieldType(s, resourceType))
-        .filter(x => {
+        .map((s) => resolveFieldType(s, resourceType))
+        .filter((x) => {
             if (x.error) {
                 console.warn(`Skipping ${resourceType}.${x.field} due to error: ${x.error}`);
                 return false;

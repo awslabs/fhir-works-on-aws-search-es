@@ -77,7 +77,7 @@ describe('numberQuery', () => {
     describe('invalid inputs', () => {
         each([['This is not a number at all'], ['badPrefix100'], ['100someSuffix'], ['100|system|code']]).test(
             '%s',
-            param => {
+            (param) => {
                 expect(() => numberQuery(factorOverrideParam, param)).toThrow(InvalidSearchParameterError);
             },
         );

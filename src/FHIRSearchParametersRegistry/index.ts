@@ -109,7 +109,7 @@ export class FHIRSearchParametersRegistry {
         this.typeNameMap = {};
         this.capabilityStatement = {};
 
-        compiledSearchParams.forEach(searchParam => {
+        compiledSearchParams.forEach((searchParam) => {
             this.typeNameMap[searchParam.base] = this.typeNameMap[searchParam.base] ?? {};
             this.typeNameMap[searchParam.base][searchParam.name] = searchParam;
 
@@ -118,7 +118,7 @@ export class FHIRSearchParametersRegistry {
                 this.includeMap[searchParam.base].push(searchParam);
 
                 // eslint-disable-next-line no-unused-expressions
-                searchParam.target?.forEach(target => {
+                searchParam.target?.forEach((target) => {
                     this.revincludeMap[target] = this.revincludeMap[target] ?? [];
                     this.revincludeMap[target].push(searchParam);
                 });
@@ -136,12 +136,13 @@ export class FHIRSearchParametersRegistry {
 
             this.capabilityStatement[resourceType].searchInclude = [
                 '*',
-                ...(this.includeMap[resourceType]?.map(searchParam => `${searchParam.base}:${searchParam.name}`) ?? []),
+                ...(this.includeMap[resourceType]?.map((searchParam) => `${searchParam.base}:${searchParam.name}`) ??
+                    []),
             ];
 
             this.capabilityStatement[resourceType].searchRevInclude = [
                 '*',
-                ...(this.revincludeMap[resourceType]?.map(searchParam => `${searchParam.base}:${searchParam.name}`) ??
+                ...(this.revincludeMap[resourceType]?.map((searchParam) => `${searchParam.base}:${searchParam.name}`) ??
                     []),
             ];
         });
@@ -153,7 +154,7 @@ export class FHIRSearchParametersRegistry {
         Object.entries(this.capabilityStatement).forEach(([resourceType, searchCapabilities]) => {
             searchCapabilities.searchParam.push(
                 ...resourceSearchParams.filter(
-                    resourceSearchParam => !this.typeNameMap?.[resourceType]?.[resourceSearchParam.name],
+                    (resourceSearchParam) => !this.typeNameMap?.[resourceType]?.[resourceSearchParam.name],
                 ),
             );
         });

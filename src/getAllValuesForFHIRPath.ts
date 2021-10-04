@@ -27,9 +27,9 @@ export const getAllValuesForFHIRPath = (resource: any, path: string): any[] => {
     let values: any[] = [resource];
     let pathTraversed = '';
 
-    pathParts.forEach(pathPart => {
+    pathParts.forEach((pathPart) => {
         pathTraversed = pathTraversed === '' ? pathPart : `${pathTraversed}.${pathPart}`;
-        values = values.flatMap(value => value[pathPart]).filter(isPresent);
+        values = values.flatMap((value) => value[pathPart]).filter(isPresent);
     });
 
     return values;
