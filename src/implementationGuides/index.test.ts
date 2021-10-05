@@ -101,8 +101,7 @@ describe('compile', () => {
                 ],
                 expression:
                     'CapabilityStatement.title | CodeSystem.title | ConceptMap.title | ImplementationGuide.title | MessageDefinition.title | OperationDefinition.title | StructureDefinition.title | StructureMap.title | TerminologyCapabilities.title | ValueSet.title',
-                xpath:
-                    'f:CapabilityStatement/f:title | f:CodeSystem/f:title | f:ConceptMap/f:title | f:ImplementationGuide/f:title | f:MessageDefinition/f:title | f:OperationDefinition/f:title | f:StructureDefinition/f:title | f:StructureMap/f:title | f:TerminologyCapabilities/f:title | f:ValueSet/f:title',
+                xpath: 'f:CapabilityStatement/f:title | f:CodeSystem/f:title | f:ConceptMap/f:title | f:ImplementationGuide/f:title | f:MessageDefinition/f:title | f:OperationDefinition/f:title | f:StructureDefinition/f:title | f:StructureMap/f:title | f:TerminologyCapabilities/f:title | f:ValueSet/f:title',
             },
         ]);
         await expect(compiled).resolves.toMatchSnapshot();
@@ -137,8 +136,7 @@ describe('compile', () => {
                 base: ['Patient'],
                 expression:
                     "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.value.code",
-                xpath:
-                    "f:Patient/f:extension[@url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race']/f:extension/f:valueCoding/f:code/@value",
+                xpath: "f:Patient/f:extension[@url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race']/f:extension/f:valueCoding/f:code/@value",
             },
         ]);
         await expect(compiled).resolves.toMatchSnapshot();

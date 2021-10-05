@@ -112,7 +112,7 @@ describe('parseDateSearchParam', () => {
             ['2020-02-02T07'],
             ['2020-02-02T07:07:07someSuffix'],
             ['2020-02-02someSuffix'],
-        ]).test('%s', param => {
+        ]).test('%s', (param) => {
             expect(() => parseDateSearchParam(param)).toThrow(InvalidSearchParameterError);
         });
     });

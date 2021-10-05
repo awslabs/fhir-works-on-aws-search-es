@@ -24,7 +24,8 @@ const SUPPORTED_MODIFIERS: string[] = [];
 
 // The date parameter format is yyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm] (the standard XML format).
 // https://www.hl7.org/fhir/search.html#date
-const DATE_SEARCH_PARAM_REGEX = /^(?<prefix>eq|ne|lt|gt|ge|le|sa|eb|ap)?(?<inputDate>(?<year>\d{4})(?:-(?<month>\d{2})(?:-(?<day>\d{2})(?:T(?<hours>\d{2}):(?<minutes>\d{2})(?::(?<seconds>\d{2})(?:\.(?<milliseconds>\d{3}))?(?<timeZone>Z|[+-](?:\d{2}:\d{2}))?)?)?)?)?)$/;
+const DATE_SEARCH_PARAM_REGEX =
+    /^(?<prefix>eq|ne|lt|gt|ge|le|sa|eb|ap)?(?<inputDate>(?<year>\d{4})(?:-(?<month>\d{2})(?:-(?<day>\d{2})(?:T(?<hours>\d{2}):(?<minutes>\d{2})(?::(?<seconds>\d{2})(?:\.(?<milliseconds>\d{3}))?(?<timeZone>Z|[+-](?:\d{2}:\d{2}))?)?)?)?)?)$/;
 
 export const parseDateSearchParam = (param: string): DateSearchParameter => {
     const match = param.match(DATE_SEARCH_PARAM_REGEX);

@@ -205,7 +205,7 @@ describe('quantityQuery', () => {
             ['100|a|b|c'],
             ['100xxx|system|code'],
             ['100e-2x|system|code'],
-        ]).test('%s', param => {
+        ]).test('%s', (param) => {
             expect(() => quantityQuery(quantityParam, param, true)).toThrow(InvalidSearchParameterError);
         });
     });

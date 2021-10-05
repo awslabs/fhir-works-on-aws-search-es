@@ -10,7 +10,8 @@ import getComponentLogger from '../../loggerBuilder';
 const logger = getComponentLogger();
 
 const ID_ONLY_REGEX = /^[A-Za-z0-9\-.]{1,64}$/;
-const FHIR_REFERENCE_REGEX = /^((?<fhirServiceBaseUrl>https?:\/\/[A-Za-z0-9\-\\.:%$_/]+)\/)?(?<resourceType>[A-Z][a-zA-Z]+)\/(?<id>[A-Za-z0-9\-.]{1,64})$/;
+const FHIR_REFERENCE_REGEX =
+    /^((?<fhirServiceBaseUrl>https?:\/\/[A-Za-z0-9\-\\.:%$_/]+)\/)?(?<resourceType>[A-Z][a-zA-Z]+)\/(?<id>[A-Za-z0-9\-.]{1,64})$/;
 
 const SUPPORTED_MODIFIERS: string[] = [];
 

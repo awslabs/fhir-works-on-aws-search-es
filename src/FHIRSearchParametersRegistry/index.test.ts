@@ -79,7 +79,7 @@ describe('FHIRSearchParametersRegistry', () => {
             ];
 
             const fhirSearchParametersRegistry = new FHIRSearchParametersRegistry('4.0.1', IGCompiledSearchParams);
-            expect(fhirSearchParametersRegistry.getCapabilities().Patient.searchParam.find(x => x.name === 'race'))
+            expect(fhirSearchParametersRegistry.getCapabilities().Patient.searchParam.find((x) => x.name === 'race'))
                 .toMatchInlineSnapshot(`
                 Object {
                   "definition": "http://hl7.org/fhir/us/core/SearchParameter/us-core-race",
@@ -124,7 +124,7 @@ describe('FHIRSearchParametersRegistry', () => {
                 }
             `);
 
-            expect(fhirSearchParametersRegistry.getCapabilities().Patient.searchParam.filter(s => s.name === 'given'))
+            expect(fhirSearchParametersRegistry.getCapabilities().Patient.searchParam.filter((s) => s.name === 'given'))
                 .toMatchInlineSnapshot(`
                 Array [
                   Object {
@@ -171,7 +171,7 @@ describe('FHIRSearchParametersRegistry', () => {
                 }
             `);
 
-            expect(fhirSearchParametersRegistry.getCapabilities().Patient.searchParam.filter(s => s.name === '_id'))
+            expect(fhirSearchParametersRegistry.getCapabilities().Patient.searchParam.filter((s) => s.name === '_id'))
                 .toMatchInlineSnapshot(`
                 Array [
                   Object {

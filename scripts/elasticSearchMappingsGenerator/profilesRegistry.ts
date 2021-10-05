@@ -33,13 +33,13 @@ export class ProfilesRegistry {
     }
 
     getTypeForField(resourceType: string, field: string): string | undefined {
-        const resource = this.structureDefinitions.find(s => s.fullUrl === buildFullUrl(resourceType));
+        const resource = this.structureDefinitions.find((s) => s.fullUrl === buildFullUrl(resourceType));
 
         if (resource === undefined) {
             return undefined;
         }
 
-        const profileField = resource.resource.snapshot.element.find(el => el.id === `${resourceType}.${field}`);
+        const profileField = resource.resource.snapshot.element.find((el) => el.id === `${resourceType}.${field}`);
 
         if (profileField === undefined) {
             return undefined;

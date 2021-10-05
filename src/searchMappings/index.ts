@@ -36,11 +36,11 @@ export const getSearchMappings = (
             throw new Error(`search mappings are not available for FHIR version ${fhirVersion}`);
     }
 
-    const searchableFieldsMappings = mapValues(searchMappings, fieldsArr =>
-        fieldsArr.map(fhirToESMapping).filter(x => x.mapping !== undefined),
+    const searchableFieldsMappings = mapValues(searchMappings, (fieldsArr) =>
+        fieldsArr.map(fhirToESMapping).filter((x) => x.mapping !== undefined),
     );
 
-    const flatMappings = mapValues(searchableFieldsMappings, fieldsArr =>
+    const flatMappings = mapValues(searchableFieldsMappings, (fieldsArr) =>
         fieldsArr.reduce((acc, field) => {
             const fieldWithIntermediateProperties = field.field.split('.').join('.properties.');
             acc[fieldWithIntermediateProperties] = field.mapping;
@@ -48,15 +48,15 @@ export const getSearchMappings = (
         }, {} as any),
     );
 
-    const mappings = mapValues(flatMappings, x => unflatten(x) as any);
+    const mappings = mapValues(flatMappings, (x) => unflatten(x) as any);
 
     // All resourceTypes inherit the fields from Resource
     const resourceMappings = mappings.Resource;
     delete mappings.Resource;
 
-    const mergedMappings = mapValues(mappings, x => ({ ...x, ...resourceMappings, ...CUSTOM_MAPPINGS }));
+    const mergedMappings = mapValues(mappings, (x) => ({ ...x, ...resourceMappings, ...CUSTOM_MAPPINGS }));
 
-    return mapValues(mergedMappings, x => ({
+    return mapValues(mergedMappings, (x) => ({
         dynamic: false,
         properties: x,
     }));

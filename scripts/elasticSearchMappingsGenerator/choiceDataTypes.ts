@@ -63,5 +63,5 @@ const capitalizeFirstLetter = (string: string) => {
 
 // eslint-disable-next-line import/prefer-default-export
 export function getTypeFromField(field: string): string | undefined {
-    return fhirTypes.find(t => field.endsWith(capitalizeFirstLetter(t)));
+    return fhirTypes.find((t) => field.endsWith(capitalizeFirstLetter(t)));
 }

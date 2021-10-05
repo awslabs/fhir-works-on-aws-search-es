@@ -41,7 +41,7 @@ export function stringQuery(compiled: CompiledSearchParam, value: string, modifi
             );
         }
 
-        const queries = fields.map(field => ({
+        const queries = fields.map((field) => ({
             wildcard: {
                 [field]: {
                     value: `*${value.toLowerCase()}*`,
