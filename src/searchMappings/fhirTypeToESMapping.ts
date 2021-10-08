@@ -4,8 +4,6 @@
  *
  */
 
-import { SearchField } from '../../scripts/elasticSearchMappingsGenerator/types';
-
 /** ************************************
  * Primitive Types
  ************************************ */
@@ -238,7 +236,10 @@ const fhirTypeMapping: Record<string, any> = {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export function fhirToESMapping(searchField: SearchField): { field: string; mapping: any } {
+export function fhirToESMapping(searchField: { field: string; type: string }): {
+    field: string;
+    mapping: any;
+} {
     if (!(searchField.type in fhirTypeMapping)) {
         throw new Error(`There is not a mapping available for the type: ${searchField.type}`);
     }
