@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.5.2...v3.6.0) (2021-10-08)
+
+
+### Features
+
+* add class to aid in updating search mappings ([#126](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/126)) ([9219508](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/9219508bf5f314d433c83b21ffb287a91f1cad12))
+* add static search mappings ([#124](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/124)) ([e41ba1a](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/e41ba1af43b6439a050fe4f31089e9dda725ae01))
+
+
+### Bug Fixes
+
+* update IG validation to reject reference params with no target ([#123](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/123)) ([f789799](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/f789799e58e21d21fcbb410dc83cc70a31aa99e4))
+
 ### [3.5.2](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.5.1...v3.5.2) (2021-09-15)
 
 
