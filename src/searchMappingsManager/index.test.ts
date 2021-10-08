@@ -45,6 +45,14 @@ describe('SearchMappingsManager', () => {
 
         searchMock.add(
             {
+                method: 'HEAD',
+                path: '/:index',
+            },
+            () => ({ statusCode: 200, body: true }),
+        );
+
+        searchMock.add(
+            {
                 method: 'PUT',
                 path: '/:index/_mapping',
             },
@@ -95,22 +103,29 @@ describe('SearchMappingsManager', () => {
 
         searchMock.add(
             {
-                method: 'PUT',
-                path: '/patient/_mapping',
+                method: 'HEAD',
+                path: '/patient',
             },
-            () => {
+            () =>
                 // @ts-ignore
-                return new errors.ResponseError({
+                new errors.ResponseError({
                     headers: null,
-                    statusCode: 400,
+                    statusCode: 404,
                     warnings: null,
                     body: {
                         error: {
                             type: 'index_not_found_exception',
                         },
                     },
-                });
+                }),
+        );
+
+        searchMock.add(
+            {
+                method: 'HEAD',
+                path: '/practitioner',
             },
+            () => ({ statusCode: 200, body: true }),
         );
 
         searchMock.add(

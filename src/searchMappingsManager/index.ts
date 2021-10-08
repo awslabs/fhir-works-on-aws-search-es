@@ -5,7 +5,6 @@
  *
  */
 
-import { ResponseError } from '@elastic/elasticsearch/lib/errors';
 import { Client } from '@elastic/elasticsearch';
 import { ElasticSearch } from '../elasticSearch';
 
@@ -21,25 +20,36 @@ export class SearchMappingsManager {
 
     private readonly searchClient: Client;
 
+    private readonly ignoreMappingsErrorsForExistingIndices: boolean;
+
     /**
      * @param options
+     *
      * @param options.searchMappings - search mappings for all FHIR resource types
+     *
      * @param options.numberOfShards - number of shards for each new index created. See the documentation for guidance on how to choose the right number:
      * https://docs.aws.amazon.com/opensearch-service/latest/developerguide/sizing-domains.html#bp-sharding
+     *
      * @param options.searchClient - optionally provide your own search client instance
+     *
+     * @param options.ignoreMappingsErrorsForExistingIndices - optionally ignore errors for update mappings requests and log them as warnings.
+     * This can be convenient if you have existing indices with conflicting mappings
      */
     constructor({
         searchMappings,
         numberOfShards,
         searchClient = ElasticSearch,
+        ignoreMappingsErrorsForExistingIndices = false,
     }: {
         searchMappings: { [resourceType: string]: any };
         numberOfShards: number;
         searchClient?: Client;
+        ignoreMappingsErrorsForExistingIndices?: boolean;
     }) {
         this.searchMappings = searchMappings;
         this.numberOfShards = numberOfShards;
         this.searchClient = searchClient;
+        this.ignoreMappingsErrorsForExistingIndices = ignoreMappingsErrorsForExistingIndices;
     }
 
     /**
@@ -49,14 +59,21 @@ export class SearchMappingsManager {
         const resourceTypesWithErrors = [];
         for (const [resourceType, mappings] of Object.entries(this.searchMappings)) {
             try {
-                try {
-                    await this.updateMapping(resourceType, mappings);
-                } catch (error) {
-                    if (error instanceof ResponseError && error.body.error.type === 'index_not_found_exception') {
-                        console.log(`index for ${resourceType} was not found. It will be created`);
-                        await this.createIndexWithMapping(resourceType, mappings);
-                    } else {
-                        throw error;
+                if (!(await this.indexExists(resourceType))) {
+                    console.log(`index for ${resourceType} was not found. It will be created`);
+                    await this.createIndexWithMapping(resourceType, mappings);
+                } else {
+                    try {
+                        await this.updateMapping(resourceType, mappings);
+                    } catch (e) {
+                        if (this.ignoreMappingsErrorsForExistingIndices) {
+                            console.log(
+                                `Warning: Failed to update mappings for ${resourceType}`,
+                                JSON.stringify(e, null, 2),
+                            );
+                        } else {
+                            throw e;
+                        }
                     }
                 }
             } catch (e) {
@@ -69,6 +86,14 @@ export class SearchMappingsManager {
         if (resourceTypesWithErrors.length > 0) {
             throw new Error(`Failed to update mappings for: ${resourceTypesWithErrors}`);
         }
+    }
+
+    async indexExists(resourceType: string): Promise<boolean> {
+        return (
+            await this.searchClient.indices.exists({
+                index: toIndexName(resourceType),
+            })
+        ).body;
     }
 
     async updateMapping(resourceType: string, mapping: any) {
