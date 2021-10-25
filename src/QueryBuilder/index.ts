@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { isEmpty } from 'lodash';
 import { InvalidSearchParameterError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
 import { NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
@@ -95,16 +96,16 @@ function searchParamQuery(
     let queryList = [];
     for (let i = 0; i < splitSearchValue.length; i += 1) {
         queryList.push(
-            searchParam.compiled.map((compiled) => {
-                return typeQueryWithConditions(
+            searchParam.compiled.map(compiled =>
+                typeQueryWithConditions(
                     searchParam,
                     compiled,
                     splitSearchValue[i],
                     useKeywordSubFields,
                     baseUrl,
                     modifier,
-                );
-            }),
+                ),
+            ),
         );
     }
     // flatten array of arrays of results into one array with results
@@ -127,7 +128,7 @@ function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
             normalizedQueryParams[searchParameter] = [searchValue];
             return;
         }
-        if (Array.isArray(searchValue) && searchValue.every((s) => typeof s === 'string')) {
+        if (Array.isArray(searchValue) && searchValue.every(s => typeof s === 'string')) {
             normalizedQueryParams[searchParameter] = searchValue;
             return;
         }
@@ -140,14 +141,22 @@ function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
     return normalizedQueryParams;
 }
 
+function isChainedParameter(parameterKey: string) {
+    return parameterKey.match('[A-Za-z][.][A-Za-z]');
+}
+
 function searchRequestQuery(
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
-    request: TypeSearchRequest,
+    queryParams: any,
+    resourceType: string,
+    baseUrl: string,
     useKeywordSubFields: boolean,
 ): any[] {
-    const { baseUrl, queryParams, resourceType } = request;
     return Object.entries(normalizeQueryParams(queryParams))
-        .filter(([searchParameter]) => !NON_SEARCHABLE_PARAMETERS.includes(searchParameter))
+        .filter(
+            ([searchParameter]) =>
+                !NON_SEARCHABLE_PARAMETERS.includes(searchParameter) && !isChainedParameter(searchParameter),
+        )
         .flatMap(([searchParameter, searchValues]) => {
             const searchModifier = parseSearchModifiers(searchParameter);
             const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
@@ -159,11 +168,69 @@ function searchRequestQuery(
                     `Invalid search parameter '${searchModifier.parameterName}' for resource type ${resourceType}`,
                 );
             }
-            return searchValues.map((searchValue) =>
+            return searchValues.map(searchValue =>
                 searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields, baseUrl, searchModifier.modifier),
             );
         });
 }
+
+// eslint-disable-next-line import/prefer-default-export
+export const getOrganizedChainedParameters = (
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
+    request: TypeSearchRequest,
+): any => {
+    const organizedChainedParam = Object.entries(normalizeQueryParams(request.queryParams))
+        .filter(
+            ([searchParameter]) =>
+                !NON_SEARCHABLE_PARAMETERS.includes(searchParameter) && isChainedParameter(searchParameter),
+        )
+        .flatMap(([searchParameter, searchValues]) => {
+            // Validate chain and add resource type
+            const chain = searchParameter.split('.');
+            const initialSearchParam: any = chain.pop();
+            let currentResourceType = request.resourceType;
+            const organizedChain: string[] = [];
+            chain.forEach(currentSearchParam => {
+                const searchModifier = parseSearchModifiers(currentSearchParam, false);
+                const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
+                    currentResourceType,
+                    searchModifier.parameterName,
+                );
+                if (fhirSearchParam === undefined) {
+                    throw new InvalidSearchParameterError(
+                        `Invalid search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType}`,
+                    );
+                }
+                if (fhirSearchParam.type !== 'reference') {
+                    throw new InvalidSearchParameterError(
+                        `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} does not point to another resource.`,
+                    );
+                }
+                let nextResourceType;
+                if (searchModifier.modifier) {
+                    if (fhirSearchParam.target?.includes(searchModifier.modifier)) {
+                        organizedChain.push(currentSearchParam);
+                        nextResourceType = searchModifier.modifier;
+                    } else {
+                        throw new InvalidSearchParameterError(
+                            `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} does not point to resource type ${searchModifier.modifier}.`,
+                        );
+                    }
+                } else if (fhirSearchParam.target?.length !== 1) {
+                    throw new InvalidSearchParameterError(
+                        `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
+                    );
+                } else {
+                    organizedChain.push(`${searchModifier.parameterName}:${fhirSearchParam.target[0]}`);
+                    [nextResourceType] = fhirSearchParam.target;
+                }
+
+                currentResourceType = nextResourceType;
+            });
+            return { chain: organizedChain, searchQuery: { [initialSearchParam]: searchValues } };
+        });
+    return organizedChainedParam;
+};
 
 // eslint-disable-next-line import/prefer-default-export
 export const buildQueryForAllSearchParameters = (
@@ -171,11 +238,33 @@ export const buildQueryForAllSearchParameters = (
     request: TypeSearchRequest,
     useKeywordSubFields: boolean,
     additionalFilters: any[] = [],
+    chainedParameterQuery: any = {},
 ): any => {
+    const esQuery = searchRequestQuery(
+        fhirSearchParametersRegistry,
+        request.queryParams,
+        request.resourceType,
+        request.baseUrl,
+        useKeywordSubFields,
+    );
+    if (!isEmpty(chainedParameterQuery)) {
+        const ESChainedParamQuery = searchRequestQuery(
+            fhirSearchParametersRegistry,
+            chainedParameterQuery,
+            request.resourceType,
+            request.baseUrl,
+            useKeywordSubFields,
+        );
+        esQuery.push({
+            bool: {
+                should: ESChainedParamQuery,
+            },
+        });
+    }
     return {
         bool: {
             filter: additionalFilters,
-            must: searchRequestQuery(fhirSearchParametersRegistry, request, useKeywordSubFields),
+            must: esQuery,
         },
     };
 };
