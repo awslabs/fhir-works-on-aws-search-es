@@ -241,7 +241,6 @@ export class ElasticSearchService implements Search {
             this.fhirSearchParametersRegistry,
             request,
         )) {
-            // search Location, address-city=NYC
             let stepQueryParams = searchQuery;
             let chainComplete = true;
             // eslint-disable-next-line no-restricted-syntax
@@ -257,7 +256,7 @@ export class ElasticSearchService implements Search {
                 const params: Query = {
                     resourceType,
                     queryRequest: {
-                        size: 100,
+                        size: MAX_CHAINED_PARAMS_RESULT,
                         track_total_hits: true,
                         body: {
                             query: stepQuery,
@@ -275,8 +274,7 @@ export class ElasticSearchService implements Search {
                         `Chained parameter ${stepQueryParams} result in more than ${MAX_CHAINED_PARAMS_RESULT} ${resourceType} resource. Please provide more precise queries.`,
                     );
                 }
-                stepQueryParams = {};
-                stepQueryParams[nextStepParam] = hits.map((hit) => `${resourceType}/${hit._source.id}`);
+                stepQueryParams = { [nextStepParam]: hits.map((hit) => `${resourceType}/${hit._source.id}`) };
             }
             if (chainComplete) {
                 combinedChainedParameters = merge(combinedChainedParameters, stepQueryParams);
