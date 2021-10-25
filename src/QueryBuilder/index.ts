@@ -96,7 +96,7 @@ function searchParamQuery(
     let queryList = [];
     for (let i = 0; i < splitSearchValue.length; i += 1) {
         queryList.push(
-            searchParam.compiled.map(compiled =>
+            searchParam.compiled.map((compiled) =>
                 typeQueryWithConditions(
                     searchParam,
                     compiled,
@@ -128,7 +128,7 @@ function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
             normalizedQueryParams[searchParameter] = [searchValue];
             return;
         }
-        if (Array.isArray(searchValue) && searchValue.every(s => typeof s === 'string')) {
+        if (Array.isArray(searchValue) && searchValue.every((s) => typeof s === 'string')) {
             normalizedQueryParams[searchParameter] = searchValue;
             return;
         }
@@ -168,7 +168,7 @@ function searchRequestQuery(
                     `Invalid search parameter '${searchModifier.parameterName}' for resource type ${resourceType}`,
                 );
             }
-            return searchValues.map(searchValue =>
+            return searchValues.map((searchValue) =>
                 searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields, baseUrl, searchModifier.modifier),
             );
         });
@@ -190,7 +190,7 @@ export const getOrganizedChainedParameters = (
             const initialSearchParam: any = chain.pop();
             let currentResourceType = request.resourceType;
             const organizedChain: string[] = [];
-            chain.forEach(currentSearchParam => {
+            chain.forEach((currentSearchParam) => {
                 const searchModifier = parseSearchModifiers(currentSearchParam, false);
                 const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
                     currentResourceType,
