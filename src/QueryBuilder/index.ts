@@ -14,7 +14,7 @@ import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
 import getOrSearchValues from './searchOR';
-import parseSearchModifiers from './searchModifiers';
+import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from './util';
 import { uriQuery } from './typeQueries/uriQuery';
 
 function typeQueryWithConditions(
@@ -120,31 +120,6 @@ function searchParamQuery(
     };
 }
 
-function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
-    const normalizedQueryParams: { [key: string]: string[] } = {};
-
-    Object.entries(queryParams).forEach(([searchParameter, searchValue]) => {
-        if (typeof searchValue === 'string') {
-            normalizedQueryParams[searchParameter] = [searchValue];
-            return;
-        }
-        if (Array.isArray(searchValue) && searchValue.every((s) => typeof s === 'string')) {
-            normalizedQueryParams[searchParameter] = searchValue;
-            return;
-        }
-
-        // This may occur if the router has advanced querystring parsing enabled
-        // e.g. {{API_URL}}/Patient?name[key]=Smith may be parsed into {"name":{"key":"Smith"}}
-        throw new InvalidSearchParameterError(`Invalid search parameter: '${searchParameter}'`);
-    });
-
-    return normalizedQueryParams;
-}
-
-function isChainedParameter(parameterKey: string) {
-    return parameterKey.match('[A-Za-z][.][A-Za-z]');
-}
-
 function searchRequestQuery(
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     queryParams: any,
@@ -173,64 +148,6 @@ function searchRequestQuery(
             );
         });
 }
-
-// eslint-disable-next-line import/prefer-default-export
-export const getOrganizedChainedParameters = (
-    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
-    request: TypeSearchRequest,
-): any => {
-    const organizedChainedParam = Object.entries(normalizeQueryParams(request.queryParams))
-        .filter(
-            ([searchParameter]) =>
-                !NON_SEARCHABLE_PARAMETERS.includes(searchParameter) && isChainedParameter(searchParameter),
-        )
-        .flatMap(([searchParameter, searchValues]) => {
-            // Validate chain and add resource type
-            const chain = searchParameter.split('.');
-            const initialSearchParam: any = chain.pop();
-            let currentResourceType = request.resourceType;
-            const organizedChain: string[] = [];
-            chain.forEach((currentSearchParam) => {
-                const searchModifier = parseSearchModifiers(currentSearchParam, false);
-                const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
-                    currentResourceType,
-                    searchModifier.parameterName,
-                );
-                if (fhirSearchParam === undefined) {
-                    throw new InvalidSearchParameterError(
-                        `Invalid search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType}`,
-                    );
-                }
-                if (fhirSearchParam.type !== 'reference') {
-                    throw new InvalidSearchParameterError(
-                        `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} does not point to another resource.`,
-                    );
-                }
-                let nextResourceType;
-                if (searchModifier.modifier) {
-                    if (fhirSearchParam.target?.includes(searchModifier.modifier)) {
-                        organizedChain.push(currentSearchParam);
-                        nextResourceType = searchModifier.modifier;
-                    } else {
-                        throw new InvalidSearchParameterError(
-                            `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} does not point to resource type ${searchModifier.modifier}.`,
-                        );
-                    }
-                } else if (fhirSearchParam.target?.length !== 1) {
-                    throw new InvalidSearchParameterError(
-                        `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
-                    );
-                } else {
-                    organizedChain.push(`${searchModifier.parameterName}:${fhirSearchParam.target[0]}`);
-                    [nextResourceType] = fhirSearchParam.target;
-                }
-
-                currentResourceType = nextResourceType;
-            });
-            return { chain: organizedChain, searchQuery: { [initialSearchParam]: searchValues } };
-        });
-    return organizedChainedParam;
-};
 
 // eslint-disable-next-line import/prefer-default-export
 export const buildQueryForAllSearchParameters = (

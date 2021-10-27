@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import parseSearchModifiers from './searchModifiers';
+import { parseSearchModifiers } from './util';
 
 describe('getSearchModifiers', () => {
     test('name:exact', () => {

@@ -31,7 +31,8 @@ import {
 } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
-import { buildQueryForAllSearchParameters, buildSortClause, getOrganizedChainedParameters } from './QueryBuilder';
+import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
+import parseChainedParameters from './QueryBuilder/chain';
 import getComponentLogger from './loggerBuilder';
 
 export type Query = {
@@ -233,23 +234,30 @@ export class ElasticSearchService implements Search {
         }
     }
 
+    // Return translated chained parameters that can be used as normal search parameters
     // eslint-disable-next-line class-methods-use-this
-    private async getChainedParametersQuery(request: TypeSearchRequest, filters: any[] = []) {
+    private async getChainedParametersQuery(request: TypeSearchRequest, filters: any[] = []): Promise<{}> {
         let combinedChainedParameters = {};
+
         // eslint-disable-next-line no-restricted-syntax
-        for (const { chain, searchQuery } of getOrganizedChainedParameters(
+        for (const { chain, initialValue } of parseChainedParameters(
             this.fhirSearchParametersRegistry,
-            request,
+            request.resourceType,
+            request.queryParams,
         )) {
-            let stepQueryParams = searchQuery;
+            let stepValue = initialValue;
             let chainComplete = true;
+            const lastChain: { resourceType: string; searchParam: string } = chain.pop()!;
             // eslint-disable-next-line no-restricted-syntax
-            for (const stepParam of chain.slice().reverse()) {
-                const [nextStepParam, resourceType] = stepParam.split(':');
-                const stepReqeust: TypeSearchRequest = { ...request, resourceType, queryParams: stepQueryParams };
+            for (const { resourceType, searchParam } of chain) {
+                const stepRequest: TypeSearchRequest = {
+                    ...request,
+                    resourceType,
+                    queryParams: { [searchParam]: stepValue },
+                };
                 const stepQuery = buildQueryForAllSearchParameters(
                     this.fhirSearchParametersRegistry,
-                    stepReqeust,
+                    stepRequest,
                     this.useKeywordSubFields,
                     filters,
                 );
@@ -260,6 +268,7 @@ export class ElasticSearchService implements Search {
                         track_total_hits: true,
                         body: {
                             query: stepQuery,
+                            fields: ['id'],
                         },
                     },
                 };
@@ -271,13 +280,13 @@ export class ElasticSearchService implements Search {
                 }
                 if (total > MAX_CHAINED_PARAMS_RESULT) {
                     throw new Error(
-                        `Chained parameter ${stepQueryParams} result in more than ${MAX_CHAINED_PARAMS_RESULT} ${resourceType} resource. Please provide more precise queries.`,
+                        `Chained parameter ${searchParam} result in more than ${MAX_CHAINED_PARAMS_RESULT} ${resourceType} resource. Please provide more precise queries.`,
                     );
                 }
-                stepQueryParams = { [nextStepParam]: hits.map((hit) => `${resourceType}/${hit._source.id}`) };
+                stepValue = hits.map((hit) => `${resourceType}/${hit._source.id}`);
             }
             if (chainComplete) {
-                combinedChainedParameters = merge(combinedChainedParameters, stepQueryParams);
+                combinedChainedParameters = merge(combinedChainedParameters, { [lastChain.searchParam]: stepValue });
             }
         }
         return combinedChainedParameters;

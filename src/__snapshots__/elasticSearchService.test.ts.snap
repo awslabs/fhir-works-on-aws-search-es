@@ -1676,6 +1676,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -1708,6 +1711,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -1738,6 +1744,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -1836,6 +1845,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -1868,6 +1880,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -1940,6 +1955,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -1998,6 +2016,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -2046,6 +2067,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -2118,6 +2142,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
@@ -2155,6 +2182,9 @@ Array [
   Array [
     Object {
       "body": Object {
+        "fields": Array [
+          "id",
+        ],
         "query": Object {
           "bool": Object {
             "filter": Array [
