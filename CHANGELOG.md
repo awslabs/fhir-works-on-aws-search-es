@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.6.0...v3.7.0) (2021-10-28)
+
+
+### Features
+
+* use sessionId as search preference ([#130](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/130)) ([85f53ee](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/85f53eeef4df2b2f680b3726580093ab79184376))
+
 ## [3.6.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.5.2...v3.6.0) (2021-10-08)
 
 
