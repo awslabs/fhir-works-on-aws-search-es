@@ -1123,7 +1123,7 @@ describe('typeSearch', () => {
             (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
             const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
 
-            expect(
+            await expect(
                 es.typeSearch({
                     resourceType: 'Patient',
                     baseUrl: 'https://base-url.com',

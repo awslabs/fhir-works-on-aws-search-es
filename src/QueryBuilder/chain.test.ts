@@ -79,7 +79,7 @@ describe('parseChainedParameters', () => {
             }),
         ).toThrow(
             new InvalidSearchParameterError(
-                "Chained search parameter 'address' for resource type Organization does not point to another resource.",
+                "Chained search parameter 'address' for resource type Organization is not a reference.",
             ),
         );
 
