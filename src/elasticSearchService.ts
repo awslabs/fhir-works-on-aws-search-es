@@ -238,6 +238,7 @@ export class ElasticSearchService implements Search {
             const searchQueryWithAlias = {
                 ...searchQuery.queryRequest,
                 index: getAliasName(searchQuery.resourceType, request.tenantId),
+                ...(request.sessionId && { preference: request.sessionId }),
             };
 
             if (logger.isDebugEnabled()) {
@@ -281,7 +282,10 @@ export class ElasticSearchService implements Search {
             logger.debug(`Elastic msearch query: ${JSON.stringify(searchQueriesWithAlias, null, 2)}`);
         }
         const apiResponse = await this.esClient.msearch({
-            body: searchQueriesWithAlias.flatMap((query) => [{ index: query.index }, { query: query.body!.query }]),
+            body: searchQueriesWithAlias.flatMap((query) => [
+                { index: query.index, ...(request.sessionId && { preference: request.sessionId }) },
+                { query: query.body!.query },
+            ]),
         });
 
         return (apiResponse.body.responses as any[])
