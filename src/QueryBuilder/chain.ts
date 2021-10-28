@@ -38,7 +38,7 @@ const parseChainedParameters = (
                 }
                 if (fhirSearchParam.type !== 'reference') {
                     throw new InvalidSearchParameterError(
-                        `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} does not point to another resource.`,
+                        `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} is not a reference.`,
                     );
                 }
                 let nextResourceType;
