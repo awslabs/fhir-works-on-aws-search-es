@@ -1,6 +1,6 @@
 {
   "name": "fhir-works-on-aws-search-es",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "description": "FHIR Works on AWS search Elasticsearch implementation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -32,7 +32,7 @@
     "aws-elasticsearch-connector": "^8.2.0",
     "aws-sdk": "^2.1000.0",
     "date-fns": "^2.19.0",
-    "fhir-works-on-aws-interface": "^11.1.0",
+    "fhir-works-on-aws-interface": "^11.3.0",
     "flat": "^5.0.2",
     "lodash": "^4.17.20",
     "nearley": "^2.20.0"

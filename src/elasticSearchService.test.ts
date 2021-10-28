@@ -96,6 +96,7 @@ describe('typeSearch', () => {
                 baseUrl: 'https://base-url.com',
                 queryParams,
                 allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+                sessionId: 'CUSTOMER_SESSION_ID',
             });
 
             expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
@@ -587,6 +588,7 @@ describe('typeSearch', () => {
             baseUrl: 'https://base-url.com',
             queryParams: { ...queryParams },
             allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            sessionId: 'CUSTOMER_SESSION_ID',
         });
 
         expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot('search queries');
