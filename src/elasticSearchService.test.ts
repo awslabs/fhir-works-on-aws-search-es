@@ -1014,6 +1014,7 @@ describe('typeSearch', () => {
                                 _type: '_doc',
                                 _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
                                 _score: 1,
+                                fields: { id: ['ab69afd3-39ed-42c3-9f77-8a718a247742'] },
                                 _source: {
                                     vid: '1',
                                     id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
@@ -1055,6 +1056,7 @@ describe('typeSearch', () => {
                                     _type: '_doc',
                                     _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
                                     _score: 1,
+                                    fields: { id: ['ab69afd3-39ed-42c3-9f77-8a718a247742'] },
                                     _source: {
                                         vid: '1',
                                         id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
