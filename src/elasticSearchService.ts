@@ -269,6 +269,7 @@ export class ElasticSearchService implements Search {
                         body: {
                             query: stepQuery,
                             fields: ['id'],
+                            _source: false,
                         },
                     },
                 };
@@ -283,7 +284,7 @@ export class ElasticSearchService implements Search {
                         `Chained parameter ${searchParam} result in more than ${MAX_CHAINED_PARAMS_RESULT} ${resourceType} resource. Please provide more precise queries.`,
                     );
                 }
-                stepValue = hits.map((hit) => `${resourceType}/${hit._source.id}`);
+                stepValue = hits.map((hit) => `${resourceType}/${hit.fields.id[0]}`);
             }
             if (chainComplete) {
                 combinedChainedParameters = merge(combinedChainedParameters, { [lastChain.searchParam]: stepValue });
