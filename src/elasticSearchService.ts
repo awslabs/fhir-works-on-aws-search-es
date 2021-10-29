@@ -279,7 +279,7 @@ export class ElasticSearchService implements Search {
                     break;
                 }
                 if (total > MAX_CHAINED_PARAMS_RESULT) {
-                    throw new Error(
+                    throw new InvalidSearchParameterError(
                         `Chained parameter ${searchParam} result in more than ${MAX_CHAINED_PARAMS_RESULT} ${resourceType} resource. Please provide more precise queries.`,
                     );
                 }
