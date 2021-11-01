@@ -42,5 +42,6 @@ export const normalizeQueryParams = (queryParams: any): { [key: string]: string[
 };
 
 export const isChainedParameter = (parameterKey: string) => {
-    return parameterKey.match('[A-Za-z][.][A-Za-z]');
+    const regex = new RegExp('[A-Za-z][.][A-Za-z]');
+    return regex.test(parameterKey);
 };
