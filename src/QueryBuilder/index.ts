@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { isEmpty } from 'lodash';
 import { InvalidSearchParameterError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
 import { NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
@@ -13,7 +14,7 @@ import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
 import getOrSearchValues from './searchOR';
-import parseSearchModifiers from './searchModifiers';
+import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from './util';
 import { uriQuery } from './typeQueries/uriQuery';
 
 function typeQueryWithConditions(
@@ -95,16 +96,16 @@ function searchParamQuery(
     let queryList = [];
     for (let i = 0; i < splitSearchValue.length; i += 1) {
         queryList.push(
-            searchParam.compiled.map((compiled) => {
-                return typeQueryWithConditions(
+            searchParam.compiled.map((compiled) =>
+                typeQueryWithConditions(
                     searchParam,
                     compiled,
                     splitSearchValue[i],
                     useKeywordSubFields,
                     baseUrl,
                     modifier,
-                );
-            }),
+                ),
+            ),
         );
     }
     // flatten array of arrays of results into one array with results
@@ -119,35 +120,18 @@ function searchParamQuery(
     };
 }
 
-function normalizeQueryParams(queryParams: any): { [key: string]: string[] } {
-    const normalizedQueryParams: { [key: string]: string[] } = {};
-
-    Object.entries(queryParams).forEach(([searchParameter, searchValue]) => {
-        if (typeof searchValue === 'string') {
-            normalizedQueryParams[searchParameter] = [searchValue];
-            return;
-        }
-        if (Array.isArray(searchValue) && searchValue.every((s) => typeof s === 'string')) {
-            normalizedQueryParams[searchParameter] = searchValue;
-            return;
-        }
-
-        // This may occur if the router has advanced querystring parsing enabled
-        // e.g. {{API_URL}}/Patient?name[key]=Smith may be parsed into {"name":{"key":"Smith"}}
-        throw new InvalidSearchParameterError(`Invalid search parameter: '${searchParameter}'`);
-    });
-
-    return normalizedQueryParams;
-}
-
 function searchRequestQuery(
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
-    request: TypeSearchRequest,
+    queryParams: any,
+    resourceType: string,
+    baseUrl: string,
     useKeywordSubFields: boolean,
 ): any[] {
-    const { baseUrl, queryParams, resourceType } = request;
     return Object.entries(normalizeQueryParams(queryParams))
-        .filter(([searchParameter]) => !NON_SEARCHABLE_PARAMETERS.includes(searchParameter))
+        .filter(
+            ([searchParameter]) =>
+                !NON_SEARCHABLE_PARAMETERS.includes(searchParameter) && !isChainedParameter(searchParameter),
+        )
         .flatMap(([searchParameter, searchValues]) => {
             const searchModifier = parseSearchModifiers(searchParameter);
             const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
@@ -171,11 +155,33 @@ export const buildQueryForAllSearchParameters = (
     request: TypeSearchRequest,
     useKeywordSubFields: boolean,
     additionalFilters: any[] = [],
+    chainedParameterQuery: any = {},
 ): any => {
+    const esQuery = searchRequestQuery(
+        fhirSearchParametersRegistry,
+        request.queryParams,
+        request.resourceType,
+        request.baseUrl,
+        useKeywordSubFields,
+    );
+    if (!isEmpty(chainedParameterQuery)) {
+        const ESChainedParamQuery = searchRequestQuery(
+            fhirSearchParametersRegistry,
+            chainedParameterQuery,
+            request.resourceType,
+            request.baseUrl,
+            useKeywordSubFields,
+        );
+        esQuery.push({
+            bool: {
+                should: ESChainedParamQuery,
+            },
+        });
+    }
     return {
         bool: {
             filter: additionalFilters,
-            must: searchRequestQuery(fhirSearchParametersRegistry, request, useKeywordSubFields),
+            must: esQuery,
         },
     };
 };

@@ -7,7 +7,7 @@
 import URL from 'url';
 
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
-import { partition } from 'lodash';
+import { partition, merge } from 'lodash';
 import {
     Search,
     TypeSearchRequest,
@@ -27,10 +27,12 @@ import {
     ITERATIVE_INCLUSION_PARAMETERS,
     SORT_PARAMETER,
     MAX_ES_WINDOW_SIZE,
+    MAX_CHAINED_PARAMS_RESULT,
 } from './constants';
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
+import parseChainedParameters from './QueryBuilder/chain';
 import getComponentLogger from './loggerBuilder';
 
 export type Query = {
@@ -160,11 +162,14 @@ export class ElasticSearchService implements Search {
 
             const filter = this.getFilters(request);
 
+            const chainedParameterQuery = await this.getChainedParametersQuery(request, filter);
+
             const query = buildQueryForAllSearchParameters(
                 this.fhirSearchParametersRegistry,
                 request,
                 this.useKeywordSubFields,
                 filter,
+                chainedParameterQuery,
             );
 
             const params: Query = {
@@ -227,6 +232,65 @@ export class ElasticSearchService implements Search {
             logger.error(error);
             throw error;
         }
+    }
+
+    // Return translated chained parameters that can be used as normal search parameters
+    // eslint-disable-next-line class-methods-use-this
+    private async getChainedParametersQuery(request: TypeSearchRequest, filters: any[] = []): Promise<{}> {
+        let combinedChainedParameters = {};
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { chain, initialValue } of parseChainedParameters(
+            this.fhirSearchParametersRegistry,
+            request.resourceType,
+            request.queryParams,
+        )) {
+            let stepValue = initialValue;
+            let chainComplete = true;
+            const lastChain: { resourceType: string; searchParam: string } = chain.pop()!;
+            // eslint-disable-next-line no-restricted-syntax
+            for (const { resourceType, searchParam } of chain) {
+                const stepRequest: TypeSearchRequest = {
+                    ...request,
+                    resourceType,
+                    queryParams: { [searchParam]: stepValue },
+                };
+                const stepQuery = buildQueryForAllSearchParameters(
+                    this.fhirSearchParametersRegistry,
+                    stepRequest,
+                    this.useKeywordSubFields,
+                    filters,
+                );
+                const params: Query = {
+                    resourceType,
+                    queryRequest: {
+                        size: MAX_CHAINED_PARAMS_RESULT,
+                        track_total_hits: true,
+                        body: {
+                            query: stepQuery,
+                            fields: ['id'],
+                            _source: false,
+                        },
+                    },
+                };
+                // eslint-disable-next-line no-await-in-loop
+                const { total, hits } = await this.executeQuery(params, request);
+                if (total === 0) {
+                    chainComplete = false;
+                    break;
+                }
+                if (total > MAX_CHAINED_PARAMS_RESULT) {
+                    throw new InvalidSearchParameterError(
+                        `Chained parameter ${searchParam} result in more than ${MAX_CHAINED_PARAMS_RESULT} ${resourceType} resource. Please provide more precise queries.`,
+                    );
+                }
+                stepValue = hits.map((hit) => `${resourceType}/${hit.fields.id[0]}`);
+            }
+            if (chainComplete) {
+                combinedChainedParameters = merge(combinedChainedParameters, { [lastChain.searchParam]: stepValue });
+            }
+        }
+        return combinedChainedParameters;
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -376,11 +440,7 @@ export class ElasticSearchService implements Search {
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
     ): Promise<SearchEntry[]> {
-        if (
-            !ITERATIVE_INCLUSION_PARAMETERS.some((param) => {
-                return request.queryParams[param];
-            })
-        ) {
+        if (!ITERATIVE_INCLUSION_PARAMETERS.some((param) => request.queryParams[param])) {
             return [];
         }
         const result: SearchEntry[] = [];
@@ -514,9 +574,9 @@ export class ElasticSearchService implements Search {
         if (value.length === 0) {
             throw new Error('Malformed SearchFilter, at least 1 value is required for the comparison');
         }
-        const parts: any[] = value.map((v: string) => {
-            return ElasticSearchService.buildSingleElasticSearchFilterPart(key, v, comparisonOperator);
-        });
+        const parts: any[] = value.map((v: string) =>
+            ElasticSearchService.buildSingleElasticSearchFilterPart(key, v, comparisonOperator),
+        );
 
         if (logicalOperator === 'AND' && parts.length > 1) {
             return {
@@ -534,9 +594,7 @@ export class ElasticSearchService implements Search {
      * @returns the `filter` part of the ES query
      */
     private static buildElasticSearchFilter(searchFilters: SearchFilter[]): any[] {
-        const partitions: SearchFilter[][] = partition(searchFilters, (filter) => {
-            return filter.logicalOperator === 'OR';
-        });
+        const partitions: SearchFilter[][] = partition(searchFilters, (filter) => filter.logicalOperator === 'OR');
         const orSearchFilterParts: any[] = partitions[0].map(ElasticSearchService.buildElasticSearchFilterPart).flat();
         const andSearchFilterParts: any[] = partitions[1].map(ElasticSearchService.buildElasticSearchFilterPart).flat();
         let filterQuery: any[] = [];

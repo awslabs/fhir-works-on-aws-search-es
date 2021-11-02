@@ -988,4 +988,153 @@ describe('typeSearch', () => {
             },
         );
     });
+
+    describe('query snapshots for chained queryParams', () => {
+        each([
+            [{ 'general-practitioner:PractitionerRole.location:Location.address-city': 'Washington' }],
+            [
+                {
+                    'general-practitioner:PractitionerRole.location:Location.address-city': 'Washington',
+                    'organization.name': 'HL7',
+                },
+            ],
+            [{ 'link:Patient.birthdate': 'ge2020-01-01', 'link:Patient.organization.name': 'HL7' }],
+        ]).test('queryParams=%j', async (queryParams: any) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 1,
+                        hits: [
+                            {
+                                _index: 'patient',
+                                _type: '_doc',
+                                _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                _score: 1,
+                                fields: { id: ['ab69afd3-39ed-42c3-9f77-8a718a247742'] },
+                                _source: {
+                                    vid: '1',
+                                    id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                    resourceType: 'Patient',
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams,
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
+    });
+
+    describe('query snapshots for chained queryParams, multi-tenancy enabled', () => {
+        each([[{ 'general-practitioner:PractitionerRole.location:Location.address-city': 'Washington' }]]).test(
+            'queryParams=%j',
+            async (queryParams: any) => {
+                const fakeSearchResult = {
+                    body: {
+                        hits: {
+                            total: {
+                                value: 1,
+                                relation: 'eq',
+                            },
+                            max_score: 1,
+                            hits: [
+                                {
+                                    _index: 'patient',
+                                    _type: '_doc',
+                                    _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                    _score: 1,
+                                    fields: { id: ['ab69afd3-39ed-42c3-9f77-8a718a247742'] },
+                                    _source: {
+                                        vid: '1',
+                                        id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                        resourceType: 'Patient',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                };
+                (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+                const es = new ElasticSearchService(
+                    FILTER_RULES_FOR_ACTIVE_RESOURCES,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    {
+                        enableMultiTenancy: true,
+                    },
+                );
+                await es.typeSearch({
+                    resourceType: 'Patient',
+                    baseUrl: 'https://base-url.com',
+                    queryParams,
+                    allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+                    tenantId: 'tenant1',
+                });
+
+                expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+            },
+        );
+    });
+
+    describe('Invalid chained queryParams', () => {
+        each([
+            // Missing resource type for general-practitioner
+            [{ 'general-practitioner.location:Location.address-city': 'Washington' }],
+            // Wrong resource type for general-practitioner
+            [{ 'general-practitioner:RelatedPerson.location:Location.address-city': 'Washington' }],
+            // Search parameter phone is not reference type
+            [{ 'phone.provider': 'AT&T' }],
+        ]).test('queryParams=%j', async (queryParams: any) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 1,
+                        hits: [
+                            {
+                                _index: 'patient',
+                                _type: '_doc',
+                                _id: 'ab69afd3-39ed-42c3-9f77-8a718a247742_1',
+                                _score: 1,
+                                _source: {
+                                    vid: '1',
+                                    id: 'ab69afd3-39ed-42c3-9f77-8a718a247742',
+                                    resourceType: 'Patient',
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+
+            await expect(
+                es.typeSearch({
+                    resourceType: 'Patient',
+                    baseUrl: 'https://base-url.com',
+                    queryParams,
+                    allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+                }),
+            ).rejects.toThrowError(InvalidSearchParameterError);
+        });
+    });
 });
