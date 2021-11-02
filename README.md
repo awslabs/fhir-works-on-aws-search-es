@@ -99,7 +99,7 @@ This package is dependent on:
 |--------------       |:----------:|---                                                                                |
 | OR search parameter | ✔          | This refers to the use of a comma. e.g. `/Patient?language=FR,NL`                 |
 | AND search parameter| ✔          | This refers to repeating search parameters e.g. `/Patient?language=FR&language=NL` |
-| Chained parameters  | -          |       |
+| Chained parameters  | ✔          | This refers to the use of a dot. e.g. `/Patient?organization.name=HL7`  * The inner query must match no more than 100 results or the search returns an error. This functionality is suitable for queries where the inner query is highly selective.    |
 | Reverse Chaining  | -          |       |
 
 
