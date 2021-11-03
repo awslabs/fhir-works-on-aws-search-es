@@ -16,6 +16,7 @@ expression-> path                                        {% id %}
 	| "(" path " as " IDENTIFIER ")" ("." IDENTIFIER):?  {% d => ({...d[1], path:`${d[1].path}${d[3][0].toUpperCase() + d[3].substring(1)}${d[5] ? '.' + d[5][1] : ''}`}) %}
 	| path " as " IDENTIFIER                             {% d => ({...d[0], path:`${d[0].path}${d[2][0].toUpperCase() + d[2].substring(1)}`}) %}
 	| path "." typeFn "(" IDENTIFIER ")"                 {% d => ({...d[0], path:`${d[0].path}${d[4][0].toUpperCase() + d[4].substring(1)}`}) %}
+	| path ".extension('" STRING_VALUE "')"              {% d => ({...d[0], path:`${d[0].path}${d[0].path ? '.':''}extension`, condition:[`${d[0].path}${d[0].path ? '.':''}extension.url`, '=', d[2]]}) %}
 	| path ".where(resolve() is " IDENTIFIER ")"         {% d => ({...d[0], condition: [d[0].path, 'resolve', d[2]]}) %}
 
 path -> IDENTIFIER ("." IDENTIFIER):*                    {% (d) => ({resourceType:d[0], path:[...d[1].flat()].join('').substring(1), fullPath:[d[0], ...d[1].flat()].join('')}) %}
