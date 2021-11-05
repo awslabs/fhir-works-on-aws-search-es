@@ -1,5 +1,31 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`compile .extension() function - DocumentReference.extension('http://example.org/fhir/StructureDefinition/participation-agreement') 1`] = `
+Array [
+  Object {
+    "base": "DocumentReference",
+    "compiled": Array [
+      Object {
+        "condition": Array [
+          "extension.url",
+          "=",
+          "http://example.org/fhir/StructureDefinition/participation-agreement",
+        ],
+        "path": "extension",
+        "resourceType": "DocumentReference",
+      },
+    ],
+    "description": "Search by url for a participation agreement, which is stored in a DocumentReference",
+    "name": "part-agree",
+    "target": Array [
+      "DocumentReference",
+    ],
+    "type": "reference",
+    "url": "http://hl7.org/fhir/SearchParameter/example-extension",
+  },
+]
+`;
+
 exports[`compile OR operator - CapabilityStatement.title | CodeSystem.title | ConceptMap.title | ImplementationGuide.title | MessageDefinition.title | OperationDefinition.title | StructureDefinition.title | StructureMap.title | TerminologyCapabilities.title | ValueSet.title 1`] = `
 Array [
   Object {

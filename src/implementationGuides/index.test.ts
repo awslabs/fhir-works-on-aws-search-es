@@ -142,6 +142,36 @@ describe('compile', () => {
         await expect(compiled).resolves.toMatchSnapshot();
     });
 
+    test(`.extension() function - DocumentReference.extension('http://example.org/fhir/StructureDefinition/participation-agreement')`, async () => {
+        // example extension from https://www.hl7.org/fhir/R4/searchparameter-example-extension.json.html
+        const extensionSearchParam = {
+            resourceType: 'SearchParameter',
+            id: 'example-extension',
+            url: 'http://hl7.org/fhir/SearchParameter/example-extension',
+            name: 'Example Search Parameter on an extension',
+            description: 'Search by url for a participation agreement, which is stored in a DocumentReference',
+            code: 'part-agree',
+            base: ['DocumentReference'],
+            type: 'reference',
+            expression:
+                "DocumentReference.extension('http://example.org/fhir/StructureDefinition/participation-agreement')",
+            xpath: "f:DocumentReference/f:extension[@url='http://example.org/fhir/StructureDefinition/participation-agreement']",
+            target: ['DocumentReference'],
+        };
+        const compiled = compile([extensionSearchParam]);
+        await expect(compiled).resolves.toMatchSnapshot();
+
+        // .extension('x') is syntactic sugar for extension.where(url = 'x')
+        await expect(compiled).resolves.toEqual(
+            await compile([
+                {
+                    ...extensionSearchParam,
+                    expression: `DocumentReference.extension.where(url = 'http://example.org/fhir/StructureDefinition/participation-agreement')`,
+                },
+            ]),
+        );
+    });
+
     test(`xpath explicitly expands choice of data types and fhirPath does not`, async () => {
         const compiled = compile([
             {
