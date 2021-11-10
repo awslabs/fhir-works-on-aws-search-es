@@ -1137,4 +1137,40 @@ describe('typeSearch', () => {
             ).rejects.toThrowError(InvalidSearchParameterError);
         });
     });
+
+    describe('query snapshots for nonsense chained queryParams', () => {
+        each([
+            [{ 'general-practitioner:PractitionerRole.location:Location.address-city': 'wefw' }],
+            [
+                {
+                    'general-practitioner:PractitionerRole.location:Location.address-city': 'pwoiejfpow',
+                    'organization.name': 'wefgw',
+                },
+            ],
+            [{ 'link:Patient.birthdate': 'ge2020-01-01', 'link:Patient.organization.name': 'opwijeow' }],
+        ]).test('queryParams=%j', async (queryParams: any) => {
+            const fakeSearchResult = {
+                body: {
+                    hits: {
+                        total: {
+                            value: 1,
+                            relation: 'eq',
+                        },
+                        max_score: 0,
+                        hits: [],
+                    },
+                },
+            };
+            (ElasticSearch.search as jest.Mock).mockResolvedValue(fakeSearchResult);
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+            await es.typeSearch({
+                resourceType: 'Patient',
+                baseUrl: 'https://base-url.com',
+                queryParams,
+                allowedResourceTypes: ALLOWED_RESOURCE_TYPES,
+            });
+
+            expect((ElasticSearch.search as jest.Mock).mock.calls).toMatchSnapshot();
+        });
+    });
 });

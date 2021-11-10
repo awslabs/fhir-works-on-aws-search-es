@@ -4,7 +4,7 @@ import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
 import { NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from './util';
 
-interface ChainParameter {
+export interface ChainParameter {
     chain: { resourceType: string; searchParam: string }[];
     initialValue: string[];
 }
