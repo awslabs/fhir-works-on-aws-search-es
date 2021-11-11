@@ -1138,7 +1138,7 @@ describe('typeSearch', () => {
         });
     });
 
-    describe('query snapshots for nonsense chained queryParams', () => {
+    describe('query snapshots for chained queryParams with no matches', () => {
         each([
             [{ 'general-practitioner:PractitionerRole.location:Location.address-city': 'wefw' }],
             [
@@ -1153,7 +1153,7 @@ describe('typeSearch', () => {
                 body: {
                     hits: {
                         total: {
-                            value: 1,
+                            value: 0,
                             relation: 'eq',
                         },
                         max_score: 0,

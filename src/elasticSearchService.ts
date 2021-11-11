@@ -321,7 +321,6 @@ export class ElasticSearchService implements Search {
                 index: getAliasName(searchQuery.resourceType, request.tenantId),
                 ...(request.sessionId && { preference: request.sessionId }),
             };
-
             if (logger.isDebugEnabled()) {
                 logger.debug(`Elastic search query: ${JSON.stringify(searchQueryWithAlias, null, 2)}`);
             }
@@ -332,9 +331,12 @@ export class ElasticSearchService implements Search {
             };
         } catch (error) {
             // Indexes are created the first time a resource of a given type is written to DDB.
-            if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
+            if (error instanceof ResponseError && error.meta.body.error.type === 'index_not_found_exception') {
                 logger.info(
-                    `Search index for ${searchQuery.queryRequest.index} does not exist. Returning an empty search result`,
+                    `Search index for ${getAliasName(
+                        searchQuery.resourceType,
+                        request.tenantId,
+                    )} does not exist. Returning an empty search result`,
                 );
                 return {
                     total: 0,

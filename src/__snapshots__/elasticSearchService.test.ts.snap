@@ -2148,6 +2148,259 @@ Array [
 ]
 `;
 
+exports[`typeSearch query snapshots for chained queryParams with no matches queryParams={"general-practitioner:PractitionerRole.location:Location.address-city":"pwoiejfpow","organization.name":"wefgw"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "_source": false,
+        "fields": Array [
+          "id",
+        ],
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "address.city",
+                    "address.city.*",
+                  ],
+                  "lenient": true,
+                  "query": "pwoiejfpow",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "index": "location-alias",
+      "size": 100,
+      "track_total_hits": true,
+    },
+  ],
+  Array [
+    Object {
+      "body": Object {
+        "_source": false,
+        "fields": Array [
+          "id",
+        ],
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "name",
+                          "name.*",
+                        ],
+                        "lenient": true,
+                        "query": "wefgw",
+                      },
+                    },
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "alias",
+                          "alias.*",
+                        ],
+                        "lenient": true,
+                        "query": "wefgw",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "index": "organization-alias",
+      "size": 100,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for chained queryParams with no matches queryParams={"general-practitioner:PractitionerRole.location:Location.address-city":"wefw"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "_source": false,
+        "fields": Array [
+          "id",
+        ],
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "multi_match": Object {
+                  "fields": Array [
+                    "address.city",
+                    "address.city.*",
+                  ],
+                  "lenient": true,
+                  "query": "wefw",
+                },
+              },
+            ],
+          },
+        },
+      },
+      "index": "location-alias",
+      "size": 100,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
+exports[`typeSearch query snapshots for chained queryParams with no matches queryParams={"link:Patient.birthdate":"ge2020-01-01","link:Patient.organization.name":"opwijeow"} 1`] = `
+Array [
+  Array [
+    Object {
+      "body": Object {
+        "_source": false,
+        "fields": Array [
+          "id",
+        ],
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "range": Object {
+                        "birthDate": Object {
+                          "gte": 2020-01-01T00:00:00.000Z,
+                        },
+                      },
+                    },
+                    Object {
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "birthDate.start",
+                            },
+                          },
+                          Object {
+                            "exists": Object {
+                              "field": "birthDate.end",
+                            },
+                          },
+                          Object {
+                            "range": Object {
+                              "birthDate.end": Object {
+                                "gte": 2020-01-01T00:00:00.000Z,
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "index": "patient-alias",
+      "size": 100,
+      "track_total_hits": true,
+    },
+  ],
+  Array [
+    Object {
+      "body": Object {
+        "_source": false,
+        "fields": Array [
+          "id",
+        ],
+        "query": Object {
+          "bool": Object {
+            "filter": Array [
+              Object {
+                "match": Object {
+                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
+                },
+              },
+            ],
+            "must": Array [
+              Object {
+                "bool": Object {
+                  "should": Array [
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "name",
+                          "name.*",
+                        ],
+                        "lenient": true,
+                        "query": "opwijeow",
+                      },
+                    },
+                    Object {
+                      "multi_match": Object {
+                        "fields": Array [
+                          "alias",
+                          "alias.*",
+                        ],
+                        "lenient": true,
+                        "query": "opwijeow",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      "index": "organization-alias",
+      "size": 100,
+      "track_total_hits": true,
+    },
+  ],
+]
+`;
+
 exports[`typeSearch query snapshots for chained queryParams, multi-tenancy enabled queryParams={"general-practitioner:PractitionerRole.location:Location.address-city":"Washington"} 1`] = `
 Array [
   Array [
@@ -2392,418 +2645,6 @@ Array [
               },
             ],
             "must": Array [],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient-alias",
-      "size": 20,
-      "track_total_hits": true,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for nonsense chained queryParams queryParams={"general-practitioner:PractitionerRole.location:Location.address-city":"pwoiejfpow","organization.name":"wefgw"} 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "multi_match": Object {
-                  "fields": Array [
-                    "address.city",
-                    "address.city.*",
-                  ],
-                  "lenient": true,
-                  "query": "pwoiejfpow",
-                },
-              },
-            ],
-          },
-        },
-      },
-      "index": "location-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [],
-          },
-        },
-      },
-      "index": "practitionerrole-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "bool": Object {
-                  "should": Array [
-                    Object {
-                      "multi_match": Object {
-                        "fields": Array [
-                          "name",
-                          "name.*",
-                        ],
-                        "lenient": true,
-                        "query": "wefgw",
-                      },
-                    },
-                    Object {
-                      "multi_match": Object {
-                        "fields": Array [
-                          "alias",
-                          "alias.*",
-                        ],
-                        "lenient": true,
-                        "query": "wefgw",
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-      "index": "organization-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "bool": Object {
-                  "should": Array [],
-                },
-              },
-            ],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient-alias",
-      "size": 20,
-      "track_total_hits": true,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for nonsense chained queryParams queryParams={"general-practitioner:PractitionerRole.location:Location.address-city":"wefw"} 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "multi_match": Object {
-                  "fields": Array [
-                    "address.city",
-                    "address.city.*",
-                  ],
-                  "lenient": true,
-                  "query": "wefw",
-                },
-              },
-            ],
-          },
-        },
-      },
-      "index": "location-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [],
-          },
-        },
-      },
-      "index": "practitionerrole-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "bool": Object {
-                  "should": Array [],
-                },
-              },
-            ],
-          },
-        },
-      },
-      "from": 0,
-      "index": "patient-alias",
-      "size": 20,
-      "track_total_hits": true,
-    },
-  ],
-]
-`;
-
-exports[`typeSearch query snapshots for nonsense chained queryParams queryParams={"link:Patient.birthdate":"ge2020-01-01","link:Patient.organization.name":"opwijeow"} 1`] = `
-Array [
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "bool": Object {
-                  "should": Array [
-                    Object {
-                      "range": Object {
-                        "birthDate": Object {
-                          "gte": 2020-01-01T00:00:00.000Z,
-                        },
-                      },
-                    },
-                    Object {
-                      "bool": Object {
-                        "must": Array [
-                          Object {
-                            "exists": Object {
-                              "field": "birthDate.start",
-                            },
-                          },
-                          Object {
-                            "exists": Object {
-                              "field": "birthDate.end",
-                            },
-                          },
-                          Object {
-                            "range": Object {
-                              "birthDate.end": Object {
-                                "gte": 2020-01-01T00:00:00.000Z,
-                              },
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-      "index": "patient-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "bool": Object {
-                  "should": Array [
-                    Object {
-                      "multi_match": Object {
-                        "fields": Array [
-                          "name",
-                          "name.*",
-                        ],
-                        "lenient": true,
-                        "query": "opwijeow",
-                      },
-                    },
-                    Object {
-                      "multi_match": Object {
-                        "fields": Array [
-                          "alias",
-                          "alias.*",
-                        ],
-                        "lenient": true,
-                        "query": "opwijeow",
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-      "index": "organization-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "_source": false,
-        "fields": Array [
-          "id",
-        ],
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [],
-          },
-        },
-      },
-      "index": "patient-alias",
-      "size": 100,
-      "track_total_hits": true,
-    },
-  ],
-  Array [
-    Object {
-      "body": Object {
-        "query": Object {
-          "bool": Object {
-            "filter": Array [
-              Object {
-                "match": Object {
-                  "someFieldThatTellsIfTheResourceIsActive": "AVAILABLE",
-                },
-              },
-            ],
-            "must": Array [
-              Object {
-                "bool": Object {
-                  "should": Array [],
-                },
-              },
-            ],
           },
         },
       },
