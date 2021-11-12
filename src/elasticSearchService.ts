@@ -7,7 +7,7 @@
 import URL from 'url';
 
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
-import { partition, merge } from 'lodash';
+import { partition, merge, isEmpty } from 'lodash';
 import {
     Search,
     TypeSearchRequest,
@@ -32,7 +32,7 @@ import {
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
-import parseChainedParameters from './QueryBuilder/chain';
+import parseChainedParameters, { ChainParameter } from './QueryBuilder/chain';
 import getComponentLogger from './loggerBuilder';
 
 export type Query = {
@@ -161,8 +161,25 @@ export class ElasticSearchService implements Search {
             }
 
             const filter = this.getFilters(request);
-
-            const chainedParameterQuery = await this.getChainedParametersQuery(request, filter);
+            const parsedChainParameters = parseChainedParameters(
+                this.fhirSearchParametersRegistry,
+                request.resourceType,
+                request.queryParams,
+            );
+            let chainedParameterQuery;
+            if (parsedChainParameters.length > 0) {
+                chainedParameterQuery = await this.getChainedParametersQuery(parsedChainParameters, request, filter);
+                if (isEmpty(chainedParameterQuery)) {
+                    // chained parameter query did not return any results
+                    return {
+                        result: {
+                            numberOfResults: 0,
+                            entries: [],
+                            message: '',
+                        },
+                    };
+                }
+            }
 
             const query = buildQueryForAllSearchParameters(
                 this.fhirSearchParametersRegistry,
@@ -236,15 +253,15 @@ export class ElasticSearchService implements Search {
 
     // Return translated chained parameters that can be used as normal search parameters
     // eslint-disable-next-line class-methods-use-this
-    private async getChainedParametersQuery(request: TypeSearchRequest, filters: any[] = []): Promise<{}> {
+    private async getChainedParametersQuery(
+        parsedChainParameters: ChainParameter[],
+        request: TypeSearchRequest,
+        filters: any[] = [],
+    ): Promise<{}> {
         let combinedChainedParameters = {};
 
         // eslint-disable-next-line no-restricted-syntax
-        for (const { chain, initialValue } of parseChainedParameters(
-            this.fhirSearchParametersRegistry,
-            request.resourceType,
-            request.queryParams,
-        )) {
+        for (const { chain, initialValue } of parsedChainParameters) {
             let stepValue = initialValue;
             let chainComplete = true;
             const lastChain: { resourceType: string; searchParam: string } = chain.pop()!;
@@ -304,7 +321,6 @@ export class ElasticSearchService implements Search {
                 index: getAliasName(searchQuery.resourceType, request.tenantId),
                 ...(request.sessionId && { preference: request.sessionId }),
             };
-
             if (logger.isDebugEnabled()) {
                 logger.debug(`Elastic search query: ${JSON.stringify(searchQueryWithAlias, null, 2)}`);
             }
@@ -315,9 +331,12 @@ export class ElasticSearchService implements Search {
             };
         } catch (error) {
             // Indexes are created the first time a resource of a given type is written to DDB.
-            if (error instanceof ResponseError && error.message === 'index_not_found_exception') {
+            if (error instanceof ResponseError && error.meta.body.error.type === 'index_not_found_exception') {
                 logger.info(
-                    `Search index for ${searchQuery.queryRequest.index} does not exist. Returning an empty search result`,
+                    `Search index for ${getAliasName(
+                        searchQuery.resourceType,
+                        request.tenantId,
+                    )} does not exist. Returning an empty search result`,
                 );
                 return {
                     total: 0,
