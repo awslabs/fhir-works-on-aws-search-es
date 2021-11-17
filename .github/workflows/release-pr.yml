@@ -31,6 +31,6 @@ jobs:
           source_branch: dev-release
           destination_branch: mainline
           pr_draft: false
-          pr_reviewer: "Bingjiling,rsmayda"
+          pr_reviewer: "awslabs/aws-chamonix-fhir"
           pr_label: "auto-release-pr"
           github_token: ${{ secrets.GITHUB_TOKEN }}
