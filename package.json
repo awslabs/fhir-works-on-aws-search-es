@@ -23,6 +23,7 @@
     "test": "jest src --silent",
     "test-coverage": "jest --coverage",
     "release": "yarn run build && yarn run lint && yarn run test",
+    "standard-version": "standard-version --skip.tag=true",
     "clean": "rm -rf build/* node_modules/* dist/* .serverless/* .nyc_output/* lib/*",
     "local": "node .",
     "prepublish": "tsc"
@@ -56,6 +57,7 @@
     "jest-mock-extended": "^1.0.8",
     "json-stringify-pretty-compact": "^2.0.0",
     "prettier": "^2.4.1",
+    "standard-version": "^9.3.2",
     "ts-jest": "^26.4.4",
     "typescript": "^4.1.3"
   },
