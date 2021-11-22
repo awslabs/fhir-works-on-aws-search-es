@@ -7,7 +7,11 @@ jobs:
   tag-release:
     name: Create release PR
     runs-on: ubuntu-18.04
-    if: ${{ !startsWith(github.event.head_commit.message, 'chore') }}
+    if: >
+      ${{ startsWith(github.event.head_commit.message, 'feat') ||
+      startsWith(github.event.head_commit.message, 'fix') ||
+      contains(github.event.head_commit.message, 'BREAKING_CHANGE') ||
+      contains(github.event.head_commit.message, '!')}}
     steps:
       - uses: actions/checkout@v2.3.4
         with:
@@ -22,13 +26,13 @@ jobs:
           yarn install
           git config user.name "github-action-automation"
           git config user.email "aws-chamonix-dev@amazon.com"
-          git checkout -b dev-release
+          git checkout -b "dev-release-${{ github.event.head_commit.id }}"
           yarn run standard-version
-          git push --set-upstream origin dev-release
+          git push --set-upstream origin "dev-release-${{ github.event.head_commit.id }}"
       - name: Create Pull Request to merge to mainline
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: dev-release
+          source_branch: "dev-release-${{ github.event.head_commit.id }}"
           destination_branch: mainline
           pr_draft: false
           pr_reviewer: "awslabs/aws-chamonix-fhir"

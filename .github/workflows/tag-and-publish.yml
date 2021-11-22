@@ -1,8 +1,8 @@
-name: Tag release, publish to NPM
+name: Tag release and publish to npm
 on: [workflow_dispatch]
 jobs:
   tag-release:
-    name: Tag release based on CHANGELOG
+    name: Tag release and publish to npm
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2.3.4
@@ -20,6 +20,7 @@ jobs:
           NEW_VERSION=v$(jq '.version' -r package.json)
           git ls-remote --exit-code --tags origin $NEW_VERSION || git tag $NEW_VERSION
           git push origin --tags
-      - uses: JS-DevTools/npm-publish@v1
+      - name: Publish to NPM
+        uses: JS-DevTools/npm-publish@v1
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{secrets.NPM_TOKEN}}
