@@ -82,7 +82,8 @@ export function tokenQuery(
             `${compiled.path}.code${keywordSuffix}`, // Coding
             `${compiled.path}.coding.code${keywordSuffix}`, // CodeableConcept
             `${compiled.path}.value${keywordSuffix}`, // Identifier, ContactPoint
-            `${compiled.path}${keywordSuffix}`, // code, boolean, uri, string
+            `${compiled.path}${keywordSuffix}`, // code, uri, string
+            `${compiled.path}`, // boolean
         ];
 
         queries.push({
