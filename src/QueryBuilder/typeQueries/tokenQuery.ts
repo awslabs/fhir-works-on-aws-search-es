@@ -55,7 +55,8 @@ export function tokenQuery(
     }
     const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
     const queries = [];
-    const keywordSuffix = useKeywordSubFields && !FIELDS_WITHOUT_KEYWORD.includes(compiled.path) ? '.keyword' : '';
+    const useKeywordSuffix = useKeywordSubFields && !FIELDS_WITHOUT_KEYWORD.includes(compiled.path);
+    const keywordSuffix = useKeywordSuffix ? '.keyword' : '';
 
     // Token search params are used for many different field types. Search is not aware of the types of the fields in FHIR resources.
     // The field type is specified in StructureDefinition, but not in SearchParameter.
@@ -82,9 +83,14 @@ export function tokenQuery(
             `${compiled.path}.code${keywordSuffix}`, // Coding
             `${compiled.path}.coding.code${keywordSuffix}`, // CodeableConcept
             `${compiled.path}.value${keywordSuffix}`, // Identifier, ContactPoint
-            `${compiled.path}${keywordSuffix}`, // code, uri, string
-            `${compiled.path}`, // boolean
+            `${compiled.path}${keywordSuffix}`, // code, uri, string, boolean
         ];
+
+        // accommodate for boolean value when keywordSuffix is used
+        // See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html for more detail
+        if (useKeywordSuffix) {
+            fields.push(`${compiled.path}`);
+        }
 
         queries.push({
             multi_match: {

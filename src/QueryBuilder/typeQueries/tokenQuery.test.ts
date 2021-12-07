@@ -217,7 +217,6 @@ describe('tokenQuery', () => {
                         "identifier.coding.code",
                         "identifier.value",
                         "identifier",
-                        "identifier",
                       ],
                       "lenient": true,
                       "query": "2345",
