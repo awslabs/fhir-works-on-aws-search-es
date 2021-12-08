@@ -79,6 +79,8 @@ export function tokenQuery(
     }
 
     if (code !== undefined) {
+        // '.code', '.coding.code', 'value' came from the original input data, e.g. language in Patient resource:
+        // ${keywordSuffix} came from ElasticSearch field mapping
         const fields = [
             `${compiled.path}.code${keywordSuffix}`, // Coding
             `${compiled.path}.coding.code${keywordSuffix}`, // CodeableConcept
@@ -86,8 +88,7 @@ export function tokenQuery(
             `${compiled.path}${keywordSuffix}`, // code, uri, string, boolean
         ];
 
-        // accommodate for boolean value when keywordSuffix is used
-        // See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html for more detail
+        // accommodate for boolean value when keywordSuffix is used, as .keyword field is not created for boolean value
         if (useKeywordSuffix) {
             fields.push(`${compiled.path}`);
         }
