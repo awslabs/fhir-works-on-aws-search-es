@@ -55,7 +55,8 @@ export function tokenQuery(
     }
     const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
     const queries = [];
-    const keywordSuffix = useKeywordSubFields && !FIELDS_WITHOUT_KEYWORD.includes(compiled.path) ? '.keyword' : '';
+    const useKeywordSuffix = useKeywordSubFields && !FIELDS_WITHOUT_KEYWORD.includes(compiled.path);
+    const keywordSuffix = useKeywordSuffix ? '.keyword' : '';
 
     // Token search params are used for many different field types. Search is not aware of the types of the fields in FHIR resources.
     // The field type is specified in StructureDefinition, but not in SearchParameter.
@@ -78,12 +79,19 @@ export function tokenQuery(
     }
 
     if (code !== undefined) {
+        // '.code', '.coding.code', 'value' came from the original input data, e.g. language in Patient resource:
+        // ${keywordSuffix} came from ElasticSearch field mapping
         const fields = [
             `${compiled.path}.code${keywordSuffix}`, // Coding
             `${compiled.path}.coding.code${keywordSuffix}`, // CodeableConcept
             `${compiled.path}.value${keywordSuffix}`, // Identifier, ContactPoint
-            `${compiled.path}${keywordSuffix}`, // code, boolean, uri, string
+            `${compiled.path}${keywordSuffix}`, // code, uri, string, boolean
         ];
+
+        // accommodate for boolean value when keywordSuffix is used, as .keyword field is not created for boolean value
+        if (useKeywordSuffix) {
+            fields.push(`${compiled.path}`);
+        }
 
         queries.push({
             multi_match: {

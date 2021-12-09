@@ -102,6 +102,7 @@ describe('tokenQuery', () => {
                         "identifier.coding.code.keyword",
                         "identifier.value.keyword",
                         "identifier.keyword",
+                        "identifier",
                       ],
                       "lenient": true,
                       "query": "2345",
@@ -121,6 +122,7 @@ describe('tokenQuery', () => {
                   "identifier.coding.code.keyword",
                   "identifier.value.keyword",
                   "identifier.keyword",
+                  "identifier",
                 ],
                 "lenient": true,
                 "query": "http://acme.org/patient",
@@ -140,6 +142,7 @@ describe('tokenQuery', () => {
                         "identifier.coding.code.keyword",
                         "identifier.value.keyword",
                         "identifier.keyword",
+                        "identifier",
                       ],
                       "lenient": true,
                       "query": "2345",
@@ -181,6 +184,7 @@ describe('tokenQuery', () => {
                         "identifier.coding.code.keyword",
                         "identifier.value.keyword",
                         "identifier.keyword",
+                        "identifier",
                       ],
                       "lenient": true,
                       "query": "2345",
@@ -219,6 +223,23 @@ describe('tokenQuery', () => {
                     },
                   },
                 ],
+              },
+            }
+        `);
+    });
+    test('boolean', () => {
+        expect(tokenQuery(identifierParam, 'true', true)).toMatchInlineSnapshot(`
+            Object {
+              "multi_match": Object {
+                "fields": Array [
+                  "identifier.code.keyword",
+                  "identifier.coding.code.keyword",
+                  "identifier.value.keyword",
+                  "identifier.keyword",
+                  "identifier",
+                ],
+                "lenient": true,
+                "query": "true",
               },
             }
         `);
