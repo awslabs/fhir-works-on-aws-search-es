@@ -5,7 +5,7 @@
 
 import { isEmpty } from 'lodash';
 import { InvalidSearchParameterError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
-import { NON_SEARCHABLE_PARAMETERS } from '../constants';
+import { GENERAL_PARAMETERS, NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { stringQuery } from './typeQueries/stringQuery';
 import { dateQuery } from './typeQueries/dateQuery';
@@ -16,6 +16,7 @@ import { referenceQuery } from './typeQueries/referenceQuery';
 import getOrSearchValues from './searchOR';
 import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from './util';
 import { uriQuery } from './typeQueries/uriQuery';
+import getComponentLogger from '../loggerBuilder';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -133,6 +134,11 @@ function searchRequestQuery(
                 !NON_SEARCHABLE_PARAMETERS.includes(searchParameter) && !isChainedParameter(searchParameter),
         )
         .flatMap(([searchParameter, searchValues]) => {
+            if (GENERAL_PARAMETERS.includes(searchParameter)) {
+                // since we don't support any of these at the moment, just log a message instead of ignoring and continue.
+                getComponentLogger().info(`Search parameter ${searchParameter} is not currently supported.`);
+                return [];
+            }
             const searchModifier = parseSearchModifiers(searchParameter);
             const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
                 resourceType,

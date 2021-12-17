@@ -17,11 +17,12 @@ export const NON_SEARCHABLE_PARAMETERS = [
     SORT_PARAMETER,
     SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
     SEARCH_PAGINATION_PARAMS.COUNT,
-    '_format',
     '_include',
     '_revinclude',
     ...ITERATIVE_INCLUSION_PARAMETERS,
 ];
+
+export const GENERAL_PARAMETERS = ['_format', '_pretty', '_summary', '_elements'];
 
 export const MAX_ES_WINDOW_SIZE: number = 10000;
 
