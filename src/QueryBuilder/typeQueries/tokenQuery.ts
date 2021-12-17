@@ -5,55 +5,23 @@
 
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
-
-interface TokenSearchParameter {
-    system?: string;
-    code?: string;
-    explicitNoSystemProperty: boolean;
-}
-
-const SUPPORTED_MODIFIERS: string[] = [];
+import { TokenSearchValue } from '../../FhirQueryParser';
 
 // Fields that do not have `.keyword` suffix. This is only important if `useKeywordSubFields` is true
 const FIELDS_WITHOUT_KEYWORD = ['id'];
+const SUPPORTED_MODIFIERS: string[] = [];
 
 // eslint-disable-next-line import/prefer-default-export
-export const parseTokenSearchParam = (param: string): TokenSearchParameter => {
-    if (param === '|') {
-        throw new InvalidSearchParameterError(`Invalid token search parameter: ${param}`);
-    }
-    const parts = param.split('|');
-    if (parts.length > 2) {
-        throw new InvalidSearchParameterError(`Invalid token search parameter: ${param}`);
-    }
-    let system;
-    let code;
-    let explicitNoSystemProperty = false;
-    if (parts.length === 1) {
-        [code] = parts;
-    } else {
-        [system, code] = parts;
-        if (system === '') {
-            system = undefined;
-            explicitNoSystemProperty = true;
-        }
-        if (code === '') {
-            code = undefined;
-        }
-    }
-    return { system, code, explicitNoSystemProperty };
-};
-
 export function tokenQuery(
     compiled: CompiledSearchParam,
-    value: string,
+    value: TokenSearchValue,
     useKeywordSubFields: boolean,
     modifier?: string,
 ): any {
     if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
         throw new InvalidSearchParameterError(`Unsupported token search modifier: ${modifier}`);
     }
-    const { system, code, explicitNoSystemProperty } = parseTokenSearchParam(value);
+    const { system, code, explicitNoSystemProperty } = value;
     const queries = [];
     const useKeywordSuffix = useKeywordSubFields && !FIELDS_WITHOUT_KEYWORD.includes(compiled.path);
     const keywordSuffix = useKeywordSuffix ? '.keyword' : '';
