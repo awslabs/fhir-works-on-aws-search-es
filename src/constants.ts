@@ -22,7 +22,7 @@ export const NON_SEARCHABLE_PARAMETERS = [
     ...ITERATIVE_INCLUSION_PARAMETERS,
 ];
 
-export const GENERAL_PARAMETERS = ['_format', '_pretty', '_summary', '_elements'];
+export const UNSUPPORTED_GENERAL_PARAMETERS = ['_format', '_pretty', '_summary', '_elements'];
 
 export const MAX_ES_WINDOW_SIZE: number = 10000;
 
