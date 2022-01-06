@@ -7,6 +7,7 @@ import each from 'jest-each';
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { numberQuery } from './numberQuery';
 import { FHIRSearchParametersRegistry } from '../../FHIRSearchParametersRegistry';
+import { parseNumberSearchValue } from '../../FhirQueryParser/typeParsers/numberParser';
 
 const fhirSearchParametersRegistry = new FHIRSearchParametersRegistry('4.0.1');
 const factorOverrideParam = fhirSearchParametersRegistry.getSearchParameter('ChargeItem', 'factor-override')!
@@ -15,7 +16,7 @@ const factorOverrideParam = fhirSearchParametersRegistry.getSearchParameter('Cha
 describe('numberQuery', () => {
     describe('valid inputs', () => {
         test('10', () => {
-            expect(numberQuery(factorOverrideParam, '10')).toMatchInlineSnapshot(`
+            expect(numberQuery(factorOverrideParam, parseNumberSearchValue('10'))).toMatchInlineSnapshot(`
                 Object {
                   "range": Object {
                     "factorOverride": Object {
@@ -27,7 +28,7 @@ describe('numberQuery', () => {
             `);
         });
         test('lt10', () => {
-            expect(numberQuery(factorOverrideParam, 'lt10')).toMatchInlineSnapshot(`
+            expect(numberQuery(factorOverrideParam, parseNumberSearchValue('lt10'))).toMatchInlineSnapshot(`
                 Object {
                   "range": Object {
                     "factorOverride": Object {
@@ -38,7 +39,7 @@ describe('numberQuery', () => {
             `);
         });
         test('10.57', () => {
-            expect(numberQuery(factorOverrideParam, '10.57')).toMatchInlineSnapshot(`
+            expect(numberQuery(factorOverrideParam, parseNumberSearchValue('10.57'))).toMatchInlineSnapshot(`
                 Object {
                   "range": Object {
                     "factorOverride": Object {
@@ -50,7 +51,7 @@ describe('numberQuery', () => {
             `);
         });
         test('-8.2', () => {
-            expect(numberQuery(factorOverrideParam, '-8.2')).toMatchInlineSnapshot(`
+            expect(numberQuery(factorOverrideParam, parseNumberSearchValue('-8.2'))).toMatchInlineSnapshot(`
                 Object {
                   "range": Object {
                     "factorOverride": Object {
@@ -62,7 +63,7 @@ describe('numberQuery', () => {
             `);
         });
         test('ge8e-1', () => {
-            expect(numberQuery(factorOverrideParam, '8e-1')).toMatchInlineSnapshot(`
+            expect(numberQuery(factorOverrideParam, parseNumberSearchValue('8e-1'))).toMatchInlineSnapshot(`
                 Object {
                   "range": Object {
                     "factorOverride": Object {
@@ -78,7 +79,9 @@ describe('numberQuery', () => {
         each([['This is not a number at all'], ['badPrefix100'], ['100someSuffix'], ['100|system|code']]).test(
             '%s',
             (param) => {
-                expect(() => numberQuery(factorOverrideParam, param)).toThrow(InvalidSearchParameterError);
+                expect(() => numberQuery(factorOverrideParam, parseNumberSearchValue(param))).toThrow(
+                    InvalidSearchParameterError,
+                );
             },
         );
     });

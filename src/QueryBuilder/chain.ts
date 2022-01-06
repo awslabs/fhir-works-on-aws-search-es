@@ -2,7 +2,7 @@
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
 import { NON_SEARCHABLE_PARAMETERS } from '../constants';
-import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from './util';
+import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from '../FhirQueryParser/util';
 
 export interface ChainParameter {
     chain: { resourceType: string; searchParam: string }[];
