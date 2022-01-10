@@ -14,6 +14,7 @@ describe('queryParser', () => {
         const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { 'name:exact': 'John' });
         expect(q).toMatchInlineSnapshot(`
             Object {
+              "hasUnsearchableParams": false,
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {
@@ -46,6 +47,7 @@ describe('queryParser', () => {
         const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { 'name:exact': 'John,Anna' });
         expect(q).toMatchInlineSnapshot(`
             Object {
+              "hasUnsearchableParams": false,
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {
@@ -76,9 +78,13 @@ describe('queryParser', () => {
     });
 
     test('string AND', () => {
-        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { 'name:exact': ['John', 'Anna'] });
+        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', {
+            'name:exact': ['John', 'Anna'],
+            'organization.name': 'HL7',
+        });
         expect(q).toMatchInlineSnapshot(`
             Object {
+              "hasUnsearchableParams": true,
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {
@@ -132,6 +138,7 @@ describe('queryParser', () => {
         const q = parseQuery(fhirSearchParametersRegistry, 'ChargeItem', { 'factor-override': '10' });
         expect(q).toMatchInlineSnapshot(`
             Object {
+              "hasUnsearchableParams": false,
               "resourceType": "ChargeItem",
               "searchParams": Array [
                 Object {
@@ -168,9 +175,13 @@ describe('queryParser', () => {
     });
 
     test('date', () => {
-        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { birthdate: '1999-09-09' });
+        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', {
+            birthdate: '1999-09-09',
+            _include: 'Patient:someField',
+        });
         expect(q).toMatchInlineSnapshot(`
             Object {
+              "hasUnsearchableParams": true,
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {
@@ -216,6 +227,7 @@ describe('queryParser', () => {
         });
         expect(q).toMatchInlineSnapshot(`
             Object {
+              "hasUnsearchableParams": false,
               "resourceType": "Observation",
               "searchParams": Array [
                 Object {
@@ -294,9 +306,13 @@ describe('queryParser', () => {
     });
 
     test('token', () => {
-        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { identifier: 'http://acme.org/patient|2345' });
+        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', {
+            identifier: 'http://acme.org/patient|2345',
+            _count: '20',
+        });
         expect(q).toMatchInlineSnapshot(`
             Object {
+              "hasUnsearchableParams": true,
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {

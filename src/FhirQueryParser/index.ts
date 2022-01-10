@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  */
-
+import { size } from 'lodash';
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { isChainedParameter, normalizeQueryParams, parseSearchModifiers } from './util';
@@ -83,6 +83,7 @@ export type QueryParam =
 export interface ParsedFhirQueryParams {
     resourceType: string;
     searchParams: QueryParam[];
+    hasUnsearchableParams: boolean;
 }
 
 const parseStringLikeSearchValue = (rawSearchValue: string): StringLikeSearchValue => rawSearchValue;
@@ -202,5 +203,6 @@ export const parseQuery = (
     return {
         resourceType,
         searchParams: parsedParams,
+        hasUnsearchableParams: size(normalizedQueryParams) > searchableParams.length,
     };
 };

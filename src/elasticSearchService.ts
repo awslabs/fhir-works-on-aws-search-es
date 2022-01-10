@@ -5,6 +5,7 @@
 
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
+import * as qs from 'qs';
 
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
 import { partition, merge, isEmpty } from 'lodash';
@@ -32,6 +33,7 @@ import {
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
+import { parseQuery } from './FhirQueryParser';
 import parseChainedParameters, { ChainParameter } from './QueryBuilder/chain';
 import getComponentLogger from './loggerBuilder';
 
@@ -517,6 +519,27 @@ export class ElasticSearchService implements Search {
         logger.info(request);
         this.assertValidTenancyMode(request.tenantId);
         throw new Error('Method not implemented.');
+    }
+
+    validateSubscriptionSearchCriteria(searchCriteria: string): void {
+        if (!searchCriteria.includes('?')) {
+            throw new InvalidSearchParameterError(
+                'Search string used for field criteria does not contain ?, please use valid search string',
+            );
+        }
+        const [resourceType, ...queryStrings] = searchCriteria.split('?');
+        const queryString = queryStrings.join('?');
+        const { hasUnsearchableParams } = parseQuery(
+            this.fhirSearchParametersRegistry,
+            resourceType,
+            qs.parse(queryString),
+        );
+        if (hasUnsearchableParams) {
+            throw new InvalidSearchParameterError(
+                'Search string used for field criteria contains unsupported parameter, please remove: ' +
+                    '_revinclude, _include, _sort, _count and chained parameters',
+            );
+        }
     }
 
     private static buildSingleElasticSearchFilterPart(
