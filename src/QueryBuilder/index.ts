@@ -4,8 +4,7 @@
  */
 
 import { isEmpty } from 'lodash';
-import { InvalidSearchParameterError, TypeSearchRequest } from 'fhir-works-on-aws-interface';
-import { UNSUPPORTED_GENERAL_PARAMETERS, NON_SEARCHABLE_PARAMETERS } from '../constants';
+import { TypeSearchRequest } from 'fhir-works-on-aws-interface';
 import { CompiledSearchParam, FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { stringQuery } from './typeQueries/stringQuery';
 import { dateQuery } from './typeQueries/dateQuery';
@@ -14,7 +13,6 @@ import { numberQuery } from './typeQueries/numberQuery';
 import { quantityQuery } from './typeQueries/quantityQuery';
 import { referenceQuery } from './typeQueries/referenceQuery';
 import { uriQuery } from './typeQueries/uriQuery';
-import getComponentLogger from '../loggerBuilder';
 import {
     DateSearchValue,
     NumberSearchValue,
@@ -130,40 +128,6 @@ function searchParamQuery(
             should: queryList,
         },
     };
-}
-
-function searchRequestQuery(
-    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
-    queryParams: any,
-    resourceType: string,
-    baseUrl: string,
-    useKeywordSubFields: boolean,
-): any[] {
-    return Object.entries(normalizeQueryParams(queryParams))
-        .filter(
-            ([searchParameter]) =>
-                !NON_SEARCHABLE_PARAMETERS.includes(searchParameter) && !isChainedParameter(searchParameter),
-        )
-        .flatMap(([searchParameter, searchValues]) => {
-            if (UNSUPPORTED_GENERAL_PARAMETERS.includes(searchParameter)) {
-                // since we don't support any of these at the moment, just log a message instead of ignoring and continue.
-                getComponentLogger().info(`Search parameter ${searchParameter} is not currently supported.`);
-                return [];
-            }
-            const searchModifier = parseSearchModifiers(searchParameter);
-            const fhirSearchParam = fhirSearchParametersRegistry.getSearchParameter(
-                resourceType,
-                searchModifier.parameterName,
-            );
-            if (fhirSearchParam === undefined) {
-                throw new InvalidSearchParameterError(
-                    `Invalid search parameter '${searchModifier.parameterName}' for resource type ${resourceType}`,
-                );
-            }
-            return searchValues.map((searchValue) =>
-                searchParamQuery(fhirSearchParam, searchValue, useKeywordSubFields, baseUrl, searchModifier.modifier),
-            );
-        });
 }
 
 // eslint-disable-next-line import/prefer-default-export
