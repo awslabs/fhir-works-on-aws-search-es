@@ -5,45 +5,20 @@
 
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
-import { parseNumber } from './common/number';
 import { prefixRangeNumber } from './common/prefixRange';
-
-interface NumberSearchParameter {
-    prefix: string;
-    number: number;
-    implicitRange: {
-        start: number;
-        end: number;
-    };
-}
-
-const NUMBER_SEARCH_PARAM_REGEX = /^(?<prefix>eq|ne|lt|gt|ge|le|sa|eb|ap)?(?<numberString>[\d.+-eE]+)$/;
+import { NumberSearchValue } from '../../FhirQueryParser';
 
 const SUPPORTED_MODIFIERS: string[] = [];
 
-export const parseNumberSearchParam = (param: string): NumberSearchParameter => {
-    const match = param.match(NUMBER_SEARCH_PARAM_REGEX);
-    if (match === null) {
-        throw new InvalidSearchParameterError(`Invalid number search parameter: ${param}`);
-    }
-
-    const { numberString } = match.groups!;
-
-    // If no prefix is present, the prefix eq is assumed.
-    // https://www.hl7.org/fhir/search.html#prefix
-    const prefix = match.groups!.prefix ?? 'eq';
-
-    const fhirNumber = parseNumber(numberString);
-    return {
-        prefix,
-        ...fhirNumber,
-    };
-};
-
-export const numberQuery = (compiledSearchParam: CompiledSearchParam, value: string, modifier?: string): any => {
+// eslint-disable-next-line import/prefer-default-export
+export const numberQuery = (
+    compiledSearchParam: CompiledSearchParam,
+    value: NumberSearchValue,
+    modifier?: string,
+): any => {
     if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
         throw new InvalidSearchParameterError(`Unsupported number search modifier: ${modifier}`);
     }
-    const { prefix, implicitRange, number } = parseNumberSearchParam(value);
+    const { prefix, implicitRange, number } = value;
     return prefixRangeNumber(prefix, number, implicitRange, compiledSearchParam.path);
 };
