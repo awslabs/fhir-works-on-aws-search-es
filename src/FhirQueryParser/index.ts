@@ -5,9 +5,10 @@
  */
 
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
+import { isEmpty } from 'lodash';
 import { FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { isChainedParameter, normalizeQueryParams, parseSearchModifiers } from './util';
-import { NON_SEARCHABLE_PARAMETERS } from '../constants';
+import { INCLUSION_PARAMETERS, NON_SEARCHABLE_PARAMETERS } from '../constants';
 import getOrSearchValues from './searchOR';
 import { DateSearchValue, parseDateSearchValue } from './typeParsers/dateParser';
 import { parseTokenSearchValue, TokenSearchValue } from './typeParsers/tokenParser';
@@ -83,6 +84,9 @@ export type QueryParam =
 export interface ParsedFhirQueryParams {
     resourceType: string;
     searchParams: QueryParam[];
+    inclusionSearchParams?: { [name: string]: string[] };
+    chainedSearchParams?: { [name: string]: string[] };
+    otherParams?: { [name: string]: string[] };
 }
 
 const parseStringLikeSearchValue = (rawSearchValue: string): StringLikeSearchValue => rawSearchValue;
@@ -175,10 +179,30 @@ export const parseQuery = (
 ): ParsedFhirQueryParams => {
     const normalizedQueryParams: { [name: string]: string[] } = normalizeQueryParams(queryParams);
 
+    const inclusionSearchParams: { [name: string]: string[] } = {};
+    const chainedSearchParams: { [name: string]: string[] } = {};
+    const otherParams: { [name: string]: string[] } = {};
+
     const searchableParams: [string, string[]][] = Object.entries(normalizedQueryParams).filter(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([searchParameter, value]) =>
-            !NON_SEARCHABLE_PARAMETERS.includes(searchParameter) && !isChainedParameter(searchParameter),
+        ([searchParameter, value]) => {
+            if (isChainedParameter(searchParameter)) {
+                chainedSearchParams[searchParameter] = value;
+                return false;
+            }
+
+            if (INCLUSION_PARAMETERS.includes(searchParameter)) {
+                inclusionSearchParams[searchParameter] = value;
+                return false;
+            }
+
+            if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
+                otherParams[searchParameter] = value;
+                return false;
+            }
+
+            return true;
+        },
     );
 
     const parsedParams = searchableParams.flatMap(([searchParameter, searchValues]) => {
@@ -202,5 +226,8 @@ export const parseQuery = (
     return {
         resourceType,
         searchParams: parsedParams,
+        ...(!isEmpty(inclusionSearchParams) && { inclusionSearchParams }),
+        ...(!isEmpty(chainedSearchParams) && { chainedSearchParams }),
+        ...(!isEmpty(otherParams) && { otherParams }),
     };
 };
