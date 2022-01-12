@@ -12,14 +12,14 @@ export const enum SEARCH_PAGINATION_PARAMS {
 
 export const SEPARATOR: string = '_';
 export const ITERATIVE_INCLUSION_PARAMETERS = ['_include:iterate', '_revinclude:iterate'];
+export const INCLUSION_PARAMETERS = ['_include', '_revinclude', ...ITERATIVE_INCLUSION_PARAMETERS];
 export const SORT_PARAMETER = '_sort';
 export const NON_SEARCHABLE_PARAMETERS = [
     SORT_PARAMETER,
     SEARCH_PAGINATION_PARAMS.PAGES_OFFSET,
     SEARCH_PAGINATION_PARAMS.COUNT,
-    '_include',
-    '_revinclude',
-    ...ITERATIVE_INCLUSION_PARAMETERS,
+    '_format',
+    ...INCLUSION_PARAMETERS,
 ];
 
 export const UNSUPPORTED_GENERAL_PARAMETERS = ['_format', '_pretty', '_summary', '_elements'];

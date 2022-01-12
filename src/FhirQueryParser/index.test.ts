@@ -328,4 +328,63 @@ describe('queryParser', () => {
             }
         `);
     });
+
+    test('chained params', () => {
+        const q = parseQuery(fhirSearchParametersRegistry, 'DiagnosticReport', {
+            'subject.name': 'DiagnosticReport?subject.name=peter',
+        });
+        expect(q).toMatchInlineSnapshot(`
+            Object {
+              "chainedSearchParams": Object {
+                "subject.name": Array [
+                  "DiagnosticReport?subject.name=peter",
+                ],
+              },
+              "resourceType": "DiagnosticReport",
+              "searchParams": Array [],
+            }
+        `);
+    });
+
+    test('inclusion params', () => {
+        const q = parseQuery(fhirSearchParametersRegistry, 'MedicationRequest', {
+            _include: 'MedicationRequest:patient',
+            _revinclude: 'Provenance:target',
+        });
+        expect(q).toMatchInlineSnapshot(`
+            Object {
+              "inclusionSearchParams": Object {
+                "_include": Array [
+                  "MedicationRequest:patient",
+                ],
+                "_revinclude": Array [
+                  "Provenance:target",
+                ],
+              },
+              "resourceType": "MedicationRequest",
+              "searchParams": Array [],
+            }
+        `);
+    });
+
+    test('other params', () => {
+        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', {
+            _count: '10',
+            _sort: '_lastUpdated',
+        });
+        expect(q).toMatchInlineSnapshot(`
+            Object {
+              "otherParams": Object {
+                "_count": Array [
+                  "10",
+                ],
+                "_sort": Array [
+                  "_lastUpdated",
+                ],
+              },
+              "resourceType": "Patient",
+              "searchParams": Array [],
+            }
+        `);
+    });
 });
