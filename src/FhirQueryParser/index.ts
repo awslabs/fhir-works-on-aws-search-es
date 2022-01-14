@@ -197,14 +197,14 @@ export const parseQuery = (
                 return false;
             }
 
-            if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
-                otherParams[searchParameter] = value;
-                return false;
-            }
-
             if (UNSUPPORTED_GENERAL_PARAMETERS.includes(searchParameter)) {
                 // since we don't support any of these at the moment, just log a message instead of ignoring and continue.
                 getComponentLogger().info(`Search parameter ${searchParameter} is not currently supported.`);
+                otherParams[searchParameter] = value;
+                return false;
+            }
+            
+            if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
                 otherParams[searchParameter] = value;
                 return false;
             }
