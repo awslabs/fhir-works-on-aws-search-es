@@ -203,7 +203,7 @@ export const parseQuery = (
                 otherParams[searchParameter] = value;
                 return false;
             }
-            
+
             if (NON_SEARCHABLE_PARAMETERS.includes(searchParameter)) {
                 otherParams[searchParameter] = value;
                 return false;
