@@ -17,6 +17,3 @@ comment:
   layout: 'reach,diff,flags,files,footer'
   behavior: default
   require_changes: no
-
-fixes:
-  disable_default_path_fixes: true
