@@ -6,7 +6,7 @@ coverage:
     project:
       default:
         # basic
-        target: 90%
+        target: 85%
         threshold: 0.1%
         # advanced settings
         if_ci_failed: error #success, failure, error, ignore
@@ -17,3 +17,6 @@ comment:
   layout: 'reach,diff,flags,files,footer'
   behavior: default
   require_changes: no
+
+fixes:
+  disable_default_path_fixes: true
