@@ -321,8 +321,9 @@ export class ElasticSearchService implements Search {
                 index: getAliasName(searchQuery.resourceType, request.tenantId),
                 ...(request.sessionId && { preference: request.sessionId }),
             };
-            console.error(`Elastic search query: ${JSON.stringify(searchQueryWithAlias, null, 2)}`);
-
+            if (logger.isDebugEnabled()) {
+                logger.debug(`Elastic search query: ${JSON.stringify(searchQueryWithAlias, null, 2)}`);
+            }
             const apiResponse = await this.esClient.search(searchQueryWithAlias);
             return {
                 total: apiResponse.body.hits.total.value,
