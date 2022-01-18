@@ -3,7 +3,6 @@ process.env.TZ = 'UTC';
 
 module.exports = {
     moduleFileExtensions: ['ts', 'js'],
-    coverageReporters: ['text', 'html'],
     transform: {
         '\\.(ts)$': 'ts-jest',
     },
