@@ -27,7 +27,7 @@ const typeMatcher = (
 ): boolean => {
     switch (searchParam.type) {
         case 'string':
-            return stringMatch(searchValue as StringLikeSearchValue, resourceValue);
+            return stringMatch(compiledSearchParam, searchValue as StringLikeSearchValue, resourceValue);
         case 'date':
             return dateMatch(searchValue as DateSearchValue, resourceValue);
         case 'number':
