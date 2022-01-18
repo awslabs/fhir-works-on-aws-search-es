@@ -1213,12 +1213,15 @@ describe('validateSubscriptionSearchCriteria', () => {
     });
 
     describe('Valid search string', () => {
-        each(['Patient?name=Harry', 'Patient?name=Harry&family=Potter']).test('queryString=%j', (queryString: any) => {
-            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+        each(['Patient?name=Harry', 'Patient?name=Harry&family=Potter', 'Patient?name=Ha?rry&family=Pott?er']).test(
+            'queryString=%j',
+            (queryString: any) => {
+                const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
 
-            expect(() => {
-                es.validateSubscriptionSearchCriteria(queryString);
-            }).toBeDefined();
-        });
+                expect(() => {
+                    es.validateSubscriptionSearchCriteria(queryString);
+                }).not.toThrow();
+            },
+        );
     });
 });
