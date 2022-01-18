@@ -8,7 +8,8 @@ import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { isEmpty } from 'lodash';
 import { FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { isChainedParameter, normalizeQueryParams, parseSearchModifiers } from './util';
-import { INCLUSION_PARAMETERS, NON_SEARCHABLE_PARAMETERS } from '../constants';
+import getComponentLogger from '../loggerBuilder';
+import { INCLUSION_PARAMETERS, NON_SEARCHABLE_PARAMETERS, UNSUPPORTED_GENERAL_PARAMETERS } from '../constants';
 import getOrSearchValues from './searchOR';
 import { DateSearchValue, parseDateSearchValue } from './typeParsers/dateParser';
 import { parseTokenSearchValue, TokenSearchValue } from './typeParsers/tokenParser';
@@ -193,6 +194,13 @@ export const parseQuery = (
 
             if (INCLUSION_PARAMETERS.includes(searchParameter)) {
                 inclusionSearchParams[searchParameter] = value;
+                return false;
+            }
+
+            if (UNSUPPORTED_GENERAL_PARAMETERS.includes(searchParameter)) {
+                // since we don't support any of these at the moment, just log a message instead of ignoring and continue.
+                getComponentLogger().info(`Search parameter ${searchParameter} is not currently supported.`);
+                otherParams[searchParameter] = value;
                 return false;
             }
 
