@@ -529,12 +529,12 @@ export class ElasticSearchService implements Search {
         }
         const [resourceType, ...queryStrings] = searchCriteria.split('?');
         const queryString = queryStrings.join('?');
-        const { hasUnsearchableParams } = parseQuery(
+        const { inclusionSearchParams, chainedSearchParams, otherParams } = parseQuery(
             this.fhirSearchParametersRegistry,
             resourceType,
             qs.parse(queryString),
         );
-        if (hasUnsearchableParams) {
+        if (inclusionSearchParams || chainedSearchParams || otherParams) {
             throw new InvalidSearchParameterError(
                 'Search string used for field criteria contains unsupported parameter, please remove: ' +
                     '_revinclude, _include, _sort, _count and chained parameters',
