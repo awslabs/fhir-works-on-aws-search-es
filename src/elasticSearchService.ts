@@ -522,12 +522,8 @@ export class ElasticSearchService implements Search {
     }
 
     validateSubscriptionSearchCriteria(searchCriteria: string): void {
-        const questionMarkIndex = searchCriteria.indexOf('?');
-        if (questionMarkIndex === -1) {
-            throw new InvalidSearchParameterError(
-                'Search string used for field criteria does not contain ?, please use valid search string',
-            );
-        }
+        const questionMarkIndex =
+            searchCriteria.indexOf('?') === -1 ? searchCriteria.length : searchCriteria.indexOf('?');
         const resourceType = searchCriteria.substring(0, questionMarkIndex);
         const queryString = searchCriteria.substring(questionMarkIndex + 1);
         const { inclusionSearchParams, chainedSearchParams, otherParams } = parseQuery(

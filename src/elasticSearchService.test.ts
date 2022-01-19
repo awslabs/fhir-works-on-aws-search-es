@@ -1180,14 +1180,6 @@ describe('validateSubscriptionSearchCriteria', () => {
         const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
 
         expect(() => {
-            es.validateSubscriptionSearchCriteria('Patient&name=Harry');
-        }).toThrowError(
-            new InvalidSearchParameterError(
-                'Search string used for field criteria does not contain ?, please use valid search string',
-            ),
-        );
-
-        expect(() => {
             es.validateSubscriptionSearchCriteria(
                 'Patient?general-practitioner:PractitionerRole.location:Location.address-city',
             );
@@ -1213,15 +1205,18 @@ describe('validateSubscriptionSearchCriteria', () => {
     });
 
     describe('Valid search string', () => {
-        each(['Patient?name=Harry', 'Patient?name=Harry&family=Potter', 'Patient?name=Ha?rry&family=Pott?er']).test(
-            'queryString=%j',
-            (queryString: any) => {
-                const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+        each([
+            'Patient?name=Harry',
+            'Patient?name=Harry&family=Potter',
+            'Patient?name=Ha?rry&family=Pott?er',
+            'Patient',
+            'Patient?',
+        ]).test('queryString=%j', (queryString: any) => {
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
 
-                expect(() => {
-                    es.validateSubscriptionSearchCriteria(queryString);
-                }).not.toThrow();
-            },
-        );
+            expect(() => {
+                es.validateSubscriptionSearchCriteria(queryString);
+            }).not.toThrow();
+        });
     });
 });

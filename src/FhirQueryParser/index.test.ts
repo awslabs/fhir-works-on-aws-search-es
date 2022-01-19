@@ -76,17 +76,9 @@ describe('queryParser', () => {
     });
 
     test('string AND', () => {
-        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', {
-            'name:exact': ['John', 'Anna'],
-            'organization.name': 'HL7',
-        });
+        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { 'name:exact': ['John', 'Anna'] });
         expect(q).toMatchInlineSnapshot(`
             Object {
-              "chainedSearchParams": Object {
-                "organization.name": Array [
-                  "HL7",
-                ],
-              },
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {
@@ -176,17 +168,9 @@ describe('queryParser', () => {
     });
 
     test('date', () => {
-        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', {
-            birthdate: '1999-09-09',
-            _include: 'Patient:someField',
-        });
+        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { birthdate: '1999-09-09' });
         expect(q).toMatchInlineSnapshot(`
             Object {
-              "inclusionSearchParams": Object {
-                "_include": Array [
-                  "Patient:someField",
-                ],
-              },
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {
@@ -310,17 +294,9 @@ describe('queryParser', () => {
     });
 
     test('token', () => {
-        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', {
-            identifier: 'http://acme.org/patient|2345',
-            _count: '20',
-        });
+        const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { identifier: 'http://acme.org/patient|2345' });
         expect(q).toMatchInlineSnapshot(`
             Object {
-              "otherParams": Object {
-                "_count": Array [
-                  "20",
-                ],
-              },
               "resourceType": "Patient",
               "searchParams": Array [
                 Object {
