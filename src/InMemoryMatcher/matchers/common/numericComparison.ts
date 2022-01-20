@@ -66,3 +66,18 @@ export const compareRanges = (prefix: string, searchParamRange: Range, resourceR
             throw new Error(`unknown search prefix: ${prefix}`);
     }
 };
+
+/**
+ * When a comparison prefix in the set lgt, lt, ge, le, sa & eb is provided, the implicit precision of the number is ignored,
+ * and they are treated as if they have arbitrarily high precision. https://www.hl7.org/fhir/search.html#number
+ * @param prefix
+ * @param number
+ * @param range
+ */
+export const applyPrefixRulesToRange = (prefix: string, number: number, range: Range): Range => {
+    if (prefix === 'eq' || prefix === 'ne') {
+        return range;
+    }
+
+    return { start: number, end: number };
+};

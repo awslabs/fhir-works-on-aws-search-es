@@ -8,6 +8,7 @@ import {
     DateSearchValue,
     NumberSearchValue,
     ParsedFhirQueryParams,
+    QuantitySearchValue,
     QueryParam,
     StringLikeSearchValue,
 } from '../FhirQueryParser';
@@ -16,6 +17,7 @@ import { numberMatch } from './matchers/numberMatch';
 import { dateMatch } from './matchers/dateMatch';
 import { getAllValuesForFHIRPath } from '../getAllValuesForFHIRPath';
 import { stringMatch } from './matchers/stringMatch';
+import { quantityMatch } from './matchers/quantityMatch';
 
 const typeMatcher = (
     searchParam: SearchParam,
@@ -31,7 +33,7 @@ const typeMatcher = (
         case 'number':
             return numberMatch(searchValue as NumberSearchValue, resourceValue);
         case 'quantity':
-            break;
+            return quantityMatch(searchValue as QuantitySearchValue, resourceValue);
         case 'reference':
             break;
         case 'token':
