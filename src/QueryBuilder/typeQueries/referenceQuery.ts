@@ -22,29 +22,33 @@ export function referenceQuery(
     if (modifier && !SUPPORTED_MODIFIERS.includes(modifier)) {
         throw new InvalidSearchParameterError(`Unsupported reference search modifier: ${modifier}`);
     }
-    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
-
-    const { id, fhirServiceBaseUrl, resourceType } = value;
 
     let references: string[] = [];
-
-    if (resourceType) {
-        if (fhirServiceBaseUrl) {
-            if (fhirServiceBaseUrl === baseUrl) {
-                references.push(`${resourceType}/${id}`);
+    switch (value.referenceType) {
+        case 'idOnly':
+            references = target.flatMap((targetType: string) => {
+                return [`${baseUrl}/${targetType}/${value.id}`, `${targetType}/${value.id}`];
+            });
+            break;
+        case 'relative':
+            references.push(`${value.resourceType}/${value.id}`);
+            references.push(`${baseUrl}/${value.resourceType}/${value.id}`);
+            break;
+        case 'url':
+            if (value.fhirServiceBaseUrl === baseUrl) {
+                references.push(`${value.resourceType}/${value.id}`);
             }
-            references.push(`${fhirServiceBaseUrl}/${resourceType}/${id}`);
-        } else {
-            references.push(`${resourceType}/${id}`);
-            references.push(`${baseUrl}/${resourceType}/${id}`);
-        }
+            references.push(`${value.fhirServiceBaseUrl}/${value.resourceType}/${value.id}`);
+            break;
+        case 'unparseable':
+            references.push(value.rawValue);
+            break;
+        default:
+            // eslint-disable-next-line no-case-declarations
+            const exhaustiveCheck: never = value;
+            return exhaustiveCheck;
     }
 
-    if (id && !resourceType && !fhirServiceBaseUrl) {
-        references = target.flatMap((targetType: string) => {
-            return [`${baseUrl}/${targetType}/${id}`, `${targetType}/${id}`];
-        });
-    }
-
+    const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
     return { terms: { [`${compiled.path}.reference${keywordSuffix}`]: references } };
 }

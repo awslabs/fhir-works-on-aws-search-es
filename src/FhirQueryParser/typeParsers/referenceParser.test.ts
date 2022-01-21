@@ -18,6 +18,7 @@ describe('parseReferenceSearchValue', () => {
             expect(parseReferenceSearchValue(referenceParam, 'Organization/111')).toMatchInlineSnapshot(`
                 Object {
                   "id": "111",
+                  "referenceType": "relative",
                   "resourceType": "Organization",
                 }
             `);
@@ -30,6 +31,7 @@ describe('parseReferenceSearchValue', () => {
                 Object {
                   "fhirServiceBaseUrl": "https://base-url.com",
                   "id": "111",
+                  "referenceType": "url",
                   "resourceType": "Organization",
                 }
             `);
@@ -40,6 +42,7 @@ describe('parseReferenceSearchValue', () => {
             expect(parseReferenceSearchValue(referenceParam, 'organizationId')).toMatchInlineSnapshot(`
                 Object {
                   "id": "organizationId",
+                  "referenceType": "idOnly",
                 }
             `);
         });
@@ -48,6 +51,7 @@ describe('parseReferenceSearchValue', () => {
                 .toMatchInlineSnapshot(`
                 Object {
                   "id": "organizationId",
+                  "referenceType": "idOnly",
                 }
             `);
         });
@@ -61,8 +65,11 @@ describe('parseReferenceSearchValue', () => {
         });
     });
     test('search value is not an URL nor has the format <resourceType>/<id>', () => {
-        expect(() => parseReferenceSearchValue(referenceParam, 'this:does# not match')).toThrow(
-            InvalidSearchParameterError,
-        );
+        expect(parseReferenceSearchValue(referenceParam, 'this:does# not match')).toMatchInlineSnapshot(`
+            Object {
+              "rawValue": "this:does# not match",
+              "referenceType": "unparseable",
+            }
+        `);
     });
 });

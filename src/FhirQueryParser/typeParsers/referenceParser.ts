@@ -7,12 +7,34 @@
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import getComponentLogger from '../../loggerBuilder';
 
-// export type ReferenceSearchValue = ReferenceSearchValueIdOnly | ReferenceSearchValueRelative | ReferenceSearchValueUrl;
-export interface ReferenceSearchValue {
+export interface ReferenceSearchValueIdOnly {
+    referenceType: 'idOnly';
     id: string;
-    resourceType?: string;
-    fhirServiceBaseUrl?: string;
 }
+
+export interface ReferenceSearchValueRelative {
+    referenceType: 'relative';
+    id: string;
+    resourceType: string;
+}
+
+export interface ReferenceSearchValueUrl {
+    referenceType: 'url';
+    fhirServiceBaseUrl: string;
+    id: string;
+    resourceType: string;
+}
+
+export interface ReferenceSearchValueUnparseable {
+    referenceType: 'unparseable';
+    rawValue: string;
+}
+
+export type ReferenceSearchValue =
+    | ReferenceSearchValueIdOnly
+    | ReferenceSearchValueRelative
+    | ReferenceSearchValueUrl
+    | ReferenceSearchValueUnparseable;
 
 const logger = getComponentLogger();
 const ID_ONLY_REGEX = /^[A-Za-z0-9\-.]{1,64}$/;
@@ -28,6 +50,7 @@ export const parseReferenceSearchValue = (
         const { fhirServiceBaseUrl, resourceType, id } = match.groups!;
         if (fhirServiceBaseUrl) {
             return {
+                referenceType: 'url',
                 id,
                 resourceType,
                 fhirServiceBaseUrl,
@@ -35,6 +58,7 @@ export const parseReferenceSearchValue = (
         }
         if (!fhirServiceBaseUrl) {
             return {
+                referenceType: 'relative',
                 id,
                 resourceType,
             };
@@ -52,9 +76,13 @@ export const parseReferenceSearchValue = (
         }
 
         return {
+            referenceType: 'idOnly',
             id: param,
         };
     }
 
-    throw new InvalidSearchParameterError(`Invalid reference search parameter: ${param}`);
+    return {
+        referenceType: 'unparseable',
+        rawValue: param,
+    };
 };

@@ -175,4 +175,25 @@ describe('referenceQuery', () => {
             ),
         ).toThrow(InvalidSearchParameterError);
     });
+
+    test('search value is not an URL nor has the format <resourceType>/<id>', () => {
+        expect(
+            referenceQuery(
+                organizationParam,
+                parseReferenceSearchValue({ name: 'organization', target: [] }, 'this:does# not match'),
+                true,
+                'https://base-url.com',
+                'organization',
+                ['Organization', 'Group'],
+            ),
+        ).toMatchInlineSnapshot(`
+          Object {
+            "terms": Object {
+              "managingOrganization.reference.keyword": Array [
+                "this:does# not match",
+              ],
+            },
+          }
+        `);
+    });
 });
