@@ -7,25 +7,6 @@
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import getComponentLogger from '../../loggerBuilder';
 
-export interface ReferenceSearchValueIdOnly {
-    referenceType: 'idOnly';
-    id: string;
-    inferredType: string;
-}
-
-export interface ReferenceSearchValueRelative {
-    referenceType: 'relative';
-    id: string;
-    type: string;
-}
-
-export interface ReferenceSearchValueUrl {
-    referenceType: 'url';
-    fullUrl: string;
-    id: string;
-    type: string;
-}
-
 // export type ReferenceSearchValue = ReferenceSearchValueIdOnly | ReferenceSearchValueRelative | ReferenceSearchValueUrl;
 export interface ReferenceSearchValue {
     id: string;
