@@ -56,15 +56,12 @@ export const parseReferenceSearchValue = (
                 fhirServiceBaseUrl,
             };
         }
-        if (!fhirServiceBaseUrl) {
-            return {
-                referenceType: 'relative',
-                id,
-                resourceType,
-            };
-        }
+        return {
+            referenceType: 'relative',
+            id,
+            resourceType,
+        };
     }
-
     if (ID_ONLY_REGEX.test(param)) {
         if (target === undefined || target.length === 0) {
             logger.error(
