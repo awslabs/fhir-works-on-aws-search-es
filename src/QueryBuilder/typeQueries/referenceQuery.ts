@@ -5,20 +5,14 @@
 
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
-import getComponentLogger from '../../loggerBuilder';
-
-const logger = getComponentLogger();
-
-const ID_ONLY_REGEX = /^[A-Za-z0-9\-.]{1,64}$/;
-const FHIR_REFERENCE_REGEX =
-    /^((?<fhirServiceBaseUrl>https?:\/\/[A-Za-z0-9\-\\.:%$_/]+)\/)?(?<resourceType>[A-Z][a-zA-Z]+)\/(?<id>[A-Za-z0-9\-.]{1,64})$/;
+import { ReferenceSearchValue } from '../../FhirQueryParser/typeParsers/referenceParser';
 
 const SUPPORTED_MODIFIERS: string[] = [];
 
 // eslint-disable-next-line import/prefer-default-export
 export function referenceQuery(
     compiled: CompiledSearchParam,
-    value: string,
+    value: ReferenceSearchValue,
     useKeywordSubFields: boolean,
     baseUrl: string,
     searchParamName: string,
@@ -30,30 +24,25 @@ export function referenceQuery(
     }
     const keywordSuffix = useKeywordSubFields ? '.keyword' : '';
 
-    // http://hl7.org/fhir/R4/search.html#reference
-    // reference fields should be of `keyword` ES type: https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html
-    let references: string[] = [value];
-    const match = value.match(FHIR_REFERENCE_REGEX);
-    if (match) {
-        const { fhirServiceBaseUrl, resourceType, id } = match.groups!;
-        if (fhirServiceBaseUrl && fhirServiceBaseUrl === baseUrl) {
+    const { id, fhirServiceBaseUrl, resourceType } = value;
+
+    let references: string[] = [];
+
+    if (resourceType) {
+        if (fhirServiceBaseUrl) {
+            if (fhirServiceBaseUrl === baseUrl) {
+                references.push(`${resourceType}/${id}`);
+            }
+            references.push(`${fhirServiceBaseUrl}/${resourceType}/${id}`);
+        } else {
             references.push(`${resourceType}/${id}`);
-        } else if (!fhirServiceBaseUrl) {
-            // Search doesn't have a baseUrl
             references.push(`${baseUrl}/${resourceType}/${id}`);
         }
-    } else if (ID_ONLY_REGEX.test(value)) {
-        if (target.length === 0) {
-            logger.error(
-                `ID only reference search failed. The requested search parameter: '${searchParamName}',  does not have any targets. Please ensure the compiled IG is valid`,
-            );
-            throw new InvalidSearchParameterError(
-                `ID only search for '${searchParamName}' parameter is not supported, please specify the value with the format [resourcetType]/[id] or as an absolute URL`,
-            );
-        }
+    }
 
+    if (id && !resourceType && !fhirServiceBaseUrl) {
         references = target.flatMap((targetType: string) => {
-            return [`${baseUrl}/${targetType}/${value}`, `${targetType}/${value}`];
+            return [`${baseUrl}/${targetType}/${id}`, `${targetType}/${id}`];
         });
     }
 

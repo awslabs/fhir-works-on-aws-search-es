@@ -15,6 +15,7 @@ import { DateSearchValue, parseDateSearchValue } from './typeParsers/dateParser'
 import { parseTokenSearchValue, TokenSearchValue } from './typeParsers/tokenParser';
 import { NumberSearchValue, parseNumberSearchValue } from './typeParsers/numberParser';
 import { parseQuantitySearchValue, QuantitySearchValue } from './typeParsers/quantityParser';
+import { parseReferenceSearchValue, ReferenceSearchValue } from './typeParsers/referenceParser';
 
 export { DateSearchValue, TokenSearchValue, NumberSearchValue, QuantitySearchValue };
 
@@ -63,7 +64,7 @@ export interface QuantityQueryParam extends BaseQueryParam {
 
 export interface ReferenceQueryParam extends BaseQueryParam {
     type: 'reference';
-    parsedSearchValues: StringLikeSearchValue[];
+    parsedSearchValues: ReferenceSearchValue[];
 }
 
 export interface TokenQueryParam extends BaseQueryParam {
@@ -121,7 +122,9 @@ const parseSearchQueryParam = (searchParam: SearchParam, rawSearchValue: string)
                 type: searchParam.type,
                 name: searchParam.name,
                 searchParam,
-                parsedSearchValues: orSearchValues.map(parseStringLikeSearchValue),
+                parsedSearchValues: orSearchValues.map((searchValue) =>
+                    parseReferenceSearchValue(searchParam, searchValue),
+                ),
             };
         case 'string':
             return {
