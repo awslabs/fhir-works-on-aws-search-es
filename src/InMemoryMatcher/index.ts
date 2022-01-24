@@ -18,12 +18,15 @@ import { dateMatch } from './matchers/dateMatch';
 import { getAllValuesForFHIRPath } from '../getAllValuesForFHIRPath';
 import { stringMatch } from './matchers/stringMatch';
 import { quantityMatch } from './matchers/quantityMatch';
+import { referenceMatch } from './matchers/referenceMatcher';
+import { ReferenceSearchValue } from '../FhirQueryParser/typeParsers/referenceParser';
 
 const typeMatcher = (
     searchParam: SearchParam,
     compiledSearchParam: CompiledSearchParam,
     searchValue: unknown,
     resourceValue: any,
+    { baseUrl }: { baseUrl?: string } = {},
 ): boolean => {
     switch (searchParam.type) {
         case 'string':
@@ -35,7 +38,10 @@ const typeMatcher = (
         case 'quantity':
             return quantityMatch(searchValue as QuantitySearchValue, resourceValue);
         case 'reference':
-            break;
+            return referenceMatch(searchValue as ReferenceSearchValue, resourceValue, {
+                target: searchParam.target,
+                baseUrl,
+            });
         case 'token':
             break;
         case 'composite':
@@ -78,13 +84,13 @@ function evaluateCompiledCondition(condition: string[] | undefined, resource: an
     return false;
 }
 
-function evaluateQueryParam(queryParam: QueryParam, resource: any): boolean {
+function evaluateQueryParam(queryParam: QueryParam, resource: any, { baseUrl }: { baseUrl?: string } = {}): boolean {
     return queryParam.parsedSearchValues.some((parsedSearchValue) =>
         queryParam.searchParam.compiled.some(
             (compiled) =>
                 evaluateCompiledCondition(compiled.condition, resource) &&
                 getAllValuesForFHIRPath(resource, compiled.path).some((resourceValue) =>
-                    typeMatcher(queryParam.searchParam, compiled, parsedSearchValue, resourceValue),
+                    typeMatcher(queryParam.searchParam, compiled, parsedSearchValue, resourceValue, { baseUrl }),
                 ),
         ),
     );
@@ -96,10 +102,16 @@ function evaluateQueryParam(queryParam: QueryParam, resource: any): boolean {
  * @param resource - FHIR resource to be matched
  */
 // eslint-disable-next-line import/prefer-default-export
-export function matchParsedFhirQueryParams(parsedFhirQueryParams: ParsedFhirQueryParams, resource: any): boolean {
+export function matchParsedFhirQueryParams(
+    parsedFhirQueryParams: ParsedFhirQueryParams,
+    resource: any,
+    { baseUrl }: { baseUrl?: string } = {},
+): boolean {
     if (parsedFhirQueryParams.resourceType !== resource?.resourceType) {
         return false;
     }
 
-    return parsedFhirQueryParams.searchParams.every((queryParam) => evaluateQueryParam(queryParam, resource));
+    return parsedFhirQueryParams.searchParams.every((queryParam) =>
+        evaluateQueryParam(queryParam, resource, { baseUrl }),
+    );
 }
