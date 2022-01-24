@@ -21,6 +21,7 @@ import {
     QuantitySearchValue,
     TokenSearchValue,
 } from '../FhirQueryParser';
+import { ReferenceSearchValue } from '../FhirQueryParser/typeParsers/referenceParser';
 
 function typeQueryWithConditions(
     searchParam: SearchParam,
@@ -55,7 +56,7 @@ function typeQueryWithConditions(
         case 'reference':
             typeQuery = referenceQuery(
                 compiledSearchParam,
-                searchValue as string,
+                searchValue as ReferenceSearchValue,
                 useKeywordSubFields,
                 baseUrl,
                 searchParam.name,
