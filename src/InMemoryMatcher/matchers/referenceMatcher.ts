@@ -6,11 +6,18 @@
 
 import { ReferenceSearchValue } from '../../FhirQueryParser/typeParsers/referenceParser';
 
+/**
+ * @param searchValue - parsed search value
+ * @param resourceValue - value from the FHIR resource
+ * @param options.fhirServiceBaseUrl - URL of the FHIR served where the FHIR resource is located.
+ * The URL is used to translate relative references into full URLs and vice versa
+ * @param options.target - target resource types of the search parameter being evaluated.
+ */
 // eslint-disable-next-line import/prefer-default-export
 export const referenceMatch = (
     searchValue: ReferenceSearchValue,
     resourceValue: any,
-    { baseUrl, target = [] }: { baseUrl?: string; target?: string[] },
+    { fhirServiceBaseUrl, target = [] }: { fhirServiceBaseUrl?: string; target?: string[] },
 ): boolean => {
     const reference = resourceValue?.reference;
 
@@ -18,19 +25,21 @@ export const referenceMatch = (
         case 'idOnly':
             return target.some(
                 (targetType) =>
-                    (baseUrl !== undefined && `${baseUrl}/${targetType}/${searchValue.id}` === reference) ||
+                    (fhirServiceBaseUrl !== undefined &&
+                        `${fhirServiceBaseUrl}/${targetType}/${searchValue.id}` === reference) ||
                     `${targetType}/${searchValue.id}` === reference,
             );
         case 'relative':
             return (
-                (baseUrl !== undefined && `${baseUrl}/${searchValue.resourceType}/${searchValue.id}` === reference) ||
+                (fhirServiceBaseUrl !== undefined &&
+                    `${fhirServiceBaseUrl}/${searchValue.resourceType}/${searchValue.id}` === reference) ||
                 `${searchValue.resourceType}/${searchValue.id}` === reference
             );
         case 'url':
             return (
                 `${searchValue.fhirServiceBaseUrl}/${searchValue.resourceType}/${searchValue.id}` === reference ||
-                (baseUrl !== undefined &&
-                    searchValue.fhirServiceBaseUrl === baseUrl &&
+                (fhirServiceBaseUrl !== undefined &&
+                    searchValue.fhirServiceBaseUrl === fhirServiceBaseUrl &&
                     `${searchValue.resourceType}/${searchValue.id}` === reference)
             );
         case 'unparseable':

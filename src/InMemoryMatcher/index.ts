@@ -26,7 +26,7 @@ const typeMatcher = (
     compiledSearchParam: CompiledSearchParam,
     searchValue: unknown,
     resourceValue: any,
-    { baseUrl }: { baseUrl?: string } = {},
+    { fhirServiceBaseUrl }: { fhirServiceBaseUrl?: string } = {},
 ): boolean => {
     switch (searchParam.type) {
         case 'string':
@@ -40,7 +40,7 @@ const typeMatcher = (
         case 'reference':
             return referenceMatch(searchValue as ReferenceSearchValue, resourceValue, {
                 target: searchParam.target,
-                baseUrl,
+                fhirServiceBaseUrl,
             });
         case 'token':
             break;
@@ -84,13 +84,19 @@ function evaluateCompiledCondition(condition: string[] | undefined, resource: an
     return false;
 }
 
-function evaluateQueryParam(queryParam: QueryParam, resource: any, { baseUrl }: { baseUrl?: string } = {}): boolean {
+function evaluateQueryParam(
+    queryParam: QueryParam,
+    resource: any,
+    { fhirServiceBaseUrl }: { fhirServiceBaseUrl?: string } = {},
+): boolean {
     return queryParam.parsedSearchValues.some((parsedSearchValue) =>
         queryParam.searchParam.compiled.some(
             (compiled) =>
                 evaluateCompiledCondition(compiled.condition, resource) &&
                 getAllValuesForFHIRPath(resource, compiled.path).some((resourceValue) =>
-                    typeMatcher(queryParam.searchParam, compiled, parsedSearchValue, resourceValue, { baseUrl }),
+                    typeMatcher(queryParam.searchParam, compiled, parsedSearchValue, resourceValue, {
+                        fhirServiceBaseUrl,
+                    }),
                 ),
         ),
     );
@@ -100,18 +106,20 @@ function evaluateQueryParam(queryParam: QueryParam, resource: any, { baseUrl }: 
  * checks if the given resource is matched by a FHIR search query
  * @param parsedFhirQueryParams - parsed FHIR search query
  * @param resource - FHIR resource to be matched
+ * @param options.fhirServiceBaseUrl - URL of the FHIR served where the FHIR resource is located.
+ * The URL is used to translate relative references into full URLs and vice versa
  */
 // eslint-disable-next-line import/prefer-default-export
 export function matchParsedFhirQueryParams(
     parsedFhirQueryParams: ParsedFhirQueryParams,
     resource: any,
-    { baseUrl }: { baseUrl?: string } = {},
+    { fhirServiceBaseUrl }: { fhirServiceBaseUrl?: string } = {},
 ): boolean {
     if (parsedFhirQueryParams.resourceType !== resource?.resourceType) {
         return false;
     }
 
     return parsedFhirQueryParams.searchParams.every((queryParam) =>
-        evaluateQueryParam(queryParam, resource, { baseUrl }),
+        evaluateQueryParam(queryParam, resource, { fhirServiceBaseUrl }),
     );
 }

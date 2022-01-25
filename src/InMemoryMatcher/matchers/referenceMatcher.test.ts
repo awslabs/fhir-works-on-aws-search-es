@@ -8,7 +8,7 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: 'Patient/111' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: 'xxxx',
+                    fhirServiceBaseUrl: 'xxxx',
                     target: [],
                 }),
             ).toBe(true);
@@ -19,7 +19,7 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: 'https://fwoa.com/Patient/111' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: 'https://fwoa.com',
+                    fhirServiceBaseUrl: 'https://fwoa.com',
                     target: [],
                 }),
             ).toBe(true);
@@ -30,7 +30,7 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: 'Patient/222' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: '',
+                    fhirServiceBaseUrl: '',
                     target: [],
                 }),
             ).toBe(false);
@@ -38,7 +38,7 @@ describe('referenceMatch', () => {
     });
 
     describe('url', () => {
-        test('relative reference in resource with matching baseUrl', () => {
+        test('relative reference in resource with matching base url', () => {
             const searchValue: ReferenceSearchValue = {
                 fhirServiceBaseUrl: 'https://fwoa.com',
                 id: '111',
@@ -48,7 +48,7 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: 'Patient/111' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: 'https://fwoa.com',
+                    fhirServiceBaseUrl: 'https://fwoa.com',
                     target: [],
                 }),
             ).toBe(true);
@@ -64,7 +64,7 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: 'https://fwoa.com/Patient/111' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: 'xxxx',
+                    fhirServiceBaseUrl: 'xxxx',
                     target: [],
                 }),
             ).toBe(true);
@@ -77,7 +77,7 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: 'Patient/111' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: 'xxxx',
+                    fhirServiceBaseUrl: 'xxxx',
                     target: ['Patient'],
                 }),
             ).toBe(true);
@@ -88,8 +88,8 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: 'https://fwoa.com/Patient/111' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: 'https://fwoa.com',
-                    target: ['Patient'],
+                    fhirServiceBaseUrl: 'https://fwoa.com',
+                    target: ['Observation', 'Practitioner', 'Patient'],
                 }),
             ).toBe(true);
         });
@@ -101,7 +101,7 @@ describe('referenceMatch', () => {
             const resourceValue = { reference: '@#$_someValue_$#@' };
             expect(
                 referenceMatch(searchValue, resourceValue, {
-                    baseUrl: 'xxxx',
+                    fhirServiceBaseUrl: 'xxxx',
                     target: [],
                 }),
             ).toBe(true);
