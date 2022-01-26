@@ -61,6 +61,10 @@
       "type": "CodeableConcept"
     },
     {
+      "field": "extension.valueReference",
+      "type": "Reference"
+    },
+    {
       "field": "extension.extension.valueString",
       "type": "string"
     },
