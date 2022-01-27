@@ -42,6 +42,12 @@ describe('queryParser', () => {
         `);
     });
 
+    test('string with unknown modifier', () => {
+        expect(() =>
+            parseQuery(fhirSearchParametersRegistry, 'Patient', { 'name:unknownModifier': 'John' }),
+        ).toThrowErrorMatchingInlineSnapshot(`"Unsupported string search modifier: unknownModifier"`);
+    });
+
     test('string OR', () => {
         const q = parseQuery(fhirSearchParametersRegistry, 'Patient', { 'name:exact': 'John,Anna' });
         expect(q).toMatchInlineSnapshot(`
