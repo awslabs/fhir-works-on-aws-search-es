@@ -12,7 +12,25 @@ const COMPILED_SEARCH_PARAM: CompiledSearchParam = { path: 'someField', resource
 describe('stringMatch', () => {
     test('matches string', () => {
         expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'hello')).toBe(true);
+        expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'hello world')).toBe(true);
+        expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'hello-world')).toBe(true);
         expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'something else')).toBe(false);
+    });
+
+    test('modifier :exact', () => {
+        expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'hello', 'exact')).toBe(true);
+        expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'hello world', 'exact')).toBe(false);
+    });
+
+    test('modifier :contains', () => {
+        expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'XXXXXhelloXXXX', 'contains')).toBe(true);
+        expect(stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'something else', 'contains')).toBe(false);
+    });
+
+    test('unsupported modifier', () => {
+        expect(() =>
+            stringMatch(COMPILED_SEARCH_PARAM, 'hello', 'hello', 'unknownModifier'),
+        ).toThrowErrorMatchingInlineSnapshot(`"The modifier \\":unknownModifier\\" is not supported"`);
     });
 
     test('not a string', () => {

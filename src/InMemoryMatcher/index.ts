@@ -22,15 +22,17 @@ import { referenceMatch } from './matchers/referenceMatcher';
 import { ReferenceSearchValue } from '../FhirQueryParser/typeParsers/referenceParser';
 
 const typeMatcher = (
-    searchParam: SearchParam,
+    queryParam: QueryParam,
     compiledSearchParam: CompiledSearchParam,
     searchValue: unknown,
     resourceValue: any,
     { fhirServiceBaseUrl }: { fhirServiceBaseUrl?: string } = {},
 ): boolean => {
+    const { searchParam, modifier } = queryParam;
+
     switch (searchParam.type) {
         case 'string':
-            return stringMatch(compiledSearchParam, searchValue as StringLikeSearchValue, resourceValue);
+            return stringMatch(compiledSearchParam, searchValue as StringLikeSearchValue, resourceValue, modifier);
         case 'date':
             return dateMatch(searchValue as DateSearchValue, resourceValue);
         case 'number':
@@ -94,7 +96,7 @@ function evaluateQueryParam(
             (compiled) =>
                 evaluateCompiledCondition(compiled.condition, resource) &&
                 getAllValuesForFHIRPath(resource, compiled.path).some((resourceValue) =>
-                    typeMatcher(queryParam.searchParam, compiled, parsedSearchValue, resourceValue, {
+                    typeMatcher(queryParam, compiled, parsedSearchValue, resourceValue, {
                         fhirServiceBaseUrl,
                     }),
                 ),

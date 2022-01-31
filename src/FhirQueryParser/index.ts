@@ -169,6 +169,14 @@ const parseSearchQueryParam = (searchParam: SearchParam, rawSearchValue: string)
     }
 };
 
+const validateModifiers = ({ type, modifier }: QueryParam): void => {
+    // There are other valid modifiers in the FHIR spec, but this validation only accepts the modifiers currently implemented in FWoA
+    const SUPPORTED_MODIFIERS: string[] = ['exact', 'contains'];
+    if (type === 'string' && modifier !== undefined && !SUPPORTED_MODIFIERS.includes(modifier)) {
+        throw new InvalidSearchParameterError(`Unsupported string search modifier: ${modifier}`);
+    }
+};
+
 /**
  * Parse and validate the search query parameters. This method ignores _include, _revinclude, _sort, and chained parameters
  * @param fhirSearchParametersRegistry - instance of FHIRSearchParametersRegistry
@@ -229,6 +237,7 @@ export const parseQuery = (
         return searchValues.map((searchValue) => {
             const parsedQueryParam = parseSearchQueryParam(fhirSearchParam, searchValue);
             parsedQueryParam.modifier = searchModifier.modifier;
+            validateModifiers(parsedQueryParam);
             return parsedQueryParam;
         });
     });
