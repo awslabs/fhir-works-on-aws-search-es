@@ -27,4 +27,4 @@ export const MAX_ES_WINDOW_SIZE: number = 10000;
 
 export const MAX_CHAINED_PARAMS_RESULT: number = 100;
 
-export const MAX_NUM_ES_HITS: number = 1000;
+export const MAX_INCLUSION_PARAM_RESULTS: number = 1000;
