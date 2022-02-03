@@ -62,6 +62,30 @@ describe('parseChainedParameters', () => {
               },
             ]
         `);
+
+        expect(
+            parseChainedParameters(fhirSearchParametersRegistry, 'DocumentReference', {
+                'patient.identifier': '2.16.840.1.113883.3.1579|8889154591540',
+            }),
+        ).toMatchInlineSnapshot(`
+            Array [
+              Object {
+                "chain": Array [
+                  Object {
+                    "resourceType": "Patient",
+                    "searchParam": "identifier",
+                  },
+                  Object {
+                    "resourceType": "DocumentReference",
+                    "searchParam": "patient",
+                  },
+                ],
+                "initialValue": Array [
+                  "2.16.840.1.113883.3.1579|8889154591540",
+                ],
+              },
+            ]
+        `);
     });
 
     test('invalid params', () => {

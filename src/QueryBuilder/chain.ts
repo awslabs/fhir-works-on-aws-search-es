@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/prefer-default-export
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
-import { NON_SEARCHABLE_PARAMETERS } from '../constants';
+import { COMPILED_CONDITION_OPERATOR_RESOLVE, NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from '../FhirQueryParser/util';
 
 export interface ChainParameter {
@@ -55,9 +55,28 @@ const parseChainedParameters = (
                         );
                     }
                 } else if (fhirSearchParam.target?.length !== 1) {
-                    throw new InvalidSearchParameterError(
-                        `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
-                    );
+                    // check compiled[].condition for resolution
+                    if (fhirSearchParam.compiled.length > 0) {
+                        const compiled = fhirSearchParam.compiled.pop()!; // we can use ! since we checked length before
+                        // if there is no resolve condition, we have multiple resources pointed to.
+                        // condition's format is defined in `../FHIRSearchParamtersRegistry/index.ts`
+                        if (!compiled.condition || compiled.condition[1] !== COMPILED_CONDITION_OPERATOR_RESOLVE) {
+                            throw new InvalidSearchParameterError(
+                                `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
+                            );
+                        }
+                        // we have a resolution to a resource type
+                        organizedChain.push({
+                            resourceType: currentResourceType,
+                            searchParam: searchModifier.parameterName,
+                        });
+                        // eslint-disable-next-line prefer-destructuring
+                        nextResourceType = compiled.condition[2];
+                    } else {
+                        throw new InvalidSearchParameterError(
+                            `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
+                        );
+                    }
                 } else {
                     organizedChain.push({
                         resourceType: currentResourceType,
