@@ -1,12 +1,34 @@
 // eslint-disable-next-line import/prefer-default-export
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
-import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
+import { FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { COMPILED_CONDITION_OPERATOR_RESOLVE, NON_SEARCHABLE_PARAMETERS } from '../constants';
 import { parseSearchModifiers, normalizeQueryParams, isChainedParameter } from '../FhirQueryParser/util';
 
 export interface ChainParameter {
     chain: { resourceType: string; searchParam: string }[];
     initialValue: string[];
+}
+
+export function getUniqueTarget(fhirSearchParam: SearchParam): string | undefined {
+    let target: string | undefined;
+    for (let i = 0; i < fhirSearchParam.compiled.length; i += 1) {
+        // check compiled[].condition for resolution
+        const compiled = fhirSearchParam.compiled[i]; // we can use ! since we checked length before
+        // condition's format is defined in `../FHIRSearchParamtersRegistry/index.ts`
+        if (compiled.condition && compiled.condition[1] === COMPILED_CONDITION_OPERATOR_RESOLVE) {
+            if (!target) {
+                // eslint-disable-next-line prefer-destructuring
+                target = compiled.condition[2];
+            } else if (target !== compiled.condition[2]) {
+                // case where two compiled resolve to different resource types
+                return undefined;
+            }
+        } else {
+            // if there is no resolve condition, we have multiple resources pointed to.
+            return undefined;
+        }
+    }
+    return target;
 }
 
 const parseChainedParameters = (
@@ -55,23 +77,13 @@ const parseChainedParameters = (
                         );
                     }
                 } else if (fhirSearchParam.target?.length !== 1) {
-                    // check compiled[].condition for resolution
-                    if (fhirSearchParam.compiled.length > 0) {
-                        const compiled = fhirSearchParam.compiled.pop()!; // we can use ! since we checked length before
-                        // if there is no resolve condition, we have multiple resources pointed to.
-                        // condition's format is defined in `../FHIRSearchParamtersRegistry/index.ts`
-                        if (!compiled.condition || compiled.condition[1] !== COMPILED_CONDITION_OPERATOR_RESOLVE) {
-                            throw new InvalidSearchParameterError(
-                                `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
-                            );
-                        }
-                        // we have a resolution to a resource type
+                    const result = getUniqueTarget(fhirSearchParam);
+                    if (result) {
                         organizedChain.push({
                             resourceType: currentResourceType,
                             searchParam: searchModifier.parameterName,
                         });
-                        // eslint-disable-next-line prefer-destructuring
-                        nextResourceType = compiled.condition[2];
+                        nextResourceType = result;
                     } else {
                         throw new InvalidSearchParameterError(
                             `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
