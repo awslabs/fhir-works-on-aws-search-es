@@ -185,7 +185,6 @@ describe('parseChainedParameters', () => {
         };
 
         expect(getUniqueTarget(successCase)).toMatchInlineSnapshot(`"Patient"`);
-        expect(getUniqueTarget(errorCases[0])).toMatchInlineSnapshot(`undefined`);
-        expect(getUniqueTarget(errorCases[1])).toMatchInlineSnapshot(`undefined`);
+        errorCases.forEach((errorCase) => expect(getUniqueTarget(errorCase)).toMatchInlineSnapshot(`undefined`));
     });
 });
