@@ -10,6 +10,12 @@ export interface ChainParameter {
 }
 
 export function getUniqueTarget(fhirSearchParam: SearchParam): string | undefined {
+    if (!fhirSearchParam.target) {
+        return undefined;
+    }
+    if (fhirSearchParam.target.length === 1) {
+        return fhirSearchParam.target[0];
+    }
     let target: string | undefined;
     for (let i = 0; i < fhirSearchParam.compiled.length; i += 1) {
         // check compiled[].condition for resolution
@@ -27,6 +33,10 @@ export function getUniqueTarget(fhirSearchParam: SearchParam): string | undefine
             // if there is no resolve condition, we have multiple resources pointed to.
             return undefined;
         }
+    }
+    // case for resolution to resource type that isn't contained in the target group
+    if (target && !fhirSearchParam.target.includes(target)) {
+        return undefined;
     }
     return target;
 }
@@ -76,25 +86,18 @@ const parseChainedParameters = (
                             `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} does not point to resource type ${searchModifier.modifier}.`,
                         );
                     }
-                } else if (fhirSearchParam.target?.length !== 1) {
-                    const result = getUniqueTarget(fhirSearchParam);
-                    if (result) {
-                        organizedChain.push({
-                            resourceType: currentResourceType,
-                            searchParam: searchModifier.parameterName,
-                        });
-                        nextResourceType = result;
-                    } else {
+                } else {
+                    const target = getUniqueTarget(fhirSearchParam);
+                    if (!target) {
                         throw new InvalidSearchParameterError(
                             `Chained search parameter '${searchModifier.parameterName}' for resource type ${currentResourceType} points to multiple resource types, please specify.`,
                         );
                     }
-                } else {
                     organizedChain.push({
                         resourceType: currentResourceType,
                         searchParam: searchModifier.parameterName,
                     });
-                    [nextResourceType] = fhirSearchParam.target;
+                    nextResourceType = target;
                 }
                 currentResourceType = nextResourceType;
             });

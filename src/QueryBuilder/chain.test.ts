@@ -161,6 +161,26 @@ describe('parseChainedParameters', () => {
                     },
                 ],
             },
+            {
+                name: 'patient',
+                url: 'http://hl7.org/fhir/SearchParameter/Person-patient',
+                type: 'reference',
+                description: 'The Person links to this Patient',
+                base: 'Person',
+                target: ['Patient', 'Practitioner'],
+                compiled: [
+                    {
+                        resourceType: 'Person',
+                        path: 'link.target',
+                        condition: ['link.target', 'resolve', 'Observation'],
+                    },
+                    {
+                        resourceType: 'Person',
+                        path: 'link.target',
+                        condition: ['link.something', 'resolve', 'Observation'],
+                    },
+                ],
+            },
         ];
 
         const successCase: SearchParam = {
@@ -185,6 +205,6 @@ describe('parseChainedParameters', () => {
         };
 
         expect(getUniqueTarget(successCase)).toMatchInlineSnapshot(`"Patient"`);
-        errorCases.forEach((errorCase) => expect(getUniqueTarget(errorCase)).toMatchInlineSnapshot(`undefined`));
+        errorCases.forEach((errorCase) => expect(getUniqueTarget(errorCase)).toBeUndefined());
     });
 });
