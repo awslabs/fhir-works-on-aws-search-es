@@ -58,11 +58,17 @@ export class StreamSubscriptionMatcher {
         this.topicArn = topicArn;
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
 
-        this.activeSubscriptions = new AsyncRefreshCache<Subscription[]>(async () =>
-            (await this.persistence.getActiveSubscriptions({})).map((resource) =>
-                parseSubscription(resource, this.fhirSearchParametersRegistry),
-            ),
-        );
+        this.activeSubscriptions = new AsyncRefreshCache<Subscription[]>(async () => {
+            console.log('Refreshing cache of active subscriptions...');
+
+            const activeSubscriptions: Subscription[] = (await this.persistence.getActiveSubscriptions({})).map(
+                (resource) => parseSubscription(resource, this.fhirSearchParametersRegistry),
+            );
+
+            console.log(`found ${activeSubscriptions.length} active subscriptions`);
+
+            return activeSubscriptions;
+        });
     }
 
     async match(dynamoDBStreamEvent: DynamoDBStreamEvent): Promise<void> {
