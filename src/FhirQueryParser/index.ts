@@ -5,6 +5,7 @@
  */
 import { isEmpty } from 'lodash';
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
+import * as qs from 'qs';
 import { FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { isChainedParameter, normalizeQueryParams, parseSearchModifiers } from './util';
 import getComponentLogger from '../loggerBuilder';
@@ -249,4 +250,19 @@ export const parseQuery = (
         ...(!isEmpty(chainedSearchParams) && { chainedSearchParams }),
         ...(!isEmpty(otherParams) && { otherParams }),
     };
+};
+
+/**
+ * Parse and validate the search query parameters.
+ * @param fhirSearchParametersRegistry - instance of FHIRSearchParametersRegistry
+ * @param searchCriteria - Search criteria without the base url. Example: "Observation?code=http://loinc.org|1975-2"
+ */
+export const parseQueryString = (
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
+    searchCriteria: string,
+): ParsedFhirQueryParams => {
+    const questionMarkIndex = searchCriteria.indexOf('?') === -1 ? searchCriteria.length : searchCriteria.indexOf('?');
+    const resourceType = searchCriteria.substring(0, questionMarkIndex);
+    const queryString = searchCriteria.substring(questionMarkIndex + 1);
+    return parseQuery(fhirSearchParametersRegistry, resourceType, qs.parse(queryString));
 };

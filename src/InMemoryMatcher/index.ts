@@ -12,7 +12,7 @@ import {
     QueryParam,
     StringLikeSearchValue,
 } from '../FhirQueryParser';
-import { CompiledSearchParam, SearchParam } from '../FHIRSearchParametersRegistry';
+import { CompiledSearchParam } from '../FHIRSearchParametersRegistry';
 import { numberMatch } from './matchers/numberMatch';
 import { dateMatch } from './matchers/dateMatch';
 import { getAllValuesForFHIRPath } from '../getAllValuesForFHIRPath';
