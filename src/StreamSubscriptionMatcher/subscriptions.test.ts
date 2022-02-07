@@ -106,6 +106,7 @@ describe('buildNotification', () => {
               "matchedResource": Object {
                 "id": "222",
                 "lastUpdated": "2021-10-08T12:37:44.998Z",
+                "resourceType": "DocumentReference",
                 "versionId": "1",
               },
               "subscriptionId": "111",

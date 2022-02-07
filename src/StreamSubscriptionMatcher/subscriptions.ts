@@ -22,6 +22,7 @@ export interface SubscriptionNotification {
     channelHeader: string[];
     matchedResource: {
         id: string;
+        resourceType: string;
         versionId: string;
         lastUpdated: string;
     };
@@ -40,6 +41,7 @@ export const buildNotification = (
     endpoint: subscription.endpoint,
     matchedResource: {
         id: resource.id,
+        resourceType: resource?.resourceType,
         lastUpdated: resource.meta?.lastUpdated,
         versionId: resource.meta?.versionId,
     },
