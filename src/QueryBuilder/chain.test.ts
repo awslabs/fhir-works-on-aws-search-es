@@ -4,8 +4,8 @@
  */
 
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
-import parseChainedParameters from './chain';
-import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
+import parseChainedParameters, { getUniqueTarget } from './chain';
+import { FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 
 const fhirSearchParametersRegistry = new FHIRSearchParametersRegistry('4.0.1');
 
@@ -92,5 +92,119 @@ describe('parseChainedParameters', () => {
                 "Chained search parameter 'link' for resource type Patient points to multiple resource types, please specify.",
             ),
         );
+    });
+
+    test('search param with conditions that narrow down target type', () => {
+        expect(
+            parseChainedParameters(fhirSearchParametersRegistry, 'DocumentReference', {
+                'patient.identifier': '2.16.840.1.113883.3.1579|8889154591540',
+            }),
+        ).toMatchInlineSnapshot(`
+          Array [
+            Object {
+              "chain": Array [
+                Object {
+                  "resourceType": "Patient",
+                  "searchParam": "identifier",
+                },
+                Object {
+                  "resourceType": "DocumentReference",
+                  "searchParam": "patient",
+                },
+              ],
+              "initialValue": Array [
+                "2.16.840.1.113883.3.1579|8889154591540",
+              ],
+            },
+          ]
+      `);
+    });
+
+    test('get unique target edge cases', () => {
+        const errorCases: SearchParam[] = [
+            {
+                name: 'patient',
+                url: 'http://hl7.org/fhir/SearchParameter/Person-patient',
+                type: 'reference',
+                description: 'The Person links to this Patient',
+                base: 'Person',
+                target: ['Patient', 'Practitioner'],
+                compiled: [
+                    {
+                        resourceType: 'Person',
+                        path: 'link.target',
+                        condition: ['link.target', 'resolve', 'Patient'],
+                    },
+                    {
+                        resourceType: 'Person',
+                        path: 'link.target',
+                        condition: ['link.something', 'resolve', 'Practitioner'],
+                    },
+                ],
+            },
+            {
+                name: 'patient',
+                url: 'http://hl7.org/fhir/SearchParameter/Person-patient',
+                type: 'reference',
+                description: 'The Person links to this Patient',
+                base: 'Person',
+                target: ['Patient', 'Practitioner'],
+                compiled: [
+                    {
+                        resourceType: 'Person',
+                        path: 'link.target',
+                        condition: ['link.target', 'resolve', 'Patient'],
+                    },
+                    {
+                        resourceType: 'Person',
+                        path: 'xxx.target',
+                    },
+                ],
+            },
+            {
+                name: 'patient',
+                url: 'http://hl7.org/fhir/SearchParameter/Person-patient',
+                type: 'reference',
+                description: 'The Person links to this Patient',
+                base: 'Person',
+                target: ['Patient', 'Practitioner'],
+                compiled: [
+                    {
+                        resourceType: 'Person',
+                        path: 'link.target',
+                        condition: ['link.target', 'resolve', 'Observation'],
+                    },
+                    {
+                        resourceType: 'Person',
+                        path: 'link.target',
+                        condition: ['link.something', 'resolve', 'Observation'],
+                    },
+                ],
+            },
+        ];
+
+        const successCase: SearchParam = {
+            name: 'patient',
+            url: 'http://hl7.org/fhir/SearchParameter/Person-patient',
+            type: 'reference',
+            description: 'The Person links to this Patient',
+            base: 'Person',
+            target: ['Patient', 'Practitioner'],
+            compiled: [
+                {
+                    resourceType: 'Person',
+                    path: 'link.target',
+                    condition: ['link.target', 'resolve', 'Patient'],
+                },
+                {
+                    resourceType: 'Person',
+                    path: 'link.target',
+                    condition: ['link.something', 'resolve', 'Patient'],
+                },
+            ],
+        };
+
+        expect(getUniqueTarget(successCase)).toMatchInlineSnapshot(`"Patient"`);
+        errorCases.forEach((errorCase) => expect(getUniqueTarget(errorCase)).toBeUndefined());
     });
 });
