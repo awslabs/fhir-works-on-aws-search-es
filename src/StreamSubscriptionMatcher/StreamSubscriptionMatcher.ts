@@ -17,8 +17,12 @@ import {
 import { matchParsedFhirQueryParams } from '../InMemoryMatcher';
 import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
 import { AsyncRefreshCache } from './AsyncRefreshCache';
+import getComponentLogger from '../loggerBuilder';
 
 const SNS_MAX_BATCH_SIZE = 10;
+
+const logger = getComponentLogger();
+
 const matchSubscription = (subscription: Subscription, resource: Record<string, any>): boolean => {
     return (
         // eslint-disable-next-line no-underscore-dangle
@@ -52,20 +56,20 @@ export class StreamSubscriptionMatcher {
         {
             fhirVersion = '4.0.1',
             compiledImplementationGuides,
-        }: { enableMultiTenancy?: boolean; fhirVersion?: FhirVersion; compiledImplementationGuides?: any } = {},
+        }: { fhirVersion?: FhirVersion; compiledImplementationGuides?: any } = {},
     ) {
         this.persistence = persistence;
         this.topicArn = topicArn;
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
 
         this.activeSubscriptions = new AsyncRefreshCache<Subscription[]>(async () => {
-            console.log('Refreshing cache of active subscriptions...');
+            logger.info('Refreshing cache of active subscriptions...');
 
             const activeSubscriptions: Subscription[] = (await this.persistence.getActiveSubscriptions({})).map(
                 (resource) => parseSubscription(resource, this.fhirSearchParametersRegistry),
             );
 
-            console.log(`found ${activeSubscriptions.length} active subscriptions`);
+            logger.info(`found ${activeSubscriptions.length} active subscriptions`);
 
             return activeSubscriptions;
         });
@@ -81,7 +85,7 @@ export class StreamSubscriptionMatcher {
             },
         );
 
-        console.log(
+        logger.info(
             'Summary of notifications:',
             JSON.stringify(
                 subscriptionNotifications.map((s) => ({
