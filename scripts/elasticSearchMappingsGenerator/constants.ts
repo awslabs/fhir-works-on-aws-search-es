@@ -20,6 +20,7 @@ export const EXTENSION_FIELDS = [
     'extension.valueDate',
     'extension.valueCoding',
     'extension.valueCodeableConcept',
+    'extension.valueReference',
 
     'extension.extension.valueString',
     'extension.extension.valueDecimal',
