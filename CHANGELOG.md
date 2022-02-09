@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.10.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.9.4...v3.10.0) (2022-02-09)
+
+
+### Features
+
+* add extension.valueReference to search mappings ([#162](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/162)) ([7fd7057](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/7fd705758f56fb6d725d4acff080b61852bc51df))
+
 ### [3.9.4](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.9.2...v3.9.4) (2022-02-03)
 
 
