@@ -5,7 +5,6 @@
 
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
-import * as qs from 'qs';
 
 import { ResponseError } from '@elastic/elasticsearch/lib/errors';
 import { partition, merge, isEmpty } from 'lodash';
@@ -33,7 +32,7 @@ import {
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
-import { parseQuery } from './FhirQueryParser';
+import { parseQueryString } from './FhirQueryParser';
 import parseChainedParameters, { ChainParameter } from './QueryBuilder/chain';
 import getComponentLogger from './loggerBuilder';
 
@@ -522,14 +521,9 @@ export class ElasticSearchService implements Search {
     }
 
     validateSubscriptionSearchCriteria(searchCriteria: string): void {
-        const questionMarkIndex =
-            searchCriteria.indexOf('?') === -1 ? searchCriteria.length : searchCriteria.indexOf('?');
-        const resourceType = searchCriteria.substring(0, questionMarkIndex);
-        const queryString = searchCriteria.substring(questionMarkIndex + 1);
-        const { inclusionSearchParams, chainedSearchParams, otherParams } = parseQuery(
+        const { inclusionSearchParams, chainedSearchParams, otherParams } = parseQueryString(
             this.fhirSearchParametersRegistry,
-            resourceType,
-            qs.parse(queryString),
+            searchCriteria,
         );
         if (inclusionSearchParams || chainedSearchParams || otherParams) {
             throw new InvalidSearchParameterError(
