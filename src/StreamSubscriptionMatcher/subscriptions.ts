@@ -41,7 +41,7 @@ export const buildNotification = (
     endpoint: subscription.endpoint,
     matchedResource: {
         id: resource.id,
-        resourceType: resource?.resourceType,
+        resourceType: resource.resourceType,
         lastUpdated: resource.meta?.lastUpdated,
         versionId: resource.meta?.versionId,
     },
