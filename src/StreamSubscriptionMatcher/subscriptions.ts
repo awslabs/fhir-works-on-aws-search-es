@@ -2,6 +2,9 @@ import { DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda/trigger/dynamodb
 import AWS from 'aws-sdk';
 import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
 import { ParsedFhirQueryParams, parseQueryString } from '../FhirQueryParser';
+import getComponentLogger from '../loggerBuilder';
+
+const logger = getComponentLogger();
 
 export interface Subscription {
     subscriptionId: string;
@@ -58,7 +61,9 @@ export const filterOutIneligibleResources = (dynamoDBStreamEvent: DynamoDBStream
             return [];
         }
         if (dynamoDbRecord.dynamodb?.NewImage === undefined) {
-            console.log('dynamodb.NewImage is missing from event. Is your stream correctly configured?');
+            logger.error(
+                'dynamodb.NewImage is missing from event. The stream event will be dropped. Is your stream correctly configured?',
+            );
             return [];
         }
         const resource = AWS.DynamoDB.Converter.unmarshall(dynamoDbRecord.dynamodb.NewImage);
