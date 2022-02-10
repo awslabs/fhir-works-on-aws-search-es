@@ -20,6 +20,7 @@ import { AsyncRefreshCache } from './AsyncRefreshCache';
 import getComponentLogger from '../loggerBuilder';
 
 const SNS_MAX_BATCH_SIZE = 10;
+const ACTIVE_SUBSCRIPTIONS_CACHE_REFRESH_TIMEOUT = 30_000;
 
 const logger = getComponentLogger();
 
@@ -72,7 +73,7 @@ export class StreamSubscriptionMatcher {
             logger.info(`found ${activeSubscriptions.length} active subscriptions`);
 
             return activeSubscriptions;
-        });
+        }, ACTIVE_SUBSCRIPTIONS_CACHE_REFRESH_TIMEOUT);
     }
 
     async match(dynamoDBStreamEvent: DynamoDBStreamEvent): Promise<void> {

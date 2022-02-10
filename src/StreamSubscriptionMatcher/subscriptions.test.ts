@@ -114,6 +114,49 @@ describe('buildNotification', () => {
             }
         `);
     });
+
+    test('multi-tenant id', () => {
+        const notification = buildNotification(
+            {
+                channelType: 'rest-hook',
+                channelHeader: ['SomeHeader: token-abc-123'],
+                channelPayload: 'application/fhir+json',
+                endpoint: 'https://endpoint.com',
+                parsedCriteria: { searchParams: [], resourceType: 'DocumentReference' },
+                subscriptionId: '111',
+                tenantId: 't1',
+            },
+            {
+                meta: {
+                    lastUpdated: '2021-10-08T12:37:44.998Z',
+                    versionId: '1',
+                },
+                _tenantId: 't1',
+                id: 't1|222',
+                _id: '222',
+                resourceType: 'DocumentReference',
+            },
+        );
+
+        expect(notification).toMatchInlineSnapshot(`
+            Object {
+              "channelHeader": Array [
+                "SomeHeader: token-abc-123",
+              ],
+              "channelPayload": "application/fhir+json",
+              "channelType": "rest-hook",
+              "endpoint": "https://endpoint.com",
+              "matchedResource": Object {
+                "id": "222",
+                "lastUpdated": "2021-10-08T12:37:44.998Z",
+                "resourceType": "DocumentReference",
+                "versionId": "1",
+              },
+              "subscriptionId": "111",
+              "tenantId": "t1",
+            }
+        `);
+    });
 });
 
 describe('parseSubscription', () => {
