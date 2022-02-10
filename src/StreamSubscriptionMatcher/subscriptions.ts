@@ -43,7 +43,8 @@ export const buildNotification = (
     channelPayload: subscription.channelPayload,
     endpoint: subscription.endpoint,
     matchedResource: {
-        id: resource.id,
+        // eslint-disable-next-line no-underscore-dangle
+        id: resource._tenantId ? resource._id : resource.id,
         resourceType: resource.resourceType,
         lastUpdated: resource.meta?.lastUpdated,
         versionId: resource.meta?.versionId,
