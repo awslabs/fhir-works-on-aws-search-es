@@ -11,6 +11,7 @@ import {
     QuantitySearchValue,
     QueryParam,
     StringLikeSearchValue,
+    TokenSearchValue,
 } from '../FhirQueryParser';
 import { CompiledSearchParam } from '../FHIRSearchParametersRegistry';
 import { numberMatch } from './matchers/numberMatch';
@@ -20,6 +21,8 @@ import { stringMatch } from './matchers/stringMatch';
 import { quantityMatch } from './matchers/quantityMatch';
 import { referenceMatch } from './matchers/referenceMatcher';
 import { ReferenceSearchValue } from '../FhirQueryParser/typeParsers/referenceParser';
+import { tokenMatch } from './matchers/tokenMatch';
+import { uriMatch } from './matchers/uriMatch';
 
 const typeMatcher = (
     queryParam: QueryParam,
@@ -45,13 +48,13 @@ const typeMatcher = (
                 fhirServiceBaseUrl,
             });
         case 'token':
-            break;
+            return tokenMatch(searchValue as TokenSearchValue, resourceValue);
         case 'composite':
             break;
         case 'special':
             break;
         case 'uri':
-            break;
+            return uriMatch(searchValue as StringLikeSearchValue, resourceValue);
         default:
             // eslint-disable-next-line no-case-declarations
             const exhaustiveCheck: never = searchParam.type;

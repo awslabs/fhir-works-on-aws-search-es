@@ -128,6 +128,28 @@ describe('tokenMatch', () => {
                     ),
                 ).toBe(true);
             });
+
+            test('code type', () => {
+                expect(
+                    tokenMatch(
+                        {
+                            code: 'female',
+                            explicitNoSystemProperty: false,
+                        },
+                        'female',
+                    ),
+                ).toBe(true);
+
+                expect(
+                    tokenMatch(
+                        {
+                            code: 'female',
+                            explicitNoSystemProperty: false,
+                        },
+                        'male',
+                    ),
+                ).toBe(false);
+            });
         });
     });
 
