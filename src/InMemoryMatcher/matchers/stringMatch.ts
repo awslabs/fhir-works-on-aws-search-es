@@ -6,6 +6,7 @@
 
 import { StringLikeSearchValue } from '../../FhirQueryParser';
 import { CompiledSearchParam } from '../../FHIRSearchParametersRegistry';
+import { getAllValuesForFHIRPath } from '../../getAllValuesForFHIRPath';
 
 const comparisons = {
     eq: (a: unknown, b: string) => typeof a === 'string' && a.split(/[ \-,.]/).includes(b), // simple approximation of the way OpenSearch matches text fields.
@@ -49,29 +50,18 @@ export const stringMatch = (
     if (typeof resourceValue === 'string') {
         valuesFromResource = [resourceValue];
     } else {
+        let fieldsToMatch: string[] = [];
+
         if (compiledSearchParam.path === 'name') {
             // name is a special parameter.
-            valuesFromResource = [
-                resourceValue?.family,
-                resourceValue?.given,
-                resourceValue?.text,
-                resourceValue?.prefix,
-                resourceValue?.suffix,
-            ];
+            fieldsToMatch = ['family', 'given', 'text', 'prefix', 'suffix'];
         }
-
         if (compiledSearchParam.path === 'address') {
             // address is a special parameter.
-            valuesFromResource = [
-                resourceValue?.city,
-                resourceValue?.country,
-                resourceValue?.district,
-                resourceValue?.line,
-                resourceValue?.postalCode,
-                resourceValue?.state,
-                resourceValue?.text,
-            ];
+            fieldsToMatch = ['city', 'country', 'district', 'line', 'postalCode', 'state', 'text'];
         }
+
+        valuesFromResource = fieldsToMatch.flatMap((field) => getAllValuesForFHIRPath(resourceValue, field));
     }
 
     return valuesFromResource.some((f) => op(f, value));

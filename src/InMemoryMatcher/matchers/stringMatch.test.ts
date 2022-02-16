@@ -48,6 +48,12 @@ describe('stringMatch', () => {
                         [field]: 'John',
                     }),
                 ).toBe(true);
+
+                expect(
+                    stringMatch(compiledNameParam, 'John', {
+                        [field]: ['John'],
+                    }),
+                ).toBe(true);
             });
         });
 
@@ -57,6 +63,12 @@ describe('stringMatch', () => {
                 expect(
                     stringMatch(compiledNameParam, 'somePlace', {
                         [field]: 'somePlace',
+                    }),
+                ).toBe(true);
+
+                expect(
+                    stringMatch(compiledNameParam, 'somePlace', {
+                        [field]: ['somePlace'],
                     }),
                 ).toBe(true);
             });
