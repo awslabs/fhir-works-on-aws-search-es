@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.10.1](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.10.0...v3.10.1) (2022-02-17)
+
+
+### Bug Fixes
+
+* update code coverage to not run on feat branches ([#175](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/175)) ([e4d9527](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/e4d95276e9d069b7f83aa4f2d48a964ad66c4888))
+
 ## [3.10.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.9.4...v3.10.0) (2022-02-09)
 
 
