@@ -86,7 +86,8 @@ export const parseSubscription = (
         channelPayload: resource?.channel?.payload,
         endpoint: resource?.channel?.endpoint,
         parsedCriteria: parseQueryString(fhirSearchParametersRegistry, resource?.criteria),
-        subscriptionId: resource?.id,
+        // eslint-disable-next-line no-underscore-dangle
+        subscriptionId: resource._tenantId ? resource._id : resource.id,
         // eslint-disable-next-line no-underscore-dangle
         tenantId: resource?._tenantId,
     };

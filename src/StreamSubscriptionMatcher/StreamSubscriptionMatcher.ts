@@ -7,6 +7,8 @@
 import { DynamoDBStreamEvent } from 'aws-lambda/trigger/dynamodb-stream';
 import { chunk } from 'lodash';
 import { FhirVersion, Persistence } from 'fhir-works-on-aws-interface';
+import { v4 } from 'uuid';
+import { SNSClient, PublishBatchCommand } from '@aws-sdk/client-sns';
 import {
     buildNotification,
     filterOutIneligibleResources,
@@ -42,6 +44,10 @@ export class StreamSubscriptionMatcher {
     private readonly persistence: Persistence;
 
     private readonly topicArn: string;
+
+    private readonly snsClient = new SNSClient({
+        region: process.env.AWS_REGION || 'us-west-2',
+    });
 
     private activeSubscriptions: AsyncRefreshCache<Subscription[]>;
 
@@ -96,8 +102,20 @@ export class StreamSubscriptionMatcher {
             ),
         );
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const chunks: SubscriptionNotification[][] = chunk(subscriptionNotifications, SNS_MAX_BATCH_SIZE);
-        // TODO: use publishBatch to send SNS messages.
+        await Promise.all(
+            chunk(subscriptionNotifications, SNS_MAX_BATCH_SIZE).map((subscriptionNotificationBatch) => {
+                const command = new PublishBatchCommand({
+                    PublishBatchRequestEntries: subscriptionNotificationBatch.map((subscriptionNotification) => ({
+                        Id: v4(), // The ID only needs to be unique within a batch. A UUID works well here
+                        Message: JSON.stringify(subscriptionNotification),
+                        MessageAttributes: {
+                            channelType: { DataType: 'String', StringValue: subscriptionNotification.channelType },
+                        },
+                    })),
+                    TopicArn: this.topicArn,
+                });
+                return this.snsClient.send(command);
+            }),
+        );
     }
 }
