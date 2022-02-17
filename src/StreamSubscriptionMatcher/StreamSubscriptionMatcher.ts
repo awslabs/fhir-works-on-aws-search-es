@@ -54,8 +54,8 @@ export class StreamSubscriptionMatcher {
     /**
      * @param persistence - Persistence implementation. Used to fetch the active Subscriptions
      * @param topicArn - arn of the SNS topic where notifications will be sent
-     * @param fhirVersion - FHIR version. Used to determine how to interpret search parameters
-     * @param compiledImplementationGuides - Additional search parameters from implementation guides
+     * @param options.fhirVersion - FHIR version. Used to determine how to interpret search parameters
+     * @param options.compiledImplementationGuides - Additional search parameters from implementation guides
      */
     constructor(
         persistence: Persistence,
