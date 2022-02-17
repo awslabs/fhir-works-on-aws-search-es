@@ -7,7 +7,8 @@
 import { DynamoDBStreamEvent } from 'aws-lambda/trigger/dynamodb-stream';
 import { chunk } from 'lodash';
 import { FhirVersion, Persistence } from 'fhir-works-on-aws-interface';
-
+import { v4 } from 'uuid';
+import { SNSClient, PublishBatchCommand } from '@aws-sdk/client-sns';
 import {
     buildNotification,
     filterOutIneligibleResources,
@@ -42,22 +43,30 @@ export class StreamSubscriptionMatcher {
 
     private readonly persistence: Persistence;
 
+    private readonly topicArn: string;
+
+    private readonly snsClient = new SNSClient({
+        region: process.env.AWS_REGION || 'us-west-2',
+    });
+
     private activeSubscriptions: AsyncRefreshCache<Subscription[]>;
 
     /**
      * @param persistence - Persistence implementation. Used to fetch the active Subscriptions
-     * @param compiledImplementationGuides
+     * @param topicArn - arn of the SNS topic where notifications will be sent
      * @param fhirVersion - FHIR version. Used to determine how to interpret search parameters
      * @param compiledImplementationGuides - Additional search parameters from implementation guides
      */
     constructor(
         persistence: Persistence,
+        topicArn: string,
         {
             fhirVersion = '4.0.1',
             compiledImplementationGuides,
         }: { fhirVersion?: FhirVersion; compiledImplementationGuides?: any } = {},
     ) {
         this.persistence = persistence;
+        this.topicArn = topicArn;
         this.fhirSearchParametersRegistry = new FHIRSearchParametersRegistry(fhirVersion, compiledImplementationGuides);
 
         this.activeSubscriptions = new AsyncRefreshCache<Subscription[]>(async () => {
@@ -73,7 +82,7 @@ export class StreamSubscriptionMatcher {
         }, ACTIVE_SUBSCRIPTIONS_CACHE_REFRESH_TIMEOUT);
     }
 
-    async match(dynamoDBStreamEvent: DynamoDBStreamEvent): Promise<SubscriptionNotification[][]> {
+    async match(dynamoDBStreamEvent: DynamoDBStreamEvent): Promise<void> {
         const eligibleResources = filterOutIneligibleResources(dynamoDBStreamEvent);
         const subscriptionNotifications: SubscriptionNotification[] = (await this.activeSubscriptions.get()).flatMap(
             (subscription) => {
@@ -93,6 +102,20 @@ export class StreamSubscriptionMatcher {
             ),
         );
 
-        return chunk(subscriptionNotifications, SNS_MAX_BATCH_SIZE);
+        await Promise.all(
+            chunk(subscriptionNotifications, SNS_MAX_BATCH_SIZE).map((subscriptionNotificationBatch) => {
+                const command = new PublishBatchCommand({
+                    PublishBatchRequestEntries: subscriptionNotificationBatch.map((subscriptionNotification) => ({
+                        Id: v4(), // The ID only needs to be unique within a batch. A UUID works well here
+                        Message: JSON.stringify(subscriptionNotification),
+                        MessageAttributes: {
+                            channelType: { DataType: 'String', StringValue: subscriptionNotification.channelType },
+                        },
+                    })),
+                    TopicArn: this.topicArn,
+                });
+                return this.snsClient.send(command);
+            }),
+        );
     }
 }
