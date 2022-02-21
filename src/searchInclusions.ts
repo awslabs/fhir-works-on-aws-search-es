@@ -9,6 +9,7 @@ import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import getComponentLogger from './loggerBuilder';
 import { Query } from './elasticSearchService';
 import { getAllValuesForFHIRPath } from './getAllValuesForFHIRPath';
+import { MAX_INCLUSION_PARAM_RESULTS } from './constants';
 
 const logger = getComponentLogger();
 
@@ -179,6 +180,7 @@ export const buildIncludeQuery = (
 ): Query => ({
     resourceType,
     queryRequest: {
+        size: MAX_INCLUSION_PARAM_RESULTS,
         body: {
             query: {
                 bool: {
@@ -207,6 +209,7 @@ export const buildRevIncludeQuery = (
     return {
         resourceType: sourceResource,
         queryRequest: {
+            size: MAX_INCLUSION_PARAM_RESULTS,
             body: {
                 query: {
                     bool: {
