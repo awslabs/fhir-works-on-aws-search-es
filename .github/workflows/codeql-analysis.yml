@@ -7,12 +7,10 @@ name: Security Code Scanning
 
 on:
   pull_request:
-    branches: [ mainline ]
+    branches: [ scan-feat-subscriptions" ]
     paths-ignore:
       - '**/*.md'
       - '**/*.txt'
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
   CodeQL-Analyze:
