@@ -368,7 +368,7 @@ export class ElasticSearchService implements Search {
         const apiResponse = await this.esClient.msearch({
             body: searchQueriesWithAlias.flatMap((query) => [
                 { index: query.index, ...(request.sessionId && { preference: request.sessionId }) },
-                { query: query.body!.query },
+                { size: query.size, query: query.body!.query },
             ]),
         });
 
