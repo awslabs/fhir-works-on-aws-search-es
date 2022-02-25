@@ -9,6 +9,9 @@ import { chunk } from 'lodash';
 import { FhirVersion, Persistence } from 'fhir-works-on-aws-interface';
 import { v4 } from 'uuid';
 import { SNSClient, PublishBatchCommand } from '@aws-sdk/client-sns';
+import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
+import https from 'https';
+import { captureAWSv3Client } from 'aws-xray-sdk';
 import {
     buildNotification,
     filterOutIneligibleResources,
@@ -45,9 +48,7 @@ export class StreamSubscriptionMatcher {
 
     private readonly topicArn: string;
 
-    private readonly snsClient = new SNSClient({
-        region: process.env.AWS_REGION || 'us-west-2',
-    });
+    private readonly snsClient: SNSClient;
 
     private activeSubscriptions: AsyncRefreshCache<Subscription[]>;
 
@@ -80,24 +81,40 @@ export class StreamSubscriptionMatcher {
 
             return activeSubscriptions;
         }, ACTIVE_SUBSCRIPTIONS_CACHE_REFRESH_TIMEOUT);
+
+        const agent = new https.Agent({
+            maxSockets: 150,
+        });
+
+        this.snsClient = captureAWSv3Client(
+            new SNSClient({
+                region: process.env.AWS_REGION || 'us-west-2',
+                maxAttempts: 2,
+                requestHandler: new NodeHttpHandler({ httpsAgent: agent }),
+            }),
+        );
     }
 
     async match(dynamoDBStreamEvent: DynamoDBStreamEvent): Promise<void> {
+        logger.info(`DynamoDb records in event: ${dynamoDBStreamEvent.Records.length}`);
         const eligibleResources = filterOutIneligibleResources(dynamoDBStreamEvent);
-        const subscriptionNotifications: SubscriptionNotification[] = (await this.activeSubscriptions.get()).flatMap(
-            (subscription) => {
-                return eligibleResources
-                    .filter((resource) => matchSubscription(subscription, resource))
-                    .map((resource) => buildNotification(subscription, resource));
-            },
-        );
+        logger.info(`FHIR resource create/update records: ${eligibleResources.length}`);
+
+        const activeSubscriptions = await this.activeSubscriptions.get();
+        logger.info(`Active Subscriptions: ${activeSubscriptions.length}`);
+
+        const subscriptionNotifications: SubscriptionNotification[] = activeSubscriptions.flatMap((subscription) => {
+            return eligibleResources
+                .filter((resource) => matchSubscription(subscription, resource))
+                .map((resource) => buildNotification(subscription, resource));
+        });
 
         logger.info(
             'Summary of notifications:',
             JSON.stringify(
                 subscriptionNotifications.map((s) => ({
-                    subscriptionId: s.subscriptionId,
-                    resourceId: s.matchedResource.id,
+                    subscriptionId: `Subscription/${s.subscriptionId}`,
+                    resourceId: `${s.matchedResource.resourceType}/${s.matchedResource.id}`,
                 })),
             ),
         );
@@ -117,5 +134,6 @@ export class StreamSubscriptionMatcher {
                 return this.snsClient.send(command);
             }),
         );
+        logger.info(`Notifications sent: ${subscriptionNotifications.length}`);
     }
 }
