@@ -32,6 +32,7 @@ import {
 import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
+import { parseQueryString } from './FhirQueryParser';
 import parseChainedParameters, { ChainParameter } from './QueryBuilder/chain';
 import getComponentLogger from './loggerBuilder';
 
@@ -517,6 +518,19 @@ export class ElasticSearchService implements Search {
         logger.info(request);
         this.assertValidTenancyMode(request.tenantId);
         throw new Error('Method not implemented.');
+    }
+
+    validateSubscriptionSearchCriteria(searchCriteria: string): void {
+        const { inclusionSearchParams, chainedSearchParams, otherParams } = parseQueryString(
+            this.fhirSearchParametersRegistry,
+            searchCriteria,
+        );
+        if (inclusionSearchParams || chainedSearchParams || otherParams) {
+            throw new InvalidSearchParameterError(
+                'Search string used for field criteria contains unsupported parameter, please remove: ' +
+                    '_revinclude, _include, _sort, _count and chained parameters',
+            );
+        }
     }
 
     private static buildSingleElasticSearchFilterPart(

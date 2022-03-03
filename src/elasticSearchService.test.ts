@@ -1174,3 +1174,49 @@ describe('typeSearch', () => {
         });
     });
 });
+
+describe('validateSubscriptionSearchCriteria', () => {
+    describe('Invalid search string', () => {
+        const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+
+        expect(() => {
+            es.validateSubscriptionSearchCriteria(
+                'Patient?general-practitioner:PractitionerRole.location:Location.address-city',
+            );
+        }).toThrowError(
+            new InvalidSearchParameterError(
+                'Search string used for field criteria contains unsupported parameter, please remove: _revinclude, _include, _sort, _count and chained parameters',
+            ),
+        );
+
+        expect(() => {
+            es.validateSubscriptionSearchCriteria('Patient?name=Harry&_count=10');
+        }).toThrowError(
+            new InvalidSearchParameterError(
+                'Search string used for field criteria contains unsupported parameter, please remove: _revinclude, _include, _sort, _count and chained parameters',
+            ),
+        );
+
+        expect(() => {
+            es.validateSubscriptionSearchCriteria('Patient?random-filed=random-value');
+        }).toThrowError(
+            new InvalidSearchParameterError("Invalid search parameter 'random-filed' for resource type Patient"),
+        );
+    });
+
+    describe('Valid search string', () => {
+        each([
+            'Patient?name=Harry',
+            'Patient?name=Harry&family=Potter',
+            'Patient?name=Ha?rry&family=Pott?er',
+            'Patient',
+            'Patient?',
+        ]).test('queryString=%j', (queryString: any) => {
+            const es = new ElasticSearchService(FILTER_RULES_FOR_ACTIVE_RESOURCES);
+
+            expect(() => {
+                es.validateSubscriptionSearchCriteria(queryString);
+            }).not.toThrow();
+        });
+    });
+});

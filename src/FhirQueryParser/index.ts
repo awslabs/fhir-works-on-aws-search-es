@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  */
-
-import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
 import { isEmpty } from 'lodash';
+import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
+import * as qs from 'qs';
 import { FHIRSearchParametersRegistry, SearchParam } from '../FHIRSearchParametersRegistry';
 import { isChainedParameter, normalizeQueryParams, parseSearchModifiers } from './util';
 import getComponentLogger from '../loggerBuilder';
@@ -170,6 +170,14 @@ const parseSearchQueryParam = (searchParam: SearchParam, rawSearchValue: string)
     }
 };
 
+const validateModifiers = ({ type, modifier }: QueryParam): void => {
+    // There are other valid modifiers in the FHIR spec, but this validation only accepts the modifiers currently implemented in FWoA
+    const SUPPORTED_MODIFIERS: string[] = ['exact', 'contains'];
+    if (type === 'string' && modifier !== undefined && !SUPPORTED_MODIFIERS.includes(modifier)) {
+        throw new InvalidSearchParameterError(`Unsupported string search modifier: ${modifier}`);
+    }
+};
+
 /**
  * Parse and validate the search query parameters. This method ignores _include, _revinclude, _sort, and chained parameters
  * @param fhirSearchParametersRegistry - instance of FHIRSearchParametersRegistry
@@ -230,6 +238,7 @@ export const parseQuery = (
         return searchValues.map((searchValue) => {
             const parsedQueryParam = parseSearchQueryParam(fhirSearchParam, searchValue);
             parsedQueryParam.modifier = searchModifier.modifier;
+            validateModifiers(parsedQueryParam);
             return parsedQueryParam;
         });
     });
@@ -241,4 +250,19 @@ export const parseQuery = (
         ...(!isEmpty(chainedSearchParams) && { chainedSearchParams }),
         ...(!isEmpty(otherParams) && { otherParams }),
     };
+};
+
+/**
+ * Parse and validate the search query parameters.
+ * @param fhirSearchParametersRegistry - instance of FHIRSearchParametersRegistry
+ * @param searchCriteria - Search criteria without the base url. Example: "Observation?code=http://loinc.org|1975-2"
+ */
+export const parseQueryString = (
+    fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
+    searchCriteria: string,
+): ParsedFhirQueryParams => {
+    const questionMarkIndex = searchCriteria.indexOf('?') === -1 ? searchCriteria.length : searchCriteria.indexOf('?');
+    const resourceType = searchCriteria.substring(0, questionMarkIndex);
+    const queryString = searchCriteria.substring(questionMarkIndex + 1);
+    return parseQuery(fhirSearchParametersRegistry, resourceType, qs.parse(queryString));
 };
