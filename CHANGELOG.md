@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.11.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.10.0...v3.11.0) (2022-03-03)
+
+
+### Features
+
+* add support for FHIR Subscriptions ([#178](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/178)) ([23f053a](https://github.com/awslabs/fhir-works-on-aws-search-es/commit/23f053a72960e61dffad8bcb2ae4dfc374deb7fe)), closes [#156](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/156) [#157](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/157) [#153](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/153) [#159](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/159) [#161](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/161) [#163](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/163) [#170](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/170) [#172](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/172) [#173](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/173) [#174](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/174) [#179](https://github.com/awslabs/fhir-works-on-aws-search-es/issues/179)
+
 ## [3.10.0](https://github.com/awslabs/fhir-works-on-aws-search-es/compare/v3.9.4...v3.10.0) (2022-02-09)
 
 
