@@ -16,6 +16,12 @@ import { parseTokenSearchValue, TokenSearchValue } from './typeParsers/tokenPars
 import { NumberSearchValue, parseNumberSearchValue } from './typeParsers/numberParser';
 import { parseQuantitySearchValue, QuantitySearchValue } from './typeParsers/quantityParser';
 import { parseReferenceSearchValue, ReferenceSearchValue } from './typeParsers/referenceParser';
+import {
+    InclusionSearchParameter,
+    WildcardInclusionSearchParameter,
+    InclusionSearchParameterType,
+} from '../searchInclusions';
+import { parseInclusionParams } from './searchInclusion';
 
 export { DateSearchValue, TokenSearchValue, NumberSearchValue, QuantitySearchValue };
 
@@ -86,7 +92,7 @@ export type QueryParam =
 export interface ParsedFhirQueryParams {
     resourceType: string;
     searchParams: QueryParam[];
-    inclusionSearchParams?: { [name: string]: string[] };
+    inclusionSearchParams?: (InclusionSearchParameter | WildcardInclusionSearchParameter)[];
     chainedSearchParams?: { [name: string]: string[] };
     otherParams?: { [name: string]: string[] };
 }
@@ -191,7 +197,7 @@ export const parseQuery = (
 ): ParsedFhirQueryParams => {
     const normalizedQueryParams: { [name: string]: string[] } = normalizeQueryParams(queryParams);
 
-    const inclusionSearchParams: { [name: string]: string[] } = {};
+    const inclusionSearchParams: (InclusionSearchParameter | WildcardInclusionSearchParameter)[] = [];
     const chainedSearchParams: { [name: string]: string[] } = {};
     const otherParams: { [name: string]: string[] } = {};
 
@@ -204,7 +210,9 @@ export const parseQuery = (
             }
 
             if (INCLUSION_PARAMETERS.includes(searchParameter)) {
-                inclusionSearchParams[searchParameter] = value;
+                inclusionSearchParams.push(
+                    ...parseInclusionParams(fhirSearchParametersRegistry, searchParameter, value),
+                );
                 return false;
             }
 

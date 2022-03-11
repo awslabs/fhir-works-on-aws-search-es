@@ -359,14 +359,24 @@ describe('queryParser', () => {
         });
         expect(q).toMatchInlineSnapshot(`
             Object {
-              "inclusionSearchParams": Object {
-                "_include": Array [
-                  "MedicationRequest:patient",
-                ],
-                "_revinclude": Array [
-                  "Provenance:target",
-                ],
-              },
+              "inclusionSearchParams": Array [
+                Object {
+                  "isWildcard": false,
+                  "path": "subject",
+                  "searchParameter": "patient",
+                  "sourceResource": "MedicationRequest",
+                  "targetResourceType": undefined,
+                  "type": "_include",
+                },
+                Object {
+                  "isWildcard": false,
+                  "path": "target",
+                  "searchParameter": "target",
+                  "sourceResource": "Provenance",
+                  "targetResourceType": undefined,
+                  "type": "_revinclude",
+                },
+              ],
               "resourceType": "MedicationRequest",
               "searchParams": Array [],
             }
