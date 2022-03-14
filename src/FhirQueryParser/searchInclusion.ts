@@ -1,10 +1,6 @@
 import { uniq } from 'lodash';
 import { InvalidSearchParameterError } from 'fhir-works-on-aws-interface';
-import {
-    InclusionSearchParameter,
-    WildcardInclusionSearchParameter,
-    InclusionSearchParameterType,
-} from '../searchInclusions';
+import { InclusionSearchParameter, WildcardInclusionSearchParameter } from '../searchInclusions';
 import { FHIRSearchParametersRegistry } from '../FHIRSearchParametersRegistry';
 
 export const inclusionParameterFromString = (

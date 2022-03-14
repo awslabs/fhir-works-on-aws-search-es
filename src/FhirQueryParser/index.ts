@@ -16,11 +16,7 @@ import { parseTokenSearchValue, TokenSearchValue } from './typeParsers/tokenPars
 import { NumberSearchValue, parseNumberSearchValue } from './typeParsers/numberParser';
 import { parseQuantitySearchValue, QuantitySearchValue } from './typeParsers/quantityParser';
 import { parseReferenceSearchValue, ReferenceSearchValue } from './typeParsers/referenceParser';
-import {
-    InclusionSearchParameter,
-    WildcardInclusionSearchParameter,
-    InclusionSearchParameterType,
-} from '../searchInclusions';
+import { InclusionSearchParameter, WildcardInclusionSearchParameter } from '../searchInclusions';
 import { parseInclusionParams } from './searchInclusion';
 
 export { DateSearchValue, TokenSearchValue, NumberSearchValue, QuantitySearchValue };
