@@ -29,10 +29,15 @@ import {
     MAX_ES_WINDOW_SIZE,
     MAX_CHAINED_PARAMS_RESULT,
 } from './constants';
-import { buildIncludeQueries, buildRevIncludeQueries } from './searchInclusions';
+import {
+    buildIncludeQueries,
+    buildRevIncludeQueries,
+    InclusionSearchParameter,
+    WildcardInclusionSearchParameter,
+} from './searchInclusions';
 import { FHIRSearchParametersRegistry } from './FHIRSearchParametersRegistry';
 import { buildQueryForAllSearchParameters, buildSortClause } from './QueryBuilder';
-import { parseQueryString } from './FhirQueryParser';
+import { parseQueryString, parseQuery, ParsedFhirQueryParams } from './FhirQueryParser';
 import parseChainedParameters, { ChainParameter } from './QueryBuilder/chain';
 import getComponentLogger from './loggerBuilder';
 
@@ -182,9 +187,16 @@ export class ElasticSearchService implements Search {
                 }
             }
 
+            const parsedFhirQueryParams: ParsedFhirQueryParams = parseQuery(
+                this.fhirSearchParametersRegistry,
+                request.resourceType,
+                request.queryParams,
+            );
+
             const query = buildQueryForAllSearchParameters(
                 this.fhirSearchParametersRegistry,
                 request,
+                parsedFhirQueryParams.searchParams,
                 this.useKeywordSubFields,
                 filter,
                 chainedParameterQuery,
@@ -239,11 +251,21 @@ export class ElasticSearchService implements Search {
                 );
             }
 
-            const includedResources = await this.processSearchInclusions(result.entries, request);
-            result.entries.push(...includedResources);
+            if (parsedFhirQueryParams.inclusionSearchParams) {
+                const includedResources = await this.processSearchInclusions(
+                    result.entries,
+                    request,
+                    parsedFhirQueryParams.inclusionSearchParams,
+                );
+                result.entries.push(...includedResources);
 
-            const iterativelyIncludedResources = await this.processIterativeSearchInclusions(result.entries, request);
-            result.entries.push(...iterativelyIncludedResources);
+                const iterativelyIncludedResources = await this.processIterativeSearchInclusions(
+                    result.entries,
+                    request,
+                    parsedFhirQueryParams.inclusionSearchParams,
+                );
+                result.entries.push(...iterativelyIncludedResources);
+            }
 
             return { result };
         } catch (error) {
@@ -273,9 +295,15 @@ export class ElasticSearchService implements Search {
                     resourceType,
                     queryParams: { [searchParam]: stepValue },
                 };
+                const parsedFhirQueryParams: ParsedFhirQueryParams = parseQuery(
+                    this.fhirSearchParametersRegistry,
+                    stepRequest.resourceType,
+                    stepRequest.queryParams,
+                );
                 const stepQuery = buildQueryForAllSearchParameters(
                     this.fhirSearchParametersRegistry,
                     stepRequest,
+                    parsedFhirQueryParams.searchParams,
                     this.useKeywordSubFields,
                     filters,
                 );
@@ -425,13 +453,14 @@ export class ElasticSearchService implements Search {
     private async processSearchInclusions(
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
+        inclusionSearchParameters: (InclusionSearchParameter | WildcardInclusionSearchParameter)[],
         iterative?: true,
     ): Promise<SearchEntry[]> {
-        const { queryParams, allowedResourceTypes, baseUrl } = request;
+        const { allowedResourceTypes, baseUrl } = request;
         const filter: any[] = this.getFilters(request);
 
         const includeSearchQueries: Query[] = buildIncludeQueries(
-            queryParams,
+            inclusionSearchParameters,
             searchEntries.map((x) => x.resource),
             filter,
             this.fhirSearchParametersRegistry,
@@ -439,7 +468,7 @@ export class ElasticSearchService implements Search {
         );
 
         const revIncludeSearchQueries: Query[] = buildRevIncludeQueries(
-            queryParams,
+            inclusionSearchParameters,
             searchEntries.map((x) => x.resource),
             filter,
             this.fhirSearchParametersRegistry,
@@ -459,6 +488,7 @@ export class ElasticSearchService implements Search {
     private async processIterativeSearchInclusions(
         searchEntries: SearchEntry[],
         request: TypeSearchRequest,
+        inclusionSearchParams: (InclusionSearchParameter | WildcardInclusionSearchParameter)[],
     ): Promise<SearchEntry[]> {
         if (!ITERATIVE_INCLUSION_PARAMETERS.some((param) => request.queryParams[param])) {
             return [];
@@ -474,7 +504,12 @@ export class ElasticSearchService implements Search {
         let resourcesToIterate = searchEntries;
         for (let i = 0; i < MAX_INCLUDE_ITERATIVE_DEPTH; i += 1) {
             // eslint-disable-next-line no-await-in-loop
-            const resourcesFound = await this.processSearchInclusions(resourcesToIterate, request, true);
+            const resourcesFound = await this.processSearchInclusions(
+                resourcesToIterate,
+                request,
+                inclusionSearchParams,
+                true,
+            );
 
             resourcesToIterate.forEach((resource) =>
                 resourceIdsWithInclusionsAlreadyResolved.add(resource.resource.id),

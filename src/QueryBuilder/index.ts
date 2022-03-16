@@ -19,6 +19,7 @@ import {
     ParsedFhirQueryParams,
     parseQuery,
     QuantitySearchValue,
+    QueryParam,
     TokenSearchValue,
 } from '../FhirQueryParser';
 import { ReferenceSearchValue } from '../FhirQueryParser/typeParsers/referenceParser';
@@ -135,17 +136,12 @@ function searchParamQuery(
 export const buildQueryForAllSearchParameters = (
     fhirSearchParametersRegistry: FHIRSearchParametersRegistry,
     request: TypeSearchRequest,
+    searchParams: QueryParam[],
     useKeywordSubFields: boolean,
     additionalFilters: any[] = [],
     chainedParameterQuery: any = {},
 ): any => {
-    const parsedFhirQueryParams: ParsedFhirQueryParams = parseQuery(
-        fhirSearchParametersRegistry,
-        request.resourceType,
-        request.queryParams,
-    );
-
-    const esQuery = parsedFhirQueryParams.searchParams.map((queryParam) => {
+    const esQuery = searchParams.map((queryParam) => {
         return searchParamQuery(
             queryParam.searchParam,
             queryParam.parsedSearchValues,

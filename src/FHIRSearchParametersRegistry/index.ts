@@ -175,25 +175,27 @@ export class FHIRSearchParametersRegistry {
      * @param resourceType
      * @param name
      * @param targetResourceType
-     * @return the matching SearchParam or undefined if there's no match
+     * @return the matching SearchParam or error message if there's no match
      */
     getReferenceSearchParameter(
         resourceType: string,
         name: string,
         targetResourceType?: string,
-    ): SearchParam | undefined {
+    ): SearchParam | { error: string } {
         const searchParam = this.getSearchParameter(resourceType, name);
 
         if (searchParam === undefined) {
-            return undefined;
+            return { error: `Search parameter ${name} does not exist in resource ${resourceType}` };
         }
 
         if (searchParam.type !== 'reference') {
-            return undefined;
+            return { error: `Search parameter ${name} is not of type reference in resource ${resourceType}` };
         }
 
         if (targetResourceType !== undefined && !searchParam.target?.includes(targetResourceType)) {
-            return undefined;
+            return {
+                error: `Search parameter ${name} in resource ${resourceType} does not point to target resource type ${targetResourceType}`,
+            };
         }
         return searchParam;
     }

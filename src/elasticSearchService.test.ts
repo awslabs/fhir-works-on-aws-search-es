@@ -506,7 +506,6 @@ describe('typeSearch', () => {
             [{ _revinclude: '*' }],
             [{ _revinclude: 'MedicationAdministration:request' }],
             [{ _revinclude: 'MedicationAdministration:request:MedicationRequest' }],
-            [{ _revinclude: 'MedicationAdministration:request:Device' }],
             [{ _revinclude: ['MedicationAdministration:request', 'Provenance:target'] }],
             [{ _revinclude: ['MedicationAdministration:request', 'MedicationAdministration:request'] }],
         ]).test('queryParams=%j', async (queryParams: any) => {
