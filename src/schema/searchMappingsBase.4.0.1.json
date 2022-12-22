@@ -4559,8 +4559,12 @@
       "type": "date"
     },
     {
-      "field": "item.serviceDate",
+      "field": "item.servicedDate",
       "type": "date"
+    },
+    {
+      "field": "item.servicedPeriod",
+      "type": "Period"
     }
   ],
   "Group": [
