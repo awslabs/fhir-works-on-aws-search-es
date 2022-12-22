@@ -4549,6 +4549,18 @@
     {
       "field": "type",
       "type": "CodeableConcept"
+    },
+    {
+      "field": "billablePeriod",
+      "type": "Period"
+    },
+    {
+      "field": "item.serviced",
+      "type": "date"
+    },
+    {
+      "field": "item.serviceDate",
+      "type": "date"
     }
   ],
   "Group": [
