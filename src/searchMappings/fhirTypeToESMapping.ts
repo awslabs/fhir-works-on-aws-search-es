@@ -18,6 +18,10 @@ const STRING_MAPPING = {
     },
 };
 
+const KEYWORD_MAPPING = {
+    type: 'keyword',
+};
+
 const DOUBLE_MAPPING = {
     type: 'float',
 };
@@ -218,7 +222,7 @@ const fhirTypeMapping: Record<string, any> = {
     base64Binary: STRING_MAPPING,
     boolean: BOOLEAN_MAPPING,
     canonical: STRING_MAPPING,
-    code: STRING_MAPPING,
+    code: KEYWORD_MAPPING,
     date: DATE_MAPPING,
     dateTime: DATE_MAPPING,
     decimal: DOUBLE_MAPPING,

@@ -198,7 +198,6 @@ export const parseQuery = (
     const otherParams: { [name: string]: string[] } = {};
 
     const searchableParams: [string, string[]][] = Object.entries(normalizedQueryParams).filter(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ([searchParameter, value]) => {
             if (isChainedParameter(searchParameter)) {
                 chainedSearchParams[searchParameter] = value;
